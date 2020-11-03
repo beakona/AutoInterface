@@ -2,7 +2,7 @@
 
 C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md) which redirects all interface-calls to backing member.
 
-Hand writtend source:
+Hand written source:
 
 ```csharp
 interface IPrintable
