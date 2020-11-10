@@ -12,7 +12,7 @@ Inside your .NET 5.0 project:
    <Analyzer Include="absolute-or-relative-path-to\BeaKona.AutoInterfaceGenerator.dll"/>
 </ItemGroup>
 ```
-2. Mark class `partial`.
+2. Mark class as `partial`.
 3. Explicitly enlist target interface in class interface list [NOTE: this is design decision, not technical restriction].
 4. Append attribute `BeaKona.AutoInterfaceAttribute` to backing member which will handle calls.
 <br><br>
