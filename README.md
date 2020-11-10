@@ -498,4 +498,4 @@ partial class Person<T>
 
 ---
 
-![.NET 5.0 preview](https://github.com/beakona/AutoInterface/workflows/.NET%20Core/badge.svg)
+![.NET Core](https://github.com/beakona/AutoInterface/workflows/.NET%20Core/badge.svg)
