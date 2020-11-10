@@ -15,9 +15,8 @@ env:
 
 jobs:
   build:
-
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
@@ -33,7 +32,6 @@ jobs:
 
   pack:
     needs: build
-    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
