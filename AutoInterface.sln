@@ -3,7 +3,32 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30626.31
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGenerator", "BeaKona.AutoInterfaceGenerator\BeaKona.AutoInterfaceGenerator.csproj", "{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGeneratorTest", "BeaKona.AutoInterfaceGeneratorTest\BeaKona.AutoInterfaceGeneratorTest.csproj", "{5879D401-B910-4377-BD93-DFAF5CCCAAD0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoInterfaceSample", "AutoInterfaceSample\AutoInterfaceSample.csproj", "{D80AD027-6463-4CBB-91B5-4952AE0204B3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A} = {FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5879D401-B910-4377-BD93-DFAF5CCCAAD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5879D401-B910-4377-BD93-DFAF5CCCAAD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5879D401-B910-4377-BD93-DFAF5CCCAAD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D80AD027-6463-4CBB-91B5-4952AE0204B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D80AD027-6463-4CBB-91B5-4952AE0204B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D80AD027-6463-4CBB-91B5-4952AE0204B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

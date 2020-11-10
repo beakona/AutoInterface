@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Analyzer Include="C:\Users\brani\source\git\AutoInterface\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
+  </ItemGroup>
+
+</Project>
