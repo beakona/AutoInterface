@@ -6,15 +6,15 @@ C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features
 ## How to use it?
 
 Inside your .NET 5.0 project:
-1. Add `BeaKona.AutoInterfaceGenerator.dll` as Analyzer to your Visual Studio project.
+1. Install NuGet package `BeaKona.AutoInterfaceGenerator` or add `BeaKona.AutoInterfaceGenerator.dll` as Analyzer to your Visual Studio `.csproj` file.
 ```xml
 <ItemGroup>
    <Analyzer Include="absolute-or-relative-path-to\BeaKona.AutoInterfaceGenerator.dll"/>
 </ItemGroup>
 ```
 2. Mark class `partial`.
-3. Enlist targeted interface in class interface list [NOTE: this is design decision, not technical restriction].
-4. Append attribute `BeaKona.AutoInterfaceAttribute` to backing member.
+3. Explicitly enlist target interface in class interface list [NOTE: this is design decision, not technical restriction].
+4. Append attribute `BeaKona.AutoInterfaceAttribute` to backing member which will handle calls.
 <br><br>
 
 ## Simple scenario
