@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
-    public interface ISourceTextBuilder
+    internal interface ISourceTextBuilder
     {
         IBuildContext Context
         {

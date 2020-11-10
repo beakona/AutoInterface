@@ -178,7 +178,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member &apos;{0}&apos; is static..
+        ///   Looks up a localized string similar to Type does not implement interface &apos;{0}&apos;..
         /// </summary>
         internal static string AG05_message {
             get {
@@ -187,7 +187,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Target member is static..
+        ///   Looks up a localized string similar to Type does not implement defined interface(s)..
         /// </summary>
         internal static string AG05_title {
             get {
@@ -273,33 +273,6 @@ namespace BeaKona.AutoInterfaceGenerator {
         internal static string AG08_title {
             get {
                 return ResourceManager.GetString("AG08_title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string AG09_description {
-            get {
-                return ResourceManager.GetString("AG09_description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type does not implement interface &apos;{0}&apos;..
-        /// </summary>
-        internal static string AG09_message {
-            get {
-                return ResourceManager.GetString("AG09_message", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type does not implement defined interface(s)..
-        /// </summary>
-        internal static string AG09_title {
-            get {
-                return ResourceManager.GetString("AG09_title", resourceCulture);
             }
         }
     }

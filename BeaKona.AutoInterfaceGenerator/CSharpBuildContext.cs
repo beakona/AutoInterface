@@ -7,7 +7,7 @@ using System.Collections.Immutable;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
-    public sealed class CSharpBuildContext : IBuildContext
+    internal sealed class CSharpBuildContext : IBuildContext
     {
         public CSharpBuildContext(Compilation compilation)
         {

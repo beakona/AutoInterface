@@ -111,13 +111,6 @@ namespace BeaKona
                                     // Get the symbol being declared by the member, and keep it if its annotated
                                     if (model.GetDeclaredSymbol(variableSyntax) is IFieldSymbol field)
                                     {
-                                        if (field.IsStatic)
-                                        {
-                                            ReportDiagnostic(context, "BK-AG05", nameof(AutoInterfaceResource.AG05_title), nameof(AutoInterfaceResource.AG05_message), nameof(AutoInterfaceResource.AG05_description), DiagnosticSeverity.Error, field,
-                                                field.Name);
-                                            break;
-                                        }
-
                                         Process(field, field.Type);
                                     }
                                 }
@@ -127,13 +120,6 @@ namespace BeaKona
                                 // Get the symbol being declared by the member, and keep it if its annotated
                                 if (model.GetDeclaredSymbol(propertySyntax) is IPropertySymbol property)
                                 {
-                                    if (property.IsStatic)
-                                    {
-                                        ReportDiagnostic(context, "BK-AG05", nameof(AutoInterfaceResource.AG05_title), nameof(AutoInterfaceResource.AG05_message), nameof(AutoInterfaceResource.AG05_description), DiagnosticSeverity.Error, property,
-                                            property.Name);
-                                        break;
-                                    }
-
                                     if (property.IsWriteOnly)
                                     {
                                         ReportDiagnostic(context, "BK-AG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
@@ -198,7 +184,7 @@ namespace BeaKona
                                 {
                                     if (emitted.Add(itemWithMissingInterface.InterfaceType))
                                     {
-                                        ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, itemWithMissingInterface.Member,
+                                        ReportDiagnostic(context, "BK-AG05", nameof(AutoInterfaceResource.AG05_title), nameof(AutoInterfaceResource.AG05_message), nameof(AutoInterfaceResource.AG05_description), DiagnosticSeverity.Error, itemWithMissingInterface.Member,
                                             itemWithMissingInterface.InterfaceType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                                     }
                                 }

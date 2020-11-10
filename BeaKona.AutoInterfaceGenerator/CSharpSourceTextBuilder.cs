@@ -7,7 +7,7 @@ using System.Text;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
-    public sealed class CSharpSourceTextBuilder : ISourceTextBuilder
+    internal sealed class CSharpSourceTextBuilder : ISourceTextBuilder
     {
         public CSharpSourceTextBuilder(CSharpBuildContext context)
         {
@@ -675,6 +675,18 @@ namespace BeaKona.AutoInterfaceGenerator
 
         #region helper methods
 
+        private void AppendHolderReference(ISymbol member, ScopeInfo scope)
+        {
+            if (member.IsStatic)
+            {
+                this.AppendTypeReference(member.ContainingType, scope);
+            }
+            else
+            {
+                this.Append("this");
+            }
+        }
+
         private void AppendMemberReference(AutoInterfaceInfo item, ScopeInfo scope)
         {
             if (item.CastRequired)
@@ -682,13 +694,15 @@ namespace BeaKona.AutoInterfaceGenerator
                 this.Append("((");
                 this.AppendTypeReference(item.InterfaceType, scope);
                 this.Append(')');
-                this.Append("this.");
+                this.AppendHolderReference(item.Member, scope);
+                this.Append('.');
                 this.AppendIdentifier(item.Member);
                 this.Append(')');
             }
             else
             {
-                this.Append("this.");
+                this.AppendHolderReference(item.Member, scope);
+                this.Append('.');
                 this.AppendIdentifier(item.Member);
             }
         }

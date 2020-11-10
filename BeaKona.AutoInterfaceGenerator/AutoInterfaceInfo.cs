@@ -2,7 +2,7 @@
 
 namespace BeaKona.AutoInterfaceGenerator
 {
-    public sealed class AutoInterfaceInfo
+    internal sealed class AutoInterfaceInfo
     {
         public AutoInterfaceInfo(ISymbol member, ITypeSymbol receiverType, AttributeData attribute, INamedTypeSymbol interfaceType)
         {

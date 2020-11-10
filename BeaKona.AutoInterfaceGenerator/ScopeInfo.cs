@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
-    public sealed class ScopeInfo
+    internal sealed class ScopeInfo
     {
         public ScopeInfo(Compilation compilation, ITypeSymbol type)
         {

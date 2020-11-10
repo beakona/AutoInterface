@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
-    public interface IBuildContext
+    internal interface IBuildContext
     {
         bool IsVerbatim(ISymbol symbol);
         bool IsNullableT(INamedTypeSymbol type);

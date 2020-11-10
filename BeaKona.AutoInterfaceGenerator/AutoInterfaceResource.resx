@@ -157,10 +157,10 @@
     <value />
   </data>
   <data name="AG05_message" xml:space="preserve">
-    <value>Member '{0}' is static.</value>
+    <value>Type does not implement interface '{0}'.</value>
   </data>
   <data name="AG05_title" xml:space="preserve">
-    <value>Target member is static.</value>
+    <value>Type does not implement defined interface(s).</value>
   </data>
   <data name="AG06_description" xml:space="preserve">
     <value />
@@ -188,14 +188,5 @@
   </data>
   <data name="AG08_title" xml:space="preserve">
     <value>Type is not a class, record or struct.</value>
-  </data>
-  <data name="AG09_description" xml:space="preserve">
-    <value />
-  </data>
-  <data name="AG09_message" xml:space="preserve">
-    <value>Type does not implement interface '{0}'.</value>
-  </data>
-  <data name="AG09_title" xml:space="preserve">
-    <value>Type does not implement defined interface(s).</value>
   </data>
 </root>
