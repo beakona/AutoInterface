@@ -499,3 +499,4 @@ partial class Person<T>
 ---
 
 ![.NET Core](https://github.com/beakona/AutoInterface/workflows/.NET%20Core/badge.svg)
+[![NuGet](https://img.shields.io/nuget/v/BeaKona.AutoInterfaceGenerator?style=flat-square)](https://www.nuget.org/packages/BeaKona.AutoInterfaceGenerator)
