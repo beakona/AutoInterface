@@ -483,11 +483,10 @@ partial class Person<T>
 | BK-AG02 | Type is static.                               |
 | BK-AG03 | Type is not an interface.                     |
 | BK-AG04 | Unable to cast.                               |
-| BK-AG05 | Target member is static.                      |
+| BK-AG05 | Type does not implement defined interface(s). |
 | BK-AG06 | Target member is writeonly.                   |
 | BK-AG07 | Type is not an interface.                     |
 | BK-AG08 | Type is not a class, record or struct.        |
-| BK-AG09 | Type does not implement defined interface(s). |
 
 <br>
 
