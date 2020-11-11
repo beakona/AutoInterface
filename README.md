@@ -5,7 +5,7 @@ C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features
 
 ## How to use it?
 
-Inside your .NET 5.0 project:
+Inside your .NET project:
 1. Install NuGet package `BeaKona.AutoInterfaceGenerator` or add `BeaKona.AutoInterfaceGenerator.dll` as Analyzer to your Visual Studio `.csproj` file.
 ```xml
 <ItemGroup>
