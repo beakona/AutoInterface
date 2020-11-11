@@ -79,6 +79,7 @@ namespace BeaKona.AutoInterfaceGenerator
         {
             if (this.indentation.Length > 1)
             {
+                //this.indentation = this.indentation[0..^1];
                 this.indentation = this.indentation.Substring(0, this.indentation.Length - 1);
             }
             else
@@ -709,6 +710,14 @@ namespace BeaKona.AutoInterfaceGenerator
 
         private static string AppendRefKind(RefKind kind)
         {
+            //return kind switch
+            //{
+            //    RefKind.None => "",
+            //    RefKind.In => "in ",
+            //    RefKind.Out => "out ",
+            //    RefKind.Ref => "ref ",
+            //    _ => throw new NotSupportedException(),
+            //};
             switch (kind)
             {
                 default: throw new NotSupportedException();
