@@ -5,10 +5,7 @@ namespace BeaKona.AutoInterfaceGenerator
 {
     internal interface ISourceTextBuilder
     {
-        IBuildContext Context
-        {
-            get;
-        }
+        IBuildContext Context { get; }
 
         void AppendLine();
 

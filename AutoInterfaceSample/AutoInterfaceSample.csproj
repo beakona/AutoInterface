@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Analyzer Include="C:\Users\brani\source\git\AutoInterface\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
+    <Analyzer Include="..\src\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
   </ItemGroup>
 
 </Project>

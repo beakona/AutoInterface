@@ -26,8 +26,7 @@ namespace BeaKona
         }
         public Type Type { get; }
     }
-}
-";
+}";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -166,10 +165,7 @@ namespace BeaKona
                                 continue;
                             }
 
-                            if (type.TypeKind == TypeKind.Class || type.TypeKind == TypeKind.Struct)
-                            {
-                            }
-                            else
+                            if (type.TypeKind != TypeKind.Class && type.TypeKind != TypeKind.Struct)
                             {
                                 ReportDiagnostic(context, "BK-AG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, group.First().Member);
                                 continue;
@@ -195,7 +191,7 @@ namespace BeaKona
                             ISourceTextBuilder builder = new CSharpSourceTextBuilder(buildContext);
                             if (this.ProcessClass(builder, context, group.Key, group))
                             {
-                                string name = group.Key.TypeArguments.Length > 0 ? $"{group.Key.Name}_{group.Key.TypeArguments.Length}" : group.Key.Name;
+                                string name = group.Key.Arity> 0 ? $"{group.Key.Name}_{group.Key.Arity}" : group.Key.Name;
                                 //GeneratePreview(context, name, builder.ToString());
                                 context.AddSource($"{name}_AutoInterface.cs", SourceText.From(builder.ToString(), Encoding.UTF8));
                             }
@@ -351,7 +347,7 @@ namespace BeaKona
             LocalizableString lmessage = new LocalizableResourceString(message, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
             LocalizableString? ldescription = new LocalizableResourceString(description, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
             string category = typeof(AutoInterfaceSourceGenerator).Namespace;
-            string? link = null;
+            string? link = "https://github.com/beakona/AutoInterface";
             DiagnosticDescriptor dd = new DiagnosticDescriptor(id, ltitle, lmessage, category, severity, true, ldescription, link, WellKnownDiagnosticTags.NotConfigurable);
             Diagnostic d = Diagnostic.Create(dd, location, messageArgs);
             context.ReportDiagnostic(d);
