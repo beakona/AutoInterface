@@ -9,6 +9,7 @@ on:
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_VERSION: 5.0.x
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 jobs:
   build:
