@@ -45,7 +45,7 @@ jobs:
         VERSION="${arrTag[2]}"
         echo Version: $VERSION
         VERSION="${VERSION//v}"
-        dotnet pack -c Release -p:PackageVersion=$VERSION BeaKona.AutoInterfaceGenerator
+        dotnet pack -c Release -p:PackageVersion=$VERSION src\BeaKona.AutoInterfaceGenerator
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
