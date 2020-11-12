@@ -13,7 +13,7 @@ Inside your .NET project:
 </ItemGroup>
 ```
 2. Mark class as `partial`.
-3. Explicitly enlist target interface in class interface list [NOTE: this is design decision, not technical restriction].
+3. Explicitly enlist target interface in class interface list [NOTE: this is a design decision, not technical restriction].
 4. Append attribute `BeaKona.AutoInterfaceAttribute` to backing member which will handle calls.
 <br><br>
 
