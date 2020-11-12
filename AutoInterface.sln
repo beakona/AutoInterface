@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30626.31
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGenerator", "src\BeaKona.AutoInterfaceGenerator\BeaKona.AutoInterfaceGenerator.csproj", "{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGenerator", "BeaKona.AutoInterfaceGenerator\BeaKona.AutoInterfaceGenerator.csproj", "{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGeneratorTest", "src\BeaKona.AutoInterfaceGeneratorTest\BeaKona.AutoInterfaceGeneratorTest.csproj", "{5879D401-B910-4377-BD93-DFAF5CCCAAD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGeneratorTest", "BeaKona.AutoInterfaceGeneratorTest\BeaKona.AutoInterfaceGeneratorTest.csproj", "{5879D401-B910-4377-BD93-DFAF5CCCAAD0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoInterfaceSample", "AutoInterfaceSample\AutoInterfaceSample.csproj", "{D80AD027-6463-4CBB-91B5-4952AE0204B3}"
 	ProjectSection(ProjectDependencies) = postProject
