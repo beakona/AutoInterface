@@ -71,6 +71,49 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void Append(char c) => this.output.Append(c);
 
+        public void AppendSeparated(string text)
+        {
+            if (text != null)
+            {
+                this.AppendSpaceIfNeccessary();
+                this.Append(text);
+            }
+        }
+
+        public void AppendSpaceIfNeccessary()
+        {
+            if (this.output.Length > 0)
+            {
+                char c = this.output[this.output.Length - 1];
+                switch (c)
+                {
+                    case ' ':
+                    case '\t':
+                    case '\r':
+                    case '\n':
+                    //case '.':
+                    //case '!':
+                    //case '?':
+                    //case ')':
+                    //case '(':
+                    //case '[':
+                    //case ']':
+                    //case '{':
+                    //case '}':
+                    //case '<':
+                    //case '>':
+                    //case '=':
+                    //case ',':
+                    //case ':':
+                    //case ';':
+                        break;
+                    default:
+                        this.output.Append(' ');
+                        break;
+                }
+            }
+        }
+
         private string indentation = "";
 
         public void IncrementIndentation() => this.indentation += '\t';
@@ -294,7 +337,8 @@ namespace BeaKona.AutoInterfaceGenerator
                 {
                     this.Append(", ");
                 }
-                this.Append(CSharpSourceTextBuilder.AppendRefKind(parameter.RefKind));
+                this.AppendRefKind(parameter.RefKind);
+                this.AppendSpaceIfNeccessary();
                 this.AppendIdentifier(parameter);
             }
         }
@@ -303,51 +347,21 @@ namespace BeaKona.AutoInterfaceGenerator
         {
             ScopeInfo methodScope = new ScopeInfo(scope);
 
-            bool useAsync = items.Count > 1;
-
-            bool isAsync = false;
-            bool returnsValue = false;
-            if (method.ReturnType is INamedTypeSymbol returnType)
-            {
-                if (returnType.IsGenericType)
-                {
-                    if (returnType.IsUnboundGenericType == false)
-                    {
-                        returnType = returnType.ConstructUnboundGenericType();
-                    }
-                    INamedTypeSymbol? symbolTask1 = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")?.ConstructUnboundGenericType();
-                    INamedTypeSymbol? symbolValueTask1 = compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask`1")?.ConstructUnboundGenericType();
-                    if (symbolTask1 != null && returnType.Equals(symbolTask1, SymbolEqualityComparer.Default) || symbolValueTask1 != null && returnType.Equals(symbolValueTask1, SymbolEqualityComparer.Default))
-                    {
-                        isAsync = true;
-                        returnsValue = true;
-                    }
-                }
-                else
-                {
-                    INamedTypeSymbol? symbolTask = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
-                    INamedTypeSymbol? symbolValueTask = compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask");
-                    if (symbolTask != null && returnType.Equals(symbolTask, SymbolEqualityComparer.Default) || symbolValueTask != null && returnType.Equals(symbolValueTask, SymbolEqualityComparer.Default))
-                    {
-                        isAsync = true;
-                        returnsValue = useAsync == false;
-                    }
-                }
-            }
-            if (isAsync == false)
-            {
-                returnsValue = method.ReturnsVoid == false;
-            }
-
             if (method.IsGenericMethod)
             {
                 methodScope.CreateAliases(method.TypeArguments);
             }
 
+            (bool isAsync, bool methodReturnsValue) = SemanticFacts.IsAsyncAndGetReturnType(compilation, method);
+
+            bool useAsync = items.Count > 1;
+            bool returnsValue = (isAsync && methodReturnsValue == false) ? useAsync == false : methodReturnsValue;
+
             this.AppendIndentation();
             if (isAsync && useAsync)
             {
-                this.Append("async ");
+                this.Append("async");
+                this.Append(' ');
             }
             this.AppendTypeReference(method.ReturnType, methodScope);
             this.Append(' ');
@@ -375,9 +389,14 @@ namespace BeaKona.AutoInterfaceGenerator
 
                 if (parameter.IsParams)
                 {
-                    this.Append("params ");
+                    this.Append("params");
+                    this.Append(' ');
                 }
-                this.Append(CSharpSourceTextBuilder.AppendRefKind(parameter.RefKind));
+                else
+                {
+                    this.AppendRefKind(parameter.RefKind);
+                    this.AppendSpaceIfNeccessary();
+                }
                 this.AppendTypeReference(parameter.Type, methodScope);
                 this.Append(' ');
                 this.AppendIdentifier(parameter);
@@ -408,7 +427,8 @@ namespace BeaKona.AutoInterfaceGenerator
                         this.AppendIndentation();
                         if (returnsValue && m + 1 == items.Count)
                         {
-                            this.Append("return ");
+                            this.Append("return");
+                            this.Append(' ');
                         }
                         this.AppendMethodCall(items[m], method, methodScope, isAsync && useAsync);
                         this.AppendLine();
@@ -445,7 +465,8 @@ namespace BeaKona.AutoInterfaceGenerator
                     {
                         this.Append(", ");
                     }
-                    this.Append(CSharpSourceTextBuilder.AppendRefKind(parameter.RefKind));
+                    this.AppendRefKind(parameter.RefKind);
+                    this.AppendSpaceIfNeccessary();
                     this.AppendTypeReference(parameter.Type, scope);
                     this.Append(' ');
                     this.AppendIdentifier(parameter);
@@ -556,7 +577,8 @@ namespace BeaKona.AutoInterfaceGenerator
         public void AppendEventDefinition(IEventSymbol @event, ScopeInfo scope, INamedTypeSymbol @interface, List<AutoInterfaceInfo> items)
         {
             this.AppendIndentation();
-            this.Append("event ");
+            this.Append("event");
+            this.Append(' ');
             this.AppendTypeReference(@event.Type, scope);
             this.Append(' ');
             this.AppendTypeReference(@interface, scope);
@@ -642,7 +664,8 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void AppendTypeDeclarationBegin(INamedTypeSymbol type, ScopeInfo scope)
         {
-            this.Append("partial ");
+            this.Append("partial");
+            this.Append(' ');
             if (type.TypeKind == TypeKind.Class)
             {
                 bool isRecord = type.DeclaringSyntaxReferences.Any(i => i.GetSyntax() is RecordDeclarationSyntax);
@@ -667,11 +690,24 @@ namespace BeaKona.AutoInterfaceGenerator
         public void AppendNamespaceBegin(string @namespace)
         {
             this.AppendIndentation();
-            this.Append("namespace ");
+            this.Append("namespace");
+            this.Append(' ');
             this.AppendLine(@namespace);
             this.AppendIndentation();
             this.AppendLine("{");
             this.IncrementIndentation();
+        }
+
+        public void AppendRefKind(RefKind kind)
+        {
+            switch (kind)
+            {
+                default: throw new NotSupportedException();
+                case RefKind.None: break;
+                case RefKind.In: this.Append("in"); break;
+                case RefKind.Out: this.Append("out"); break;
+                case RefKind.Ref: this.Append("ref"); break;
+            }
         }
 
         #region helper methods
@@ -708,31 +744,12 @@ namespace BeaKona.AutoInterfaceGenerator
             }
         }
 
-        private static string AppendRefKind(RefKind kind)
-        {
-            //return kind switch
-            //{
-            //    RefKind.None => "",
-            //    RefKind.In => "in ",
-            //    RefKind.Out => "out ",
-            //    RefKind.Ref => "ref ",
-            //    _ => throw new NotSupportedException(),
-            //};
-            switch (kind)
-            {
-                default: throw new NotSupportedException();
-                case RefKind.None: return "";
-                case RefKind.In: return "in ";
-                case RefKind.Out: return "out ";
-                case RefKind.Ref: return "ref ";
-            }
-        }
-
         private void AppendMethodCall(AutoInterfaceInfo item, IMethodSymbol method, ScopeInfo scope, bool async)
         {
             if (async)
             {
-                this.Append("await ");
+                this.Append("await");
+                this.Append(' ');
             }
             this.AppendMemberReference(item, scope);
             this.Append('.');

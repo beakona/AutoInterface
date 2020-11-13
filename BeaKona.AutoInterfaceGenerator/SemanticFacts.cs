@@ -69,5 +69,44 @@ namespace BeaKona.AutoInterfaceGenerator
 
             return symbols.ToArray();
         }
+
+        internal static (bool isAsync, bool returnsValue) IsAsyncAndGetReturnType(Compilation compilation, IMethodSymbol method)
+        {
+            bool isAsync = false;
+            bool returnsValue = false;
+            if (method.ReturnType is INamedTypeSymbol returnType)
+            {
+                if (returnType.IsGenericType)
+                {
+                    if (returnType.IsUnboundGenericType == false)
+                    {
+                        returnType = returnType.ConstructUnboundGenericType();
+                    }
+                    INamedTypeSymbol? symbolTask1 = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1")?.ConstructUnboundGenericType();
+                    INamedTypeSymbol? symbolValueTask1 = compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask`1")?.ConstructUnboundGenericType();
+                    if (symbolTask1 != null && returnType.Equals(symbolTask1, SymbolEqualityComparer.Default) || symbolValueTask1 != null && returnType.Equals(symbolValueTask1, SymbolEqualityComparer.Default))
+                    {
+                        isAsync = true;
+                        returnsValue = true;
+                    }
+                }
+                else
+                {
+                    INamedTypeSymbol? symbolTask = compilation.GetTypeByMetadataName("System.Threading.Tasks.Task");
+                    INamedTypeSymbol? symbolValueTask = compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask");
+                    if (symbolTask != null && returnType.Equals(symbolTask, SymbolEqualityComparer.Default) || symbolValueTask != null && returnType.Equals(symbolValueTask, SymbolEqualityComparer.Default))
+                    {
+                        isAsync = true;
+                        returnsValue = false;
+                    }
+                }
+            }
+            if (isAsync == false)
+            {
+                returnsValue = method.ReturnsVoid == false;
+            }
+
+            return (isAsync, returnsValue);
+        }
     }
 }

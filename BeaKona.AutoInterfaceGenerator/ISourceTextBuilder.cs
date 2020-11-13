@@ -17,6 +17,10 @@ namespace BeaKona.AutoInterfaceGenerator
 
         void Append(char c);
 
+        void AppendSeparated(string text);
+
+        void AppendSpaceIfNeccessary();
+
         void IncrementIndentation();
 
         void DecrementIndentation();
@@ -42,5 +46,7 @@ namespace BeaKona.AutoInterfaceGenerator
         void AppendTypeDeclarationBegin(INamedTypeSymbol type, ScopeInfo scope);
 
         void AppendNamespaceBegin(string @namespace);
+
+        void AppendRefKind(RefKind kind);
     }
 }
