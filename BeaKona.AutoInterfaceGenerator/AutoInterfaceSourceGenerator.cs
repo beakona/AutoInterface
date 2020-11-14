@@ -131,8 +131,6 @@ namespace BeaKona
                             }
                         }
 
-                        CSharpBuildContext buildContext = new CSharpBuildContext(compilation);
-
                         // group the elements by class, and generate the source
                         foreach (IGrouping<INamedTypeSymbol, AutoInterfaceInfo> group in symbols.GroupBy(i => i.Member.ContainingType))
                         {
@@ -188,12 +186,12 @@ namespace BeaKona
                                 continue;
                             }
 
-                            ISourceTextBuilder builder = new CSharpSourceTextBuilder(buildContext);
-                            if (this.ProcessClass(builder, context, group.Key, group))
+                            string? code = AutoInterfaceSourceGenerator.ProcessClass(compilation, group.Key, group);
+                            if(code != null)
                             {
                                 string name = group.Key.Arity> 0 ? $"{group.Key.Name}_{group.Key.Arity}" : group.Key.Name;
-                                //GeneratePreview(context, name, builder.ToString());
-                                context.AddSource($"{name}_AutoInterface.cs", SourceText.From(builder.ToString(), Encoding.UTF8));
+                                //GeneratePreview(context, name, code);
+                                context.AddSource($"{name}_AutoInterface.cs", SourceText.From(code, Encoding.UTF8));
                             }
                         }
                     }
@@ -213,21 +211,21 @@ namespace BeaKona
         //    context.AddSource($"Output_Debug_{name}.cs", SourceText.From(output.ToString(), Encoding.UTF8));
         //}
 
-        private bool ProcessClass(ISourceTextBuilder builder, GeneratorExecutionContext context, INamedTypeSymbol type, IEnumerable<AutoInterfaceInfo> infos)
+        private static string? ProcessClass(Compilation compilation, INamedTypeSymbol type, IEnumerable<IMemberInfo> infos)
         {
-            Compilation compilation = context.Compilation;
+            ScopeInfo scope = new ScopeInfo(type);
 
-            ScopeInfo scope = new ScopeInfo(compilation, type);
-
+            SourceBuilder sb = new SourceBuilder();
+            ICodeTextBuilder output = new CSharpCodeTextBuilder(compilation, sb);
             bool anyReasonToEmitSourceFile = false;
 
             //bool isNullable = compilation.Options.NullableContextOptions == NullableContextOptions.Enable;
-            builder.AppendLine("#nullable enable");
+            output.Builder.AppendLine("#nullable enable");
 
-            ImmutableArray<INamespaceSymbol> namespaceParts = type.ContainingNamespace != null && type.ContainingNamespace.IsGlobalNamespace == false ? builder.Context.GetNamespaceParts(type.ContainingNamespace) : new ImmutableArray<INamespaceSymbol>();
+            ImmutableArray<INamespaceSymbol> namespaceParts = type.ContainingNamespace != null && type.ContainingNamespace.IsGlobalNamespace == false ? SemanticFacts.GetNamespaceParts(type.ContainingNamespace) : new ImmutableArray<INamespaceSymbol>();
             if (namespaceParts.Length > 0)
             {
-                builder.AppendNamespaceBegin(string.Join(".", namespaceParts.Select(i => builder.Context.GetSourceIdentifier(i))));
+                output.AppendNamespaceBeginning(string.Join(".", namespaceParts.Select(i => output.GetSourceIdentifier(i))));
             }
 
             List<INamedTypeSymbol> containingTypes = new List<INamedTypeSymbol>();
@@ -238,26 +236,26 @@ namespace BeaKona
 
             foreach (INamedTypeSymbol ct in containingTypes)
             {
-                builder.AppendIndentation();
-                builder.AppendTypeDeclarationBegin(ct, new ScopeInfo(compilation, ct));
-                builder.AppendLine();
-                builder.AppendIndentation();
-                builder.AppendLine("{");
-                builder.IncrementIndentation();
+                output.Builder.AppendIndentation();
+                output.AppendTypeDeclarationBeginning(ct, new ScopeInfo(ct));
+                output.Builder.AppendLine();
+                output.Builder.AppendIndentation();
+                output.Builder.AppendLine('{');
+                output.Builder.IncrementIndentation();
             }
 
-            builder.AppendIndentation();
-            builder.AppendTypeDeclarationBegin(type, scope);
-            builder.AppendLine();
-            builder.AppendIndentation();
-            builder.AppendLine("{");
-            builder.IncrementIndentation();
+            output.Builder.AppendIndentation();
+            output.AppendTypeDeclarationBeginning(type, scope);
+            output.Builder.AppendLine();
+            output.Builder.AppendIndentation();
+            output.Builder.AppendLine('{');
+            output.Builder.IncrementIndentation();
 
             bool separatorRequired = false;
 
-            foreach (IGrouping<INamedTypeSymbol, AutoInterfaceInfo> group in infos.GroupBy(i => i.InterfaceType))
+            foreach (IGrouping<INamedTypeSymbol, IMemberInfo> group in infos.GroupBy(i => i.InterfaceType))
             {
-                List<AutoInterfaceInfo> items = group.ToList();
+                List<IMemberInfo> items = group.ToList();
 
                 foreach (ISymbol member in group.Key.GetMembers())
                 {
@@ -272,9 +270,9 @@ namespace BeaKona
 
                                 if (separatorRequired)
                                 {
-                                    builder.AppendLine();
+                                    output.Builder.AppendLine();
                                 }
-                                builder.AppendMethodDefinition(compilation, method, scope, group.Key, items);
+                                output.AppendMethodDefinition(method, scope, group.Key, items);
                                 separatorRequired = true;
                             }
                         }
@@ -284,10 +282,10 @@ namespace BeaKona
 
                             if (separatorRequired)
                             {
-                                builder.AppendLine();
+                                output.Builder.AppendLine();
                             }
 
-                            builder.AppendPropertyDefinition(property, scope, group.Key, items);
+                            output.AppendPropertyDefinition(property, scope, group.Key, items);
                             separatorRequired = true;
                         }
                         else if (member is IEventSymbol @event)
@@ -296,10 +294,10 @@ namespace BeaKona
 
                             if (separatorRequired)
                             {
-                                builder.AppendLine();
+                                output.Builder.AppendLine();
                             }
 
-                            builder.AppendEventDefinition(@event, scope, group.Key, items);
+                            output.AppendEventDefinition(@event, scope, group.Key, items);
                             separatorRequired = true;
                         }
                         else
@@ -310,25 +308,25 @@ namespace BeaKona
                 }
             }
 
-            builder.DecrementIndentation();
-            builder.AppendIndentation();
-            builder.AppendLine("}");
+            output.Builder.DecrementIndentation();
+            output.Builder.AppendIndentation();
+            output.Builder.AppendLine('}');
 
             for (int i = 0; i < containingTypes.Count; i++)
             {
-                builder.DecrementIndentation();
-                builder.AppendIndentation();
-                builder.AppendLine("}");
+                output.Builder.DecrementIndentation();
+                output.Builder.AppendIndentation();
+                output.Builder.AppendLine('}');
             }
 
             if (namespaceParts.Length > 0)
             {
-                builder.DecrementIndentation();
-                builder.AppendIndentation();
-                builder.AppendLine("}");
+                output.Builder.DecrementIndentation();
+                output.Builder.AppendIndentation();
+                output.Builder.AppendLine('}');
             }
 
-            return anyReasonToEmitSourceFile;
+            return anyReasonToEmitSourceFile ? output.ToString() : null;
         }
 
         private static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, SyntaxNode? node, params object?[] messageArgs)

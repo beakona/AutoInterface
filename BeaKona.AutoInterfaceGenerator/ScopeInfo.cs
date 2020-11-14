@@ -10,21 +10,18 @@ namespace BeaKona.AutoInterfaceGenerator
 {
     internal sealed class ScopeInfo
     {
-        public ScopeInfo(Compilation compilation, ITypeSymbol type)
+        public ScopeInfo(ITypeSymbol type)
         {
-            this.Compilation = compilation;
             this.Type = type;
             this.usedTypeArguments = new HashSet<string>(ScopeInfo.AllTypeArguments(type).Select(i => i.Name));
         }
 
         public ScopeInfo(ScopeInfo parentScope)
         {
-            this.Compilation = parentScope.Compilation;
             this.Type = parentScope.Type;
             this.usedTypeArguments = new HashSet<string>(parentScope.usedTypeArguments);
         }
 
-        public Compilation Compilation { get; }
         public ITypeSymbol Type { get; }
 
         private readonly HashSet<string> usedTypeArguments;

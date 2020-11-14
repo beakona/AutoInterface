@@ -1,10 +1,11 @@
 ﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
-    public static class SemanticFacts
+    internal static class SemanticFacts
     {
         public static string? ResolveAssemblyAlias(Compilation compilation, IAssemblySymbol assembly)
         {
@@ -107,6 +108,28 @@ namespace BeaKona.AutoInterfaceGenerator
             }
 
             return (isAsync, returnsValue);
+        }
+
+        public static bool IsNullableT(Compilation compilation, INamedTypeSymbol type)
+        {
+            if (type.IsGenericType && type.IsUnboundGenericType == false)
+            {
+                INamedTypeSymbol symbolNullableT = compilation.GetSpecialType(SpecialType.System_Nullable_T);
+
+                return symbolNullableT.ConstructUnboundGenericType().Equals(type.ConstructUnboundGenericType(), SymbolEqualityComparer.Default);
+            }
+
+            return false;
+        }
+
+        public static ImmutableArray<INamespaceSymbol> GetNamespaceParts(INamespaceSymbol @namespace)
+        {
+            List<INamespaceSymbol> parts = new List<INamespaceSymbol>();
+            for (; @namespace != null && @namespace.IsGlobalNamespace == false; @namespace = @namespace.ContainingNamespace)
+            {
+                parts.Insert(0, @namespace);
+            }
+            return parts.ToImmutableArray();
         }
     }
 }

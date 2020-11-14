@@ -21,10 +21,6 @@ namespace AutoInterfaceSample
     {
         [BeaKona.AutoInterface(typeof(IPrintable))]
         private readonly IPrintable aspect1 = new PersonPrinterV1();
-
-        void IPrintable.Print()
-        {
-        }
     }
 
     internal class PersonPrinterV1 : IPrintable
