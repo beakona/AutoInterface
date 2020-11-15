@@ -19,7 +19,7 @@ namespace AutoInterfaceSample
 
     public partial class Person : IPrintable
     {
-        [BeaKona.AutoInterface(typeof(IPrintable))]
+        [BeaKona.AutoInterface]
         private readonly IPrintable aspect1 = new PersonPrinterV1();
     }
 

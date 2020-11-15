@@ -20,11 +20,17 @@ namespace BeaKona
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
     public sealed class AutoInterfaceAttribute : Attribute
     {
+        public AutoInterfaceAttribute()
+        {
+        }
+
         public AutoInterfaceAttribute(Type type)
         {
             this.Type = type;
         }
-        public Type Type { get; }
+
+        public Type? Type { get; }
+        public bool AllowNullConditionOperator { get; set; }
     }
 }";
 
@@ -58,47 +64,7 @@ namespace BeaKona
                     if (compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceAttribute") is INamedTypeSymbol attributeSymbol)
                     {
                         // loop over the candidates, and keep the ones that are actually annotated
-                        List<AutoInterfaceInfo> symbols = new List<AutoInterfaceInfo>();
-
-                        void Process(ISymbol symbol, ITypeSymbol receiverType)
-                        {
-                            foreach (AttributeData attribute in symbol.GetAttributes())
-                            {
-                                if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default))
-                                {
-                                    if (attribute.ConstructorArguments.Length > 0)
-                                    {
-                                        if (attribute.ConstructorArguments[0].Value is INamedTypeSymbol type)
-                                        {
-                                            if (type.TypeKind == TypeKind.Interface)
-                                            {
-                                                if (receiverType.Equals(type, SymbolEqualityComparer.Default) || receiverType.AllInterfaces.Contains(type, SymbolEqualityComparer.Default))
-                                                {
-                                                    symbols.Add(new AutoInterfaceInfo(symbol, receiverType, attribute, type));
-                                                }
-                                                else
-                                                {
-                                                    ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                                        receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
-                                                    break;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                ReportDiagnostic(context, "BK-AG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                                    type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
-                                                break;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            ReportDiagnostic(context, "BK-AG07", nameof(AutoInterfaceResource.AG07_title), nameof(AutoInterfaceResource.AG07_message), nameof(AutoInterfaceResource.AG07_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax());
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        List<AutoInterfaceRecord> records = new List<AutoInterfaceRecord>();
 
                         foreach (MemberDeclarationSyntax candidate in receiver.Candidates)
                         {
@@ -110,7 +76,7 @@ namespace BeaKona
                                     // Get the symbol being declared by the member, and keep it if its annotated
                                     if (model.GetDeclaredSymbol(variableSyntax) is IFieldSymbol field)
                                     {
-                                        Process(field, field.Type);
+                                        records.AddRange(CollectRecords(context, field, field.Type, attributeSymbol));
                                     }
                                 }
                             }
@@ -123,16 +89,16 @@ namespace BeaKona
                                     {
                                         ReportDiagnostic(context, "BK-AG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
                                             property.Name);
-                                        break;
+                                        continue;
                                     }
 
-                                    Process(property, property.Type);
+                                    records.AddRange(CollectRecords(context, property, property.Type, attributeSymbol));
                                 }
                             }
                         }
 
                         // group the elements by class, and generate the source
-                        foreach (IGrouping<INamedTypeSymbol, AutoInterfaceInfo> group in symbols.GroupBy(i => i.Member.ContainingType))
+                        foreach (IGrouping<INamedTypeSymbol, AutoInterfaceRecord> group in records.GroupBy(i => i.Member.ContainingType))
                         {
                             INamedTypeSymbol type = group.Key;
 
@@ -169,12 +135,12 @@ namespace BeaKona
                                 continue;
                             }
 
-                            List<AutoInterfaceInfo> itemsWithMissingInterface = group.Where(i => type.Interfaces.Contains(i.InterfaceType, SymbolEqualityComparer.Default) == false).ToList();
+                            List<AutoInterfaceRecord> itemsWithMissingInterface = group.Where(i => type.Interfaces.Contains(i.InterfaceType, SymbolEqualityComparer.Default) == false).ToList();
 
                             if (itemsWithMissingInterface.Count > 0)
                             {
                                 HashSet<INamedTypeSymbol> emitted = new HashSet<INamedTypeSymbol>();
-                                foreach (AutoInterfaceInfo itemWithMissingInterface in itemsWithMissingInterface)
+                                foreach (AutoInterfaceRecord itemWithMissingInterface in itemsWithMissingInterface)
                                 {
                                     if (emitted.Add(itemWithMissingInterface.InterfaceType))
                                     {
@@ -210,6 +176,83 @@ namespace BeaKona
         //    output.AppendLine("}");
         //    context.AddSource($"Output_Debug_{name}.cs", SourceText.From(output.ToString(), Encoding.UTF8));
         //}
+
+        private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol attributeSymbol)
+        {
+            List<AutoInterfaceRecord> records = new List<AutoInterfaceRecord>();
+
+            foreach (AttributeData attribute in symbol.GetAttributes())
+            {
+                if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default))
+                {
+                    ITypeSymbol? type = null;
+                    if (attribute.ConstructorArguments.Length == 0)
+                    {
+                        type = receiverType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+                    }
+                    else
+                    {
+                        if (attribute.ConstructorArguments[0].Value is ITypeSymbol targetType)
+                        {
+                            type = targetType;
+                        }
+                    }
+
+                    if (type == null)
+                    {
+                        ReportDiagnostic(context, "BK-AG07", nameof(AutoInterfaceResource.AG07_title), nameof(AutoInterfaceResource.AG07_message), nameof(AutoInterfaceResource.AG07_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax());
+                        continue;
+                    }
+                    else if (type.TypeKind == TypeKind.Interface)
+                    {
+                        if (receiverType.Equals(type, SymbolEqualityComparer.Default) || receiverType.AllInterfaces.Contains(type, SymbolEqualityComparer.Default))
+                        {
+                            if (type is INamedTypeSymbol interfaceType)
+                            {
+                                bool allowNullConditionOperator = false;
+
+                                #region collect named arguments [only one argument for now]
+
+                                foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
+                                {
+                                    if (arg.Key == "AllowNullConditionOperator")
+                                    {
+                                        if (arg.Value.Value is bool b)
+                                        {
+                                            allowNullConditionOperator = b;
+                                        }
+                                    }
+                                }
+
+                                #endregion
+
+                                records.Add(new AutoInterfaceRecord(symbol, receiverType, attribute, interfaceType, allowNullConditionOperator));
+                            }
+                            else
+                            {
+                                ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                    157834);
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        ReportDiagnostic(context, "BK-AG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                            type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        continue;
+                    }
+                }
+            }
+
+            return records;
+        }
 
         private static string? ProcessClass(Compilation compilation, INamedTypeSymbol type, IEnumerable<IMemberInfo> infos)
         {

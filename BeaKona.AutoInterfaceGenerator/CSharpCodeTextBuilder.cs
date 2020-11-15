@@ -311,7 +311,7 @@ namespace BeaKona.AutoInterfaceGenerator
             if (items.Count == 1)
             {
                 this.Builder.Append(" => ");
-                this.AppendMethodCall(items[0], method, methodScope, isAsync && useAsync);
+                this.AppendMethodCall(items[0], method, methodScope, isAsync && useAsync, false);
                 this.Builder.AppendLine(';');
             }
             else
@@ -321,16 +321,21 @@ namespace BeaKona.AutoInterfaceGenerator
                 this.Builder.AppendLine('{');
                 for (int m = 0; m < items.Count; m++)
                 {
+                    IMemberInfo item = items[m];
+                    bool last = m + 1 == items.Count;
+
                     this.Builder.IncrementIndentation();
                     try
                     {
                         this.Builder.AppendIndentation();
-                        if (returnsValue && m + 1 == items.Count)
+                        if (returnsValue && last)
                         {
                             this.Builder.Append("return");
                             this.Builder.Append(' ');
                         }
-                        this.AppendMethodCall(items[m], method, methodScope, isAsync && useAsync);
+
+                        bool async = isAsync && useAsync;
+                        this.AppendMethodCall(item, method, methodScope, async, item.AllowNullConditionOperator && !async && !(returnsValue && last));
                         this.Builder.AppendLine(';');
                     }
                     finally
@@ -396,7 +401,7 @@ namespace BeaKona.AutoInterfaceGenerator
             if (property.SetMethod == null)
             {
                 this.Builder.Append(" => ");
-                this.AppendMemberReference(items[0], scope);
+                this.AppendMemberReferenceForAccess(items[0], scope, false);
                 AppendDefinition(property);
                 this.Builder.AppendLine(';');
             }
@@ -416,7 +421,7 @@ namespace BeaKona.AutoInterfaceGenerator
                         {
                             this.Builder.AppendIndentation();
                             this.Builder.Append("get => ");
-                            this.AppendMemberReference(item, scope);
+                            this.AppendMemberReferenceForAccess(item, scope, false);
                             AppendDefinition(property);
                             this.Builder.AppendLine(';');
                         }
@@ -424,7 +429,7 @@ namespace BeaKona.AutoInterfaceGenerator
                         {
                             this.Builder.AppendIndentation();
                             this.Builder.Append("set => ");
-                            this.AppendMemberReference(item, scope);
+                            this.AppendMemberReferenceForAccess(item, scope, item.AllowNullConditionOperator);
                             AppendDefinition(property);
                             this.Builder.AppendLine(" = value;");
                         }
@@ -435,7 +440,7 @@ namespace BeaKona.AutoInterfaceGenerator
                         {
                             this.Builder.AppendIndentation();
                             this.Builder.Append("get => ");
-                            this.AppendMemberReference(items.Last(), scope);
+                            this.AppendMemberReferenceForAccess(items.Last(), scope, false);
                             AppendDefinition(property);
                             this.Builder.AppendLine(';');
                         }
@@ -445,13 +450,16 @@ namespace BeaKona.AutoInterfaceGenerator
                             this.Builder.AppendLine("set");
                             this.Builder.AppendIndentation();
                             this.Builder.AppendLine('{');
-                            foreach (IMemberInfo item in items)
+                            for (int m = 0; m < items.Count; m++)
                             {
+                                IMemberInfo item = items[m];
+                                bool last = m + 1 == items.Count;
+
                                 this.Builder.IncrementIndentation();
                                 try
                                 {
                                     this.Builder.AppendIndentation();
-                                    this.AppendMemberReference(item, scope);
+                                    this.AppendMemberReferenceForAccess(item, scope, item.AllowNullConditionOperator && !last);
                                     AppendDefinition(property);
                                     this.Builder.AppendLine(" = value;");
                                 }
@@ -495,13 +503,13 @@ namespace BeaKona.AutoInterfaceGenerator
                     IMemberInfo item = items[0];
                     this.Builder.AppendIndentation();
                     this.Builder.Append("add => ");
-                    this.AppendMemberReference(item, scope);
+                    this.AppendMemberReferenceForAccess(item, scope, item.AllowNullConditionOperator);
                     this.Builder.Append('.');
                     this.AppendIdentifier(@event);
                     this.Builder.AppendLine(" += value;");
                     this.Builder.AppendIndentation();
                     this.Builder.Append("remove => ");
-                    this.AppendMemberReference(item, scope);
+                    this.AppendMemberReferenceForAccess(item, scope, item.AllowNullConditionOperator);
                     this.Builder.Append('.');
                     this.AppendIdentifier(@event);
                     this.Builder.AppendLine(" -= value;");
@@ -512,13 +520,16 @@ namespace BeaKona.AutoInterfaceGenerator
                     this.Builder.AppendLine("add");
                     this.Builder.AppendIndentation();
                     this.Builder.AppendLine('{');
-                    foreach (IMemberInfo item in items)
+                    for (int m = 0; m < items.Count; m++)
                     {
+                        IMemberInfo item = items[m];
+                        bool last = m + 1 == items.Count;
+
                         this.Builder.IncrementIndentation();
                         try
                         {
                             this.Builder.AppendIndentation();
-                            this.AppendMemberReference(item, scope);
+                            this.AppendMemberReferenceForAccess(item, scope, item.AllowNullConditionOperator && !last);
                             this.Builder.Append('.');
                             this.AppendIdentifier(@event);
                             this.Builder.AppendLine(" += value;");
@@ -534,13 +545,16 @@ namespace BeaKona.AutoInterfaceGenerator
                     this.Builder.AppendLine("remove");
                     this.Builder.AppendIndentation();
                     this.Builder.AppendLine('{');
-                    foreach (IMemberInfo item in items)
+                    for(int m = 0; m < items.Count; m++)
                     {
+                        IMemberInfo item = items[m];
+                        bool last = m + 1 == items.Count;
+
                         this.Builder.IncrementIndentation();
                         try
                         {
                             this.Builder.AppendIndentation();
-                            this.AppendMemberReference(item, scope);
+                            this.AppendMemberReferenceForAccess(item, scope, item.AllowNullConditionOperator && !last);
                             this.Builder.Append('.');
                             this.AppendIdentifier(@event);
                             this.Builder.AppendLine(" -= value;");
@@ -610,16 +624,28 @@ namespace BeaKona.AutoInterfaceGenerator
             }
         }
 
-        public void AppendMemberReference(IMemberInfo item, ScopeInfo scope)
+        public void AppendMemberReference(IMemberInfo item, ScopeInfo scope, bool willUseNullConditionOperator)
         {
             if (item.CastRequired)
             {
-                this.Builder.Append("((");
-                this.AppendTypeReference(item.InterfaceType, scope);
-                this.Builder.Append(')');
-                this.AppendHolderReference(item.Member, scope);
-                this.Builder.Append('.');
-                this.AppendIdentifier(item.Member);
+                this.Builder.Append('(');
+                if (willUseNullConditionOperator)
+                {
+                    this.AppendHolderReference(item.Member, scope);
+                    this.Builder.Append('.');
+                    this.AppendIdentifier(item.Member);
+                    this.Builder.Append(" as ");
+                    this.AppendTypeReference(item.InterfaceType.WithNullableAnnotation(NullableAnnotation.NotAnnotated), scope);
+                }
+                else
+                {
+                    this.Builder.Append('(');
+                    this.AppendTypeReference(item.InterfaceType.WithNullableAnnotation(NullableAnnotation.NotAnnotated), scope);
+                    this.Builder.Append(')');
+                    this.AppendHolderReference(item.Member, scope);
+                    this.Builder.Append('.');
+                    this.AppendIdentifier(item.Member);
+                }
                 this.Builder.Append(')');
             }
             else
@@ -630,14 +656,23 @@ namespace BeaKona.AutoInterfaceGenerator
             }
         }
 
-        public void AppendMethodCall(IMemberInfo item, IMethodSymbol method, ScopeInfo scope, bool async)
+        public void AppendMemberReferenceForAccess(IMemberInfo item, ScopeInfo scope, bool useNullConditionOperator)
+        {
+            this.AppendMemberReference(item, scope, useNullConditionOperator);
+            if (useNullConditionOperator)
+            {
+                this.Builder.Append('?');
+            }
+        }
+
+        public void AppendMethodCall(IMemberInfo item, IMethodSymbol method, ScopeInfo scope, bool async, bool useNullConditionOperator)
         {
             if (async)
             {
                 this.Builder.Append("await");
                 this.Builder.Append(' ');
             }
-            this.AppendMemberReference(item, scope);
+            this.AppendMemberReferenceForAccess(item, scope, useNullConditionOperator);
             this.Builder.Append('.');
             this.AppendIdentifier(method);
             if (method.IsGenericMethod)

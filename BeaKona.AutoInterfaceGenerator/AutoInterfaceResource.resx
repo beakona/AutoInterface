@@ -178,7 +178,7 @@
     <value>Type cannot be null.</value>
   </data>
   <data name="AG07_title" xml:space="preserve">
-    <value>Type is not an interface.</value>
+    <value>Type should be an interface.</value>
   </data>
   <data name="AG08_description" xml:space="preserve">
     <value />
@@ -188,5 +188,14 @@
   </data>
   <data name="AG08_title" xml:space="preserve">
     <value>Type is not a class, record or struct.</value>
+  </data>
+  <data name="AG09_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG09_message" xml:space="preserve">
+    <value>Internal exception [code={0}].</value>
+  </data>
+  <data name="AG09_title" xml:space="preserve">
+    <value>Internal exception.</value>
   </data>
 </root>

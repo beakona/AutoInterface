@@ -28,9 +28,11 @@ namespace BeaKona.AutoInterfaceGenerator
 
         void AppendHolderReference(ISymbol member, ScopeInfo scope);
 
-        void AppendMemberReference(IMemberInfo item, ScopeInfo scope);
+        void AppendMemberReference(IMemberInfo item, ScopeInfo scope, bool useNullConditionOperator);
 
-        void AppendMethodCall(IMemberInfo item, IMethodSymbol method, ScopeInfo scope, bool async);
+        void AppendMemberReferenceForAccess(IMemberInfo item, ScopeInfo scope, bool useNullConditionOperator);
+
+        void AppendMethodCall(IMemberInfo item, IMethodSymbol method, ScopeInfo scope, bool async, bool useNullConditionOperator);
 
         string GetSourceIdentifier(ISymbol symbol);
     }

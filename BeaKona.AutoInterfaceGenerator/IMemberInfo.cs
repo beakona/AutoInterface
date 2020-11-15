@@ -4,8 +4,9 @@ namespace BeaKona.AutoInterfaceGenerator
 {
     internal interface IMemberInfo
     {
-        bool CastRequired { get; }
         ISymbol Member { get; }
         INamedTypeSymbol InterfaceType { get; }
+        bool CastRequired { get; }
+        bool AllowNullConditionOperator { get; }
     }
 }

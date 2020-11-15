@@ -241,7 +241,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type is not an interface..
+        ///   Looks up a localized string similar to Type should be an interface..
         /// </summary>
         internal static string AG07_title {
             get {
@@ -273,6 +273,33 @@ namespace BeaKona.AutoInterfaceGenerator {
         internal static string AG08_title {
             get {
                 return ResourceManager.GetString("AG08_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG09_description {
+            get {
+                return ResourceManager.GetString("AG09_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal exception [code={0}]..
+        /// </summary>
+        internal static string AG09_message {
+            get {
+                return ResourceManager.GetString("AG09_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal exception..
+        /// </summary>
+        internal static string AG09_title {
+            get {
+                return ResourceManager.GetString("AG09_title", resourceCulture);
             }
         }
     }
