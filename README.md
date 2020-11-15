@@ -1,7 +1,6 @@
 # AutoInterface
 
-C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md) which redirects all interface-calls to a backing member.
-Source can be generated for a `class`, `record`, or `struct`.
+C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md) which redirects all interface-calls to a backing member. Source can be generated for a `class`, `record`, or `struct`.
 <br>
 
 Manually written source:
