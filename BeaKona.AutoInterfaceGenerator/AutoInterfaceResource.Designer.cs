@@ -187,7 +187,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type does not implement defined interface(s)..
+        ///   Looks up a localized string similar to Type does not implement a defined interface(s)..
         /// </summary>
         internal static string AG05_title {
             get {
@@ -268,7 +268,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type is not a class, record or struct..
+        ///   Looks up a localized string similar to Type is not a class, record, or struct..
         /// </summary>
         internal static string AG08_title {
             get {
