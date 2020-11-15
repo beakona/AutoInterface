@@ -14,6 +14,7 @@ namespace BeaKona.AutoInterfaceGenerator
     public class AutoInterfaceSourceGenerator : ISourceGenerator
     {
         private const string attributeText = @"
+#nullable enable
 namespace BeaKona
 {
     using System;
