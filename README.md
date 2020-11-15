@@ -28,7 +28,7 @@ partial class Person
 ```
 <br>
 
-Other examples can be found in [repository wiki](https://github.com/beakona/AutoInterface/wiki/Examples).
+Other examples can be found in [wiki](https://github.com/beakona/AutoInterface/wiki/Examples).
 
 <br>
 
