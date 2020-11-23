@@ -31,7 +31,6 @@ partial class Person
 Other examples can be found in [wiki](https://github.com/beakona/AutoInterface/wiki/Examples).
 
 <br>
-
 ---
 
 ![.NET Core](https://github.com/beakona/AutoInterface/workflows/.NET%20Core/badge.svg)
