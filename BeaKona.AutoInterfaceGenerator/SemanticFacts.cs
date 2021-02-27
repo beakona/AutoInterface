@@ -110,13 +110,40 @@ namespace BeaKona.AutoInterfaceGenerator
             return (isAsync, returnsValue);
         }
 
+        public static bool IsNullable(Compilation compilation, ITypeSymbol type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (type.NullableAnnotation == NullableAnnotation.Annotated)
+            {
+                return true;
+            }
+            else if (type is INamedTypeSymbol namedType)
+            {
+                return SemanticFacts.IsNullableT(compilation, namedType);
+            }
+
+            return false;
+        }
+
         public static bool IsNullableT(Compilation compilation, INamedTypeSymbol type)
         {
-            if (type.IsGenericType && type.IsUnboundGenericType == false)
+            if (type == null)
             {
-                INamedTypeSymbol symbolNullableT = compilation.GetSpecialType(SpecialType.System_Nullable_T);
+                throw new ArgumentNullException(nameof(type));
+            }
 
-                return symbolNullableT.ConstructUnboundGenericType().Equals(type.ConstructUnboundGenericType(), SymbolEqualityComparer.Default);
+            if (type.IsValueType)
+            {
+                if (type.IsGenericType && type.IsUnboundGenericType == false)
+                {
+                    INamedTypeSymbol symbolNullableT = compilation.GetSpecialType(SpecialType.System_Nullable_T);
+
+                    return symbolNullableT.ConstructUnboundGenericType().Equals(type.ConstructUnboundGenericType(), SymbolEqualityComparer.Default);
+                }
             }
 
             return false;

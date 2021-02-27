@@ -31,7 +31,8 @@ namespace BeaKona
         }
 
         public Type? Type { get; }
-        public bool AllowNullConditionOperator { get; set; }
+        public string? TemplateLanguage { get; set; }
+        public string? TemplateBody { get; set; }
     }
 }";
 
@@ -136,12 +137,12 @@ namespace BeaKona
                                 continue;
                             }
 
-                            List<AutoInterfaceRecord> itemsWithMissingInterface = group.Where(i => type.Interfaces.Contains(i.InterfaceType, SymbolEqualityComparer.Default) == false).ToList();
+                            List<AutoInterfaceRecord> referencesWithMissingInterface = group.Where(i => type.Interfaces.Contains(i.InterfaceType, SymbolEqualityComparer.Default) == false).ToList();
 
-                            if (itemsWithMissingInterface.Count > 0)
+                            if (referencesWithMissingInterface.Count > 0)
                             {
                                 HashSet<INamedTypeSymbol> emitted = new HashSet<INamedTypeSymbol>();
-                                foreach (AutoInterfaceRecord itemWithMissingInterface in itemsWithMissingInterface)
+                                foreach (AutoInterfaceRecord itemWithMissingInterface in referencesWithMissingInterface)
                                 {
                                     if (emitted.Add(itemWithMissingInterface.InterfaceType))
                                     {
@@ -153,12 +154,20 @@ namespace BeaKona
                                 continue;
                             }
 
-                            string? code = AutoInterfaceSourceGenerator.ProcessClass(compilation, group.Key, group);
-                            if(code != null)
+                            try
                             {
-                                string name = group.Key.Arity> 0 ? $"{group.Key.Name}_{group.Key.Arity}" : group.Key.Name;
-                                //GeneratePreview(context, name, code);
-                                context.AddSource($"{name}_AutoInterface.cs", SourceText.From(code, Encoding.UTF8));
+                                string? code = AutoInterfaceSourceGenerator.ProcessClass(context, compilation, group.Key, group);
+                                if (code != null)
+                                {
+                                    string name = group.Key.Arity > 0 ? $"{group.Key.Name}_{group.Key.Arity}" : group.Key.Name;
+                                    //GeneratePreview(context, name, code);
+                                    context.AddSource($"{name}_AutoInterface.cs", SourceText.From(code, Encoding.UTF8));
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, type,
+                                    ex.ToString().Replace("\r", "").Replace("\n", ""));
                             }
                         }
                     }
@@ -210,24 +219,43 @@ namespace BeaKona
                         {
                             if (type is INamedTypeSymbol interfaceType)
                             {
-                                bool allowNullConditionOperator = false;
+                                string? templateBody = null;
+                                string? templateLanguage = null;
 
                                 #region collect named arguments [only one argument for now]
 
                                 foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
                                 {
-                                    if (arg.Key == "AllowNullConditionOperator")
+                                    switch (arg.Key)
                                     {
-                                        if (arg.Value.Value is bool b)
-                                        {
-                                            allowNullConditionOperator = b;
-                                        }
+                                        case "TemplateBody":
+                                            {
+                                                if (arg.Value.Value is string s)
+                                                {
+                                                    templateBody = s;
+                                                }
+                                                break;
+                                            }
+                                        case "TemplateLanguage":
+                                            {
+                                                if (arg.Value.Value is string s)
+                                                {
+                                                    templateLanguage = s;
+                                                }
+                                                break;
+                                            }
                                     }
                                 }
 
                                 #endregion
 
-                                records.Add(new AutoInterfaceRecord(symbol, receiverType, attribute, interfaceType, allowNullConditionOperator));
+                                TemplateSettings? template = null;
+                                if (templateBody != null && templateBody.Trim().Length > 0)
+                                {
+                                    template = new TemplateSettings(templateLanguage ?? "scriban", templateBody.Trim());
+                                }
+
+                                records.Add(new AutoInterfaceRecord(symbol, receiverType, attribute, interfaceType, template));
                             }
                             else
                             {
@@ -255,21 +283,23 @@ namespace BeaKona
             return records;
         }
 
-        private static string? ProcessClass(Compilation compilation, INamedTypeSymbol type, IEnumerable<IMemberInfo> infos)
+        private static string? ProcessClass(GeneratorExecutionContext context, Compilation compilation, INamedTypeSymbol type, IEnumerable<IMemberInfo> infos)
         {
             ScopeInfo scope = new ScopeInfo(type);
 
-            SourceBuilder sb = new SourceBuilder();
-            ICodeTextBuilder output = new CSharpCodeTextBuilder(compilation, sb);
+            SourceBuilder builder = new SourceBuilder();
+
+            ICodeTextWriter writer = new CSharpCodeTextWriter(compilation);
             bool anyReasonToEmitSourceFile = false;
+            bool error = false;
 
             //bool isNullable = compilation.Options.NullableContextOptions == NullableContextOptions.Enable;
-            output.Builder.AppendLine("#nullable enable");
+            builder.AppendLine("#nullable enable");
 
             ImmutableArray<INamespaceSymbol> namespaceParts = type.ContainingNamespace != null && type.ContainingNamespace.IsGlobalNamespace == false ? SemanticFacts.GetNamespaceParts(type.ContainingNamespace) : new ImmutableArray<INamespaceSymbol>();
             if (namespaceParts.Length > 0)
             {
-                output.AppendNamespaceBeginning(string.Join(".", namespaceParts.Select(i => output.GetSourceIdentifier(i))));
+                writer.WriteNamespaceBeginning(builder, namespaceParts);
             }
 
             List<INamedTypeSymbol> containingTypes = new List<INamedTypeSymbol>();
@@ -280,97 +310,138 @@ namespace BeaKona
 
             foreach (INamedTypeSymbol ct in containingTypes)
             {
-                output.Builder.AppendIndentation();
-                output.AppendTypeDeclarationBeginning(ct, new ScopeInfo(ct));
-                output.Builder.AppendLine();
-                output.Builder.AppendIndentation();
-                output.Builder.AppendLine('{');
-                output.Builder.IncrementIndentation();
+                builder.AppendIndentation();
+                writer.WriteTypeDeclarationBeginning(builder, ct, new ScopeInfo(ct));
+                builder.AppendLine();
+                builder.AppendIndentation();
+                builder.AppendLine('{');
+                builder.IncrementIndentation();
             }
 
-            output.Builder.AppendIndentation();
-            output.AppendTypeDeclarationBeginning(type, scope);
-            output.Builder.AppendLine();
-            output.Builder.AppendIndentation();
-            output.Builder.AppendLine('{');
-            output.Builder.IncrementIndentation();
+            builder.AppendIndentation();
+            writer.WriteTypeDeclarationBeginning(builder, type, scope);
+            builder.AppendLine();
+            builder.AppendIndentation();
+            builder.AppendLine('{');
+            builder.IncrementIndentation();
 
             bool separatorRequired = false;
 
             foreach (IGrouping<INamedTypeSymbol, IMemberInfo> group in infos.GroupBy(i => i.InterfaceType))
             {
-                List<IMemberInfo> items = group.ToList();
+                List<IMemberInfo> references = group.ToList();
 
-                foreach (ISymbol member in group.Key.GetMembers())
+                ISourceTextGenerator? generator = null;
+                foreach (IMemberInfo reference in references)
                 {
-                    IMethodSymbol? memberImplementation = type.FindImplementationForInterfaceMember(member) as IMethodSymbol;
-                    if (memberImplementation == null || memberImplementation.ContainingType.Equals(type, SymbolEqualityComparer.Default) == false || memberImplementation.MethodKind != MethodKind.ExplicitInterfaceImplementation)
+                    if (reference.Template is TemplateSettings ts)
                     {
-                        if (member is IMethodSymbol method)
+                        if (generator is TemplatedSourceTextGenerator g)
                         {
-                            if (method.MethodKind == MethodKind.Ordinary)
+                            if (g.Settings.Equals(ts) == false)
                             {
-                                anyReasonToEmitSourceFile = true;
-
-                                if (separatorRequired)
-                                {
-                                    output.Builder.AppendLine();
-                                }
-                                output.AppendMethodDefinition(method, scope, group.Key, items);
-                                separatorRequired = true;
+                                error = true;
+                                ReportDiagnostic(context, "BK-AG10", nameof(AutoInterfaceResource.AG10_title), nameof(AutoInterfaceResource.AG10_message), nameof(AutoInterfaceResource.AG10_description), DiagnosticSeverity.Error, reference.Member);
+                                continue;
                             }
-                        }
-                        else if (member is IPropertySymbol property)
-                        {
-                            anyReasonToEmitSourceFile = true;
-
-                            if (separatorRequired)
-                            {
-                                output.Builder.AppendLine();
-                            }
-
-                            output.AppendPropertyDefinition(property, scope, group.Key, items);
-                            separatorRequired = true;
-                        }
-                        else if (member is IEventSymbol @event)
-                        {
-                            anyReasonToEmitSourceFile = true;
-
-                            if (separatorRequired)
-                            {
-                                output.Builder.AppendLine();
-                            }
-
-                            output.AppendEventDefinition(@event, scope, group.Key, items);
-                            separatorRequired = true;
                         }
                         else
                         {
-                            throw new NotSupportedException();
+                            generator = new TemplatedSourceTextGenerator(ts);
                         }
+                    }
+                }
+
+                if (generator != null)
+                {
+                    Model model = new Model(writer, builder, group.Key, type, references, scope);
+                    generator.Emit(writer, builder, model, ref separatorRequired, out bool anyReasonToEmitSourceFileLocal);
+                    if (anyReasonToEmitSourceFileLocal)
+                    {
+                        anyReasonToEmitSourceFile = true;
+                    }
+
+                    if (separatorRequired)
+                    {
+                        builder.AppendLine();
+                        separatorRequired = false;
+                    }
+                }
+                else
+                {
+                    foreach (IMethodSymbol method in group.Key.GetMethods().Where(i => type.IsMemberImplemented(i) == false))
+                    {
+                        anyReasonToEmitSourceFile = true;
+
+                        if (separatorRequired)
+                        {
+                            builder.AppendLine();
+                        }
+                        writer.WriteMethodDefinition(builder, method, scope, group.Key, references);
+                        separatorRequired = true;
+                    }
+
+                    foreach (IPropertySymbol property in group.Key.GetProperties().Where(i => type.IsMemberImplemented(i) == false))
+                    {
+                        anyReasonToEmitSourceFile = true;
+
+                        if (separatorRequired)
+                        {
+                            builder.AppendLine();
+                        }
+
+                        writer.WritePropertyDefinition(builder, property, scope, group.Key, references);
+                        separatorRequired = true;
+                    }
+
+                    foreach (IPropertySymbol indexer in group.Key.GetIndexers().Where(i => type.IsMemberImplemented(i) == false))
+                    {
+                        anyReasonToEmitSourceFile = true;
+
+                        if (separatorRequired)
+                        {
+                            builder.AppendLine();
+                        }
+
+                        writer.WritePropertyDefinition(builder, indexer, scope, group.Key, references);
+                        separatorRequired = true;
+                    }
+
+                    foreach (IEventSymbol @event in group.Key.GetEvents().Where(i => type.IsMemberImplemented(i) == false))
+                    {
+                        anyReasonToEmitSourceFile = true;
+
+                        if (separatorRequired)
+                        {
+                            builder.AppendLine();
+                        }
+
+                        writer.WriteEventDefinition(builder, @event, scope, group.Key, references);
+                        separatorRequired = true;
                     }
                 }
             }
 
-            output.Builder.DecrementIndentation();
-            output.Builder.AppendIndentation();
-            output.Builder.AppendLine('}');
+            builder.DecrementIndentation();
+            builder.AppendIndentation();
+            builder.AppendLine('}');
 
             for (int i = 0; i < containingTypes.Count; i++)
             {
-                output.Builder.DecrementIndentation();
-                output.Builder.AppendIndentation();
-                output.Builder.AppendLine('}');
+                builder.DecrementIndentation();
+                builder.AppendIndentation();
+                builder.AppendLine('}');
             }
 
             if (namespaceParts.Length > 0)
             {
-                output.Builder.DecrementIndentation();
-                output.Builder.AppendIndentation();
-                output.Builder.AppendLine('}');
+                builder.DecrementIndentation();
+                builder.AppendIndentation();
+                builder.AppendLine('}');
             }
 
-            return anyReasonToEmitSourceFile ? output.ToString() : null;
+            //return error.ToString() + " " + anyReasonToEmitSourceFile.ToString();
+            return error == false && anyReasonToEmitSourceFile ? builder.ToString() : null;
         }
 
         private static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, SyntaxNode? node, params object?[] messageArgs)

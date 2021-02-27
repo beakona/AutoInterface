@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace BeaKona.AutoInterfaceGenerator
@@ -15,16 +16,36 @@ namespace BeaKona.AutoInterfaceGenerator
             this.Options = options;
         }
 
+        private SourceBuilder(SourceBuilder owner, SourceBuilderOptions options) : this(options)
+        {
+            this.owner = owner;
+        }
+
+        private readonly SourceBuilder? owner;
+
         public SourceBuilderOptions Options { get; }
 
-        private readonly List<object> items = new List<object>();
+        private readonly List<object> elements = new List<object>();
+        private readonly HashSet<string> aliases = new HashSet<string>();
 
         public void Clear()
         {
-            this.items.Clear();
+            this.elements.Clear();
         }
 
-        public void AppendLine() => this.items.Add(new LineSeparatorMarker());
+        public void RegisterAlias(string alias)
+        {
+            if (this.owner != null)
+            {
+                this.owner.RegisterAlias(alias);
+            }
+            else
+            {
+                this.aliases.Add(alias);
+            }
+        }
+
+        public void AppendLine() => this.elements.Add(new LineSeparatorMarker());
 
         public void AppendLine(string? text)
         {
@@ -45,7 +66,7 @@ namespace BeaKona.AutoInterfaceGenerator
         {
             if (text != null)
             {
-                this.items.Add(text);
+                this.elements.Add(text);
             }
         }
 
@@ -57,7 +78,7 @@ namespace BeaKona.AutoInterfaceGenerator
             }
         }
 
-        public void Append(char c) => this.items.Add(c);
+        public void Append(char c) => this.elements.Add(c);
 
         public void AppendSeparated(string text)
         {
@@ -70,7 +91,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void AppendSpaceIfNeccessary()
         {
-            this.items.Add(new FlexibleSpaceMarker());
+            this.elements.Add(new FlexibleSpaceMarker());
         }
 
         private int currentDepth = 0;
@@ -87,13 +108,16 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void AppendIndentation()
         {
-            this.items.Add(new IndentationMarker(this.currentDepth));
+            this.elements.Add(new IndentationMarker(this.currentDepth));
         }
 
-        public SourceBuilder AppendNewBuilder()
+        public SourceBuilder AppendNewBuilder(bool register = true)
         {
-            SourceBuilder builder = new SourceBuilder(this.Options);
-            this.items.Add(builder);
+            SourceBuilder builder = new SourceBuilder(this, this.Options);
+            if (register)
+            {
+                this.elements.Add(builder);
+            }
             return builder;
         }
 
@@ -110,6 +134,12 @@ namespace BeaKona.AutoInterfaceGenerator
         public override string ToString()
         {
             StringBuilder text = new StringBuilder();
+            foreach (string alias in this.aliases.OrderByDescending(i => i))
+            {
+                text.Append("extern alias ");
+                text.Append(alias);
+                text.AppendLine(";");
+            }
             this.Write(text);
             return text.ToString();
         }
@@ -117,13 +147,13 @@ namespace BeaKona.AutoInterfaceGenerator
         private void Write(StringBuilder builder)
         {
             Dictionary<int, string>? cache = null;
-            foreach (object? item in this.items)
+            foreach (object? element in this.elements)
             {
-                if (item != null)
+                if (element != null)
                 {
-                    switch (item)
+                    switch (element)
                     {
-                        default: throw new NotSupportedException();
+                        default: throw new NotSupportedException(nameof(Write));
                         case string text:
                             builder.Append(text);
                             break;

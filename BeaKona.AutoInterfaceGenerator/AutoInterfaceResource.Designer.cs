@@ -286,7 +286,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Internal exception [code={0}]..
+        ///   Looks up a localized string similar to Internal exception [{0}]..
         /// </summary>
         internal static string AG09_message {
             get {
@@ -300,6 +300,33 @@ namespace BeaKona.AutoInterfaceGenerator {
         internal static string AG09_title {
             get {
                 return ResourceManager.GetString("AG09_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG10_description {
+            get {
+                return ResourceManager.GetString("AG10_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AutoInterface template for single interface should be defined at most once..
+        /// </summary>
+        internal static string AG10_message {
+            get {
+                return ResourceManager.GetString("AG10_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple AutoInterface templates..
+        /// </summary>
+        internal static string AG10_title {
+            get {
+                return ResourceManager.GetString("AG10_title", resourceCulture);
             }
         }
     }

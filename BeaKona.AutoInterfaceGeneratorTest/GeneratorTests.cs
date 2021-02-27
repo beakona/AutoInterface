@@ -46,7 +46,7 @@ namespace MyTest
 
         private static Compilation RunGenerators(Compilation c, out ImmutableArray<Diagnostic> diagnostics, params ISourceGenerator[] generators)
         {
-            CreateDriver(c, generators).RunGeneratorsAndUpdateCompilation(c, out var d, out diagnostics);
+            CreateDriver(c, generators).RunGeneratorsAndUpdateCompilation(c, out Compilation? d, out diagnostics);
             return d;
         }
     }

@@ -193,9 +193,18 @@
     <value />
   </data>
   <data name="AG09_message" xml:space="preserve">
-    <value>Internal exception [code={0}].</value>
+    <value>Internal exception [{0}].</value>
   </data>
   <data name="AG09_title" xml:space="preserve">
     <value>Internal exception.</value>
+  </data>
+  <data name="AG10_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG10_message" xml:space="preserve">
+    <value>AutoInterface template for single interface should be defined at most once.</value>
+  </data>
+  <data name="AG10_title" xml:space="preserve">
+    <value>Multiple AutoInterface templates.</value>
   </data>
 </root>

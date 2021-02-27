@@ -1,0 +1,40 @@
+﻿using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
+
+namespace BeaKona.AutoInterfaceGenerator
+{
+    internal interface ICodeTextWriter
+    {
+        Compilation Compilation { get; }
+
+        void WriteTypeReference(SourceBuilder builder, ITypeSymbol type, ScopeInfo scope);
+
+        void WriteTypeArgumentsCall(SourceBuilder builder, IEnumerable<ITypeSymbol> typeArguments, ScopeInfo scope);
+
+        void WriteTypeArgumentsDefinition(SourceBuilder builder, IEnumerable<ITypeSymbol> typeArguments, ScopeInfo scope);
+
+        void WriteParameterDefinition(SourceBuilder builder, ScopeInfo scope, IEnumerable<IParameterSymbol> parameters);
+
+        void WriteCallParameters(SourceBuilder builder, IEnumerable<IParameterSymbol> parameters);
+
+        void WriteMethodDefinition(SourceBuilder builder, IMethodSymbol method, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
+
+        void WritePropertyDefinition(SourceBuilder builder, IPropertySymbol property, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
+
+        void WriteEventDefinition(SourceBuilder builder, IEventSymbol @event, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
+
+        void WriteTypeDeclarationBeginning(SourceBuilder builder, INamedTypeSymbol type, ScopeInfo scope);
+
+        void WriteNamespaceBeginning(SourceBuilder builder, IEnumerable<INamespaceSymbol> @namespace);
+
+        void WriteHolderReference(SourceBuilder builder, ISymbol member, ScopeInfo scope);
+
+        void WriteMemberReference(SourceBuilder builder, IMemberInfo item, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
+
+        void WriteMethodCall(SourceBuilder builder, IMemberInfo item, IMethodSymbol method, ScopeInfo scope, bool async, bool typeIsNullable, bool allowCoalescing);
+
+        void WriteIdentifier(SourceBuilder builder, ISymbol symbol);
+
+        void WriteRefKind(SourceBuilder builder, RefKind kind);
+    }
+}
