@@ -40,7 +40,7 @@ interface IPrintable
 
 public partial class Person : IPrintable
 {
-   // add file mytemplate.scriban in yout VS project
+   // add file mytemplate.scriban in your VS project
    // and set it's build action to: 'C# analyzer additional file'
    [BeaKona.AutoInterface(TemplateFileName = "mytemplate.scriban")]
    private readonly IPrintable? aspect1 = null;
