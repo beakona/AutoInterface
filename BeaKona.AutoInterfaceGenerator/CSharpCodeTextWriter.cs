@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using BeaKona.AutoInterfaceGenerator.Templates;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -9,11 +10,13 @@ namespace BeaKona.AutoInterfaceGenerator
 {
     internal sealed class CSharpCodeTextWriter : ICodeTextWriter
     {
-        public CSharpCodeTextWriter(Compilation compilation)
+        public CSharpCodeTextWriter(GeneratorExecutionContext context, Compilation compilation)
         {
+            this.Context = context;
             this.Compilation = compilation;
         }
 
+        public GeneratorExecutionContext Context { get; }
         public Compilation Compilation { get; }
 
         public void WriteTypeReference(SourceBuilder builder, ITypeSymbol type, ScopeInfo scope)
@@ -265,12 +268,14 @@ namespace BeaKona.AutoInterfaceGenerator
 
             (bool isAsync, bool methodReturnsValue) = SemanticFacts.IsAsyncAndGetReturnType(this.Compilation, method);
 
+            PartialTemplate? template = this.GetMatchedTemplates(references, AutoInterfaceTargets.Method, method.Name);
+
             int rcount = references.Count();
-            bool useAsync = rcount > 1;
-            bool returnsValue = (isAsync && methodReturnsValue == false) ? useAsync == false : methodReturnsValue;
+            bool canUseAsync = template != null || rcount > 1;
+            bool returnsValue = (isAsync && methodReturnsValue == false) ? canUseAsync == false : methodReturnsValue;
 
             builder.AppendIndentation();
-            if (isAsync && useAsync)
+            if (isAsync && canUseAsync && (template != null || rcount > 1))
             {
                 builder.Append("async");
                 builder.Append(' ');
@@ -290,10 +295,10 @@ namespace BeaKona.AutoInterfaceGenerator
             this.WriteParameterDefinition(builder, methodScope, method.Parameters);
             builder.Append(")");
 
-            if (rcount == 1)
+            if (rcount == 1 && template == null)
             {
                 builder.Append(" => ");
-                this.WriteMethodCall(builder, references.First(), method, methodScope, isAsync && useAsync, false, false);
+                this.WriteMethodCall(builder, references.First(), method, methodScope, false, SemanticFacts.IsNullable(this.Compilation, method.ReturnType), true);
                 builder.AppendLine(';');
             }
             else
@@ -304,22 +309,60 @@ namespace BeaKona.AutoInterfaceGenerator
                 builder.IncrementIndentation();
                 try
                 {
-                    if (isAsync && useAsync)
+                    if (template != null)
                     {
+                        TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(template.Template);
+
+                        PartialMethodModel model = new PartialMethodModel();
+                        model.Load(this, builder, @interface, scope, references);
+                        model.Load(this, builder, method, methodScope, references);
+
+                        bool separatorRequired = false;
+                        generator.Emit(this, builder, model, ref separatorRequired);
+                        if (separatorRequired)
                         {
-                            int index = 0;
-                            foreach (IMemberInfo reference in references)
+                            builder.AppendLine();
+                        }
+                    }
+                    else
+                    {
+                        if (isAsync && canUseAsync)
+                        {
                             {
-                                builder.AppendIndentation();
-                                builder.Append("var temp");
-                                builder.Append(index);
-                                builder.Append(" = ");
-                                this.WriteMethodCall(builder, reference, method, methodScope, false, false, false);
-                                builder.Append(".ConfigureAwait(false)");
-                                builder.AppendLine(';');
-                                index++;
+                                int index = 0;
+                                foreach (IMemberInfo reference in references)
+                                {
+                                    builder.AppendIndentation();
+                                    builder.Append("var temp");
+                                    builder.Append(index);
+                                    builder.Append(" = ");
+                                    this.WriteMethodCall(builder, reference, method, methodScope, false, false, false);
+                                    builder.Append(".ConfigureAwait(false)");
+                                    builder.AppendLine(';');
+                                    index++;
+                                }
+                            }
+                            {
+                                int index = 0;
+                                foreach (IMemberInfo reference in references)
+                                {
+                                    bool last = index + 1 == rcount;
+
+                                    builder.AppendIndentation();
+                                    if (returnsValue && last)
+                                    {
+                                        builder.Append("return");
+                                        builder.Append(' ');
+                                    }
+
+                                    builder.Append("await temp");
+                                    builder.Append(index);
+                                    builder.AppendLine(';');
+                                    index++;
+                                }
                             }
                         }
+                        else
                         {
                             int index = 0;
                             foreach (IMemberInfo reference in references)
@@ -333,31 +376,10 @@ namespace BeaKona.AutoInterfaceGenerator
                                     builder.Append(' ');
                                 }
 
-                                builder.Append("await temp");
-                                builder.Append(index);
+                                this.WriteMethodCall(builder, reference, method, methodScope, false, SemanticFacts.IsNullable(this.Compilation, method.ReturnType), true);
                                 builder.AppendLine(';');
                                 index++;
                             }
-                        }
-                    }
-                    else
-                    {
-                        int index = 0;
-                        foreach (IMemberInfo reference in references)
-                        {
-                            bool last = index + 1 == rcount;
-
-                            builder.AppendIndentation();
-                            if (returnsValue && last)
-                            {
-                                builder.Append("return");
-                                builder.Append(' ');
-                            }
-
-                            bool async = isAsync && useAsync;
-                            this.WriteMethodCall(builder, reference, method, methodScope, async, false, false);
-                            builder.AppendLine(';');
-                            index++;
                         }
                     }
                 }
@@ -372,6 +394,21 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void WritePropertyDefinition(SourceBuilder builder, IPropertySymbol property, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references)
         {
+            AutoInterfaceTargets getterTarget, setterTarget;
+            if (property.IsIndexer)
+            {
+                getterTarget = AutoInterfaceTargets.PropertyGetter;
+                setterTarget = AutoInterfaceTargets.PropertySetter;
+            }
+            else
+            {
+                getterTarget = AutoInterfaceTargets.IndexerGetter;
+                setterTarget = AutoInterfaceTargets.IndexerSetter;
+            }
+
+            PartialTemplate? getterTemplate = this.GetMatchedTemplates(references, getterTarget, property.IsIndexer ? "this" : property.Name);
+            PartialTemplate? setterTemplate = this.GetMatchedTemplates(references, setterTarget, property.IsIndexer ? "this" : property.Name);
+
             builder.AppendIndentation();
             this.WriteTypeReference(builder, property.Type, scope);
             builder.Append(' ');
@@ -389,26 +426,10 @@ namespace BeaKona.AutoInterfaceGenerator
                 this.WriteIdentifier(builder, property);
             }
 
-            void AppendDefinition(IPropertySymbol property)
-            {
-                if (property.IsIndexer)
-                {
-                    builder.Append('[');
-                    this.WriteCallParameters(builder, property.Parameters);
-                    builder.Append(']');
-                }
-                else
-                {
-                    builder.Append('.');
-                    this.WriteIdentifier(builder, property);
-                }
-            }
-
-            if (property.SetMethod == null)
+            if (property.SetMethod == null && getterTemplate == null)
             {
                 builder.Append(" => ");
-                this.WriteMemberReference(builder, references.First(), scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
-                AppendDefinition(property);
+                this.WritePropertyCall(builder, references.First(), property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
                 builder.AppendLine(';');
             }
             else
@@ -419,7 +440,7 @@ namespace BeaKona.AutoInterfaceGenerator
                 builder.IncrementIndentation();
                 try
                 {
-                    if (references.Count() == 1)
+                    if (references.Count() == 1 && getterTemplate == null && setterTemplate == null)
                     {
                         IMemberInfo reference = references.First();
 
@@ -427,16 +448,14 @@ namespace BeaKona.AutoInterfaceGenerator
                         {
                             builder.AppendIndentation();
                             builder.Append("get => ");
-                            this.WriteMemberReference(builder, reference, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
-                            AppendDefinition(property);
+                            this.WritePropertyCall(builder, reference, property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
                             builder.AppendLine(';');
                         }
                         if (property.SetMethod is IMethodSymbol)
                         {
                             builder.AppendIndentation();
                             builder.Append("set => ");
-                            this.WriteMemberReference(builder, reference, scope, false, false);
-                            AppendDefinition(property);
+                            this.WritePropertyCall(builder, reference, property, scope, false, false);
                             builder.AppendLine(" = value;");
                         }
                     }
@@ -445,10 +464,43 @@ namespace BeaKona.AutoInterfaceGenerator
                         if (property.GetMethod is IMethodSymbol)
                         {
                             builder.AppendIndentation();
-                            builder.Append("get => ");
-                            this.WriteMemberReference(builder, references.Last(), scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
-                            AppendDefinition(property);
-                            builder.AppendLine(';');
+                            if (getterTemplate != null)
+                            {
+                                builder.AppendLine("get");
+                                builder.AppendIndentation();
+                                builder.AppendLine('{');
+                                builder.IncrementIndentation();
+                                try
+                                {
+                                    TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(getterTemplate.Template);
+
+                                    IPropertyModel model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
+                                    if (model is IRootModel rootModel)
+                                    {
+                                        rootModel.Load(this, builder, @interface, scope, references);
+                                    }
+                                    model.Load(this, builder, property, scope, references);
+
+                                    bool separatorRequired = false;
+                                    generator.Emit(this, builder, model, ref separatorRequired);
+                                    if (separatorRequired)
+                                    {
+                                        builder.AppendLine();
+                                    }
+                                }
+                                finally
+                                {
+                                    builder.DecrementIndentation();
+                                }
+                                builder.AppendIndentation();
+                                builder.AppendLine('}');
+                            }
+                            else
+                            {
+                                builder.Append("get => ");
+                                this.WritePropertyCall(builder, references.Last(), property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
+                                builder.AppendLine(';');
+                            }
                         }
                         if (property.SetMethod is IMethodSymbol)
                         {
@@ -459,12 +511,31 @@ namespace BeaKona.AutoInterfaceGenerator
                             builder.IncrementIndentation();
                             try
                             {
-                                foreach (IMemberInfo reference in references)
+                                if (setterTemplate != null)
                                 {
-                                    builder.AppendIndentation();
-                                    this.WriteMemberReference(builder, reference, scope, false, false);
-                                    AppendDefinition(property);
-                                    builder.AppendLine(" = value;");
+                                    TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(setterTemplate.Template);
+                                    IPropertyModel model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
+                                    if (model is IRootModel rootModel)
+                                    {
+                                        rootModel.Load(this, builder, @interface, scope, references);
+                                    }
+                                    model.Load(this, builder, property, scope, references);
+
+                                    bool separatorRequired = false;
+                                    generator.Emit(this, builder, model, ref separatorRequired);
+                                    if (separatorRequired)
+                                    {
+                                        builder.AppendLine();
+                                    }
+                                }
+                                else
+                                {
+                                    foreach (IMemberInfo reference in references)
+                                    {
+                                        builder.AppendIndentation();
+                                        this.WritePropertyCall(builder, reference, property, scope, false, false);
+                                        builder.AppendLine(" = value;");
+                                    }
                                 }
                             }
                             finally
@@ -487,6 +558,9 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void WriteEventDefinition(SourceBuilder builder, IEventSymbol @event, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references)
         {
+            PartialTemplate? adderTemplate = this.GetMatchedTemplates(references, AutoInterfaceTargets.EventAdder, @event.Name);
+            PartialTemplate? removerTemplate = this.GetMatchedTemplates(references, AutoInterfaceTargets.EventRemover, @event.Name);
+
             builder.AppendIndentation();
             builder.Append("event");
             builder.Append(' ');
@@ -501,7 +575,7 @@ namespace BeaKona.AutoInterfaceGenerator
             builder.IncrementIndentation();
             try
             {
-                if (references.Count() == 1)
+                if (references.Count() == 1 && adderTemplate == null && removerTemplate == null)
                 {
                     IMemberInfo reference = references.First();
                     builder.AppendIndentation();
@@ -519,50 +593,90 @@ namespace BeaKona.AutoInterfaceGenerator
                 }
                 else
                 {
-                    builder.AppendIndentation();
-                    builder.AppendLine("add");
-                    builder.AppendIndentation();
-                    builder.AppendLine('{');
-                    builder.IncrementIndentation();
-                    try
+                    if (@event.AddMethod != null)
                     {
-                        foreach (IMemberInfo reference in references)
+                        builder.AppendIndentation();
+                        builder.AppendLine("add");
+                        builder.AppendIndentation();
+                        builder.AppendLine('{');
+                        builder.IncrementIndentation();
+                        try
                         {
-                            builder.AppendIndentation();
-                            this.WriteMemberReference(builder, reference, scope, false, false);
-                            builder.Append('.');
-                            this.WriteIdentifier(builder, @event);
-                            builder.AppendLine(" += value;");
+                            if (adderTemplate != null)
+                            {
+                                TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(adderTemplate.Template);
+                                PartialEventModel model = new PartialEventModel();
+                                model.Load(this, builder, @interface, scope, references);
+                                model.Load(this, builder, @event, scope, references);
+
+                                bool separatorRequired = false;
+                                generator.Emit(this, builder, model, ref separatorRequired);
+                                if (separatorRequired)
+                                {
+                                    builder.AppendLine();
+                                }
+                            }
+                            else
+                            {
+                                foreach (IMemberInfo reference in references)
+                                {
+                                    builder.AppendIndentation();
+                                    this.WriteMemberReference(builder, reference, scope, false, false);
+                                    builder.Append('.');
+                                    this.WriteIdentifier(builder, @event);
+                                    builder.AppendLine(" += value;");
+                                }
+                            }
                         }
-                    }
-                    finally
-                    {
-                        builder.DecrementIndentation();
-                    }
-                    builder.AppendIndentation();
-                    builder.AppendLine('}');
-                    builder.AppendIndentation();
-                    builder.AppendLine("remove");
-                    builder.AppendIndentation();
-                    builder.AppendLine('{');
-                    builder.IncrementIndentation();
-                    try
-                    {
-                        foreach(IMemberInfo reference in references)
+                        finally
                         {
-                            builder.AppendIndentation();
-                            this.WriteMemberReference(builder, reference, scope, false, false);
-                            builder.Append('.');
-                            this.WriteIdentifier(builder, @event);
-                            builder.AppendLine(" -= value;");
+                            builder.DecrementIndentation();
                         }
+                        builder.AppendIndentation();
+                        builder.AppendLine('}');
                     }
-                    finally
+                    if (@event.RemoveMethod != null)
                     {
-                        builder.DecrementIndentation();
+                        builder.AppendIndentation();
+                        builder.AppendLine("remove");
+                        builder.AppendIndentation();
+                        builder.AppendLine('{');
+                        builder.IncrementIndentation();
+                        try
+                        {
+                            if (removerTemplate != null)
+                            {
+                                TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(removerTemplate.Template);
+                                PartialEventModel model = new PartialEventModel();
+                                model.Load(this, builder, @interface, scope, references);
+                                model.Load(this, builder, @event, scope, references);
+
+                                bool separatorRequired = false;
+                                generator.Emit(this, builder, model, ref separatorRequired);
+                                if (separatorRequired)
+                                {
+                                    builder.AppendLine();
+                                }
+                            }
+                            else
+                            {
+                                foreach (IMemberInfo reference in references)
+                                {
+                                    builder.AppendIndentation();
+                                    this.WriteMemberReference(builder, reference, scope, false, false);
+                                    builder.Append('.');
+                                    this.WriteIdentifier(builder, @event);
+                                    builder.AppendLine(" -= value;");
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            builder.DecrementIndentation();
+                        }
+                        builder.AppendIndentation();
+                        builder.AppendLine('}');
                     }
-                    builder.AppendIndentation();
-                    builder.AppendLine('}');
                 }
             }
             finally
@@ -649,17 +763,13 @@ namespace BeaKona.AutoInterfaceGenerator
             {
                 if (expressionIsNullable)
                 {
-                    builder.Append('!');
+                    builder.Append(typeIsNullable ? '?' : '!');
                 }
                 else
                 {
                     if (typeIsNullable)
                     {
-                        //builder.Append('A');
-                    }
-                    else
-                    {
-                        //builder.Append('B');
+                        builder.Append('?');
                     }
                 }
             }
@@ -669,7 +779,7 @@ namespace BeaKona.AutoInterfaceGenerator
                 {
                     if (typeIsNullable)
                     {
-                        //builder.Append('C');
+                        //? builder.Append('E');
                     }
                     else
                     {
@@ -680,9 +790,29 @@ namespace BeaKona.AutoInterfaceGenerator
                 {
                     if (typeIsNullable)
                     {
-                        //builder.Append('D');
+                        //builder.Append('G');
+                    }
+                    else
+                    {
+                        //empty or !
                     }
                 }
+            }
+        }
+
+        public void WritePropertyCall(SourceBuilder builder, IMemberInfo reference, IPropertySymbol property, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing)
+        {
+            this.WriteMemberReference(builder, reference, scope, typeIsNullable, allowCoalescing);
+            if (property.IsIndexer)
+            {
+                builder.Append('[');
+                this.WriteCallParameters(builder, property.Parameters);
+                builder.Append(']');
+            }
+            else
+            {
+                builder.Append('.');
+                this.WriteIdentifier(builder, property);
             }
         }
 
@@ -725,6 +855,12 @@ namespace BeaKona.AutoInterfaceGenerator
         }
 
         #region helper members
+
+        private PartialTemplate? GetMatchedTemplates(IEnumerable<IMemberInfo> references, AutoInterfaceTargets target, string name)
+        {
+            IEnumerable<(PartialTemplate template, ISymbol reference)> matched = references.SelectMany(i => i.TemplateParts.Where(j => j.MemberTargets.HasFlag(target)).Where(j => j.FilterMatch(name)).Select(j => (j, i.Member)));
+            return PartialTemplate.PickTemplate(this.Context, matched, name);
+        }
 
         private string GetSourceIdentifier(ISymbol symbol)
         {

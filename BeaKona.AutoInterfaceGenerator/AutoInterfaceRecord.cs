@@ -1,23 +1,25 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using BeaKona.AutoInterfaceGenerator.Templates;
+using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
     internal sealed class AutoInterfaceRecord : IMemberInfo
     {
-        public AutoInterfaceRecord(ISymbol member, ITypeSymbol receiverType, AttributeData attribute, INamedTypeSymbol interfaceType, TemplateSettings? template)
+        public AutoInterfaceRecord(ISymbol member, ITypeSymbol receiverType, INamedTypeSymbol interfaceType, TemplateDefinition? template, List<PartialTemplate> templateParts)
         {
             this.Member = member;
             this.ReceiverType = receiverType;
-            this.Attribute = attribute;
             this.InterfaceType = interfaceType;
             this.Template = template;
+            this.TemplateParts = templateParts?.ToArray() ?? new PartialTemplate[0];
         }
 
         public ISymbol Member { get; }
         public ITypeSymbol ReceiverType { get; }
-        public AttributeData Attribute { get; }
         public INamedTypeSymbol InterfaceType { get; }
-        public TemplateSettings? Template { get; }
+        public TemplateDefinition? Template { get; }
+        public PartialTemplate[] TemplateParts { get; }
         public bool CastRequired => this.InterfaceType.Equals(this.ReceiverType, SymbolEqualityComparer.Default) == false;
     }
 }

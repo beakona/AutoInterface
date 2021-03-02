@@ -2,6 +2,6 @@
 {
     internal interface ISourceTextGenerator
     {
-        void Emit(ICodeTextWriter writer, SourceBuilder builder, Model model, ref bool separatorRequired, out bool anyReasonToEmitSourceFile);
+        void Emit(ICodeTextWriter writer, SourceBuilder builder, object? model, ref bool separatorRequired);
     }
 }

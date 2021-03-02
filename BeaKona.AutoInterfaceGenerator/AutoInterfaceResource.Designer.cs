@@ -329,5 +329,167 @@ namespace BeaKona.AutoInterfaceGenerator {
                 return ResourceManager.GetString("AG10_title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG11_description {
+            get {
+                return ResourceManager.GetString("AG11_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template file &apos;{0}&apos; not found..
+        /// </summary>
+        internal static string AG11_message {
+            get {
+                return ResourceManager.GetString("AG11_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template file not found..
+        /// </summary>
+        internal static string AG11_title {
+            get {
+                return ResourceManager.GetString("AG11_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG12_description {
+            get {
+                return ResourceManager.GetString("AG12_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template should be specified either inline or from file but not both..
+        /// </summary>
+        internal static string AG12_message {
+            get {
+                return ResourceManager.GetString("AG12_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More than one template specified..
+        /// </summary>
+        internal static string AG12_title {
+            get {
+                return ResourceManager.GetString("AG12_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG13_description {
+            get {
+                return ResourceManager.GetString("AG13_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously..
+        /// </summary>
+        internal static string AG13_message {
+            get {
+                return ResourceManager.GetString("AG13_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously..
+        /// </summary>
+        internal static string AG13_title {
+            get {
+                return ResourceManager.GetString("AG13_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG14_description {
+            get {
+                return ResourceManager.GetString("AG14_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template is missing..
+        /// </summary>
+        internal static string AG14_message {
+            get {
+                return ResourceManager.GetString("AG14_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Template is missing..
+        /// </summary>
+        internal static string AG14_title {
+            get {
+                return ResourceManager.GetString("AG14_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG15_description {
+            get {
+                return ResourceManager.GetString("AG15_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter &apos;{0}&apos; is not valid Regex expression..
+        /// </summary>
+        internal static string AG15_message {
+            get {
+                return ResourceManager.GetString("AG15_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter is not valid Regex expression..
+        /// </summary>
+        internal static string AG15_title {
+            get {
+                return ResourceManager.GetString("AG15_title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string AG16_description {
+            get {
+                return ResourceManager.GetString("AG16_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple partial templates found for member: &apos;{0}&apos;..
+        /// </summary>
+        internal static string AG16_message {
+            get {
+                return ResourceManager.GetString("AG16_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple partial templates found..
+        /// </summary>
+        internal static string AG16_title {
+            get {
+                return ResourceManager.GetString("AG16_title", resourceCulture);
+            }
+        }
     }
 }

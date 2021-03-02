@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using BeaKona.AutoInterfaceGenerator.Templates;
+using Microsoft.CodeAnalysis;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
@@ -6,9 +7,9 @@ namespace BeaKona.AutoInterfaceGenerator
     {
         ISymbol Member { get; }
         ITypeSymbol ReceiverType { get; }
-        AttributeData Attribute { get; }
         INamedTypeSymbol InterfaceType { get; }
-        TemplateSettings? Template { get; }
+        TemplateDefinition? Template { get; }
+        PartialTemplate[] TemplateParts { get; }
         bool CastRequired { get; }
     }
 }

@@ -1,41 +1,22 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using BeaKona.AutoInterfaceGenerator.Templates;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
     [Generator]
     public class AutoInterfaceSourceGenerator : ISourceGenerator
     {
-        private const string attributeText = @"
-#nullable enable
-namespace BeaKona
-{
-    using System;
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
-    public sealed class AutoInterfaceAttribute : Attribute
-    {
-        public AutoInterfaceAttribute()
-        {
-        }
-
-        public AutoInterfaceAttribute(Type type)
-        {
-            this.Type = type;
-        }
-
-        public Type? Type { get; }
-        public string? TemplateLanguage { get; set; }
-        public string? TemplateBody { get; set; }
-    }
-}";
-
         public void Initialize(GeneratorInitializationContext context)
         {
             // Register a syntax receiver that will be created for each generation pass
@@ -44,7 +25,10 @@ namespace BeaKona
 
         public void Execute(GeneratorExecutionContext context)
         {
-            SourceText txt = SourceText.From(attributeText, Encoding.UTF8);
+            using Stream icStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BeaKona.AutoInterfaceGenerator.InjectedCode.cs");
+            using StreamReader icReader = new StreamReader(icStream);
+            
+            SourceText txt = SourceText.From(icReader.ReadToEnd(), Encoding.UTF8);
 
             // add the attribute text
             context.AddSource("AutoInterfaceAttribute", txt);
@@ -63,7 +47,7 @@ namespace BeaKona
                 if (context.SyntaxReceiver is SyntaxReceiver receiver)
                 {
                     // get the newly bound attribute
-                    if (compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceAttribute") is INamedTypeSymbol attributeSymbol)
+                    if (compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceAttribute") is INamedTypeSymbol autoInterfaceAttributeSymbol && compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceTemplateAttribute") is INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
                     {
                         // loop over the candidates, and keep the ones that are actually annotated
                         List<AutoInterfaceRecord> records = new List<AutoInterfaceRecord>();
@@ -78,7 +62,7 @@ namespace BeaKona
                                     // Get the symbol being declared by the member, and keep it if its annotated
                                     if (model.GetDeclaredSymbol(variableSyntax) is IFieldSymbol field)
                                     {
-                                        records.AddRange(CollectRecords(context, field, field.Type, attributeSymbol));
+                                        records.AddRange(CollectRecords(context, field, field.Type, autoInterfaceAttributeSymbol, autoInterfaceTemplateAttributeSymbol));
                                     }
                                 }
                             }
@@ -89,12 +73,12 @@ namespace BeaKona
                                 {
                                     if (property.IsWriteOnly)
                                     {
-                                        ReportDiagnostic(context, "BK-AG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
+                                        Helpers.ReportDiagnostic(context, "BK-AG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
                                             property.Name);
                                         continue;
                                     }
 
-                                    records.AddRange(CollectRecords(context, property, property.Type, attributeSymbol));
+                                    records.AddRange(CollectRecords(context, property, property.Type, autoInterfaceAttributeSymbol, autoInterfaceTemplateAttributeSymbol));
                                 }
                             }
                         }
@@ -119,21 +103,21 @@ namespace BeaKona
 
                             if (isPartial == false)
                             {
-                                ReportDiagnostic(context, "BK-AG01", nameof(AutoInterfaceResource.AG01_title), nameof(AutoInterfaceResource.AG01_message), nameof(AutoInterfaceResource.AG01_description), DiagnosticSeverity.Error, type,
+                                Helpers.ReportDiagnostic(context, "BK-AG01", nameof(AutoInterfaceResource.AG01_title), nameof(AutoInterfaceResource.AG01_message), nameof(AutoInterfaceResource.AG01_description), DiagnosticSeverity.Error, type,
                                     type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                                 continue;
                             }
 
                             if (type.IsStatic)
                             {
-                                ReportDiagnostic(context, "BK-AG02", nameof(AutoInterfaceResource.AG02_title), nameof(AutoInterfaceResource.AG02_message), nameof(AutoInterfaceResource.AG02_description), DiagnosticSeverity.Error, type,
+                                Helpers.ReportDiagnostic(context, "BK-AG02", nameof(AutoInterfaceResource.AG02_title), nameof(AutoInterfaceResource.AG02_message), nameof(AutoInterfaceResource.AG02_description), DiagnosticSeverity.Error, type,
                                     type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                                 continue;
                             }
 
                             if (type.TypeKind != TypeKind.Class && type.TypeKind != TypeKind.Struct)
                             {
-                                ReportDiagnostic(context, "BK-AG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, group.First().Member);
+                                Helpers.ReportDiagnostic(context, "BK-AG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, group.First().Member);
                                 continue;
                             }
 
@@ -146,7 +130,7 @@ namespace BeaKona
                                 {
                                     if (emitted.Add(itemWithMissingInterface.InterfaceType))
                                     {
-                                        ReportDiagnostic(context, "BK-AG05", nameof(AutoInterfaceResource.AG05_title), nameof(AutoInterfaceResource.AG05_message), nameof(AutoInterfaceResource.AG05_description), DiagnosticSeverity.Error, itemWithMissingInterface.Member,
+                                        Helpers.ReportDiagnostic(context, "BK-AG05", nameof(AutoInterfaceResource.AG05_title), nameof(AutoInterfaceResource.AG05_message), nameof(AutoInterfaceResource.AG05_description), DiagnosticSeverity.Error, itemWithMissingInterface.Member,
                                             itemWithMissingInterface.InterfaceType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                                     }
                                 }
@@ -166,7 +150,7 @@ namespace BeaKona
                             }
                             catch (Exception ex)
                             {
-                                ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, type,
+                                Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, type,
                                     ex.ToString().Replace("\r", "").Replace("\n", ""));
                             }
                         }
@@ -187,13 +171,193 @@ namespace BeaKona
         //    context.AddSource($"Output_Debug_{name}.cs", SourceText.From(output.ToString(), Encoding.UTF8));
         //}
 
-        private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol attributeSymbol)
+        private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
         {
+            List<PartialTemplate> templateParts = new List<PartialTemplate>();
+            Dictionary<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypesBySymbols = new Dictionary<ISymbol, HashSet<INamedTypeSymbol>>();
+
+            foreach (AttributeData attribute in symbol.GetAttributes())
+            {
+                if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(autoInterfaceTemplateAttributeSymbol, SymbolEqualityComparer.Default))
+                {
+                    ITypeSymbol? type = receiverType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+
+                    AutoInterfaceTargets memberTargets = (AutoInterfaceTargets)Convert.ToInt32(attribute.ConstructorArguments[0].Value);
+
+                    if (type.TypeKind == TypeKind.Interface)
+                    {
+                        if (receiverType.Equals(type, SymbolEqualityComparer.Default) || receiverType.AllInterfaces.Contains(type, SymbolEqualityComparer.Default))
+                        {
+                            if (type is INamedTypeSymbol interfaceType)
+                            {
+                                string? templateBody = null;
+                                string? templateFileName = null;
+                                string? templateLanguage = null;
+                                string? memberFilter = null;
+
+                                #region collect named arguments [only one argument for now]
+
+                                foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
+                                {
+                                    switch (arg.Key)
+                                    {
+                                        case "FileName":
+                                            {
+                                                if (arg.Value.Value is string s)
+                                                {
+                                                    templateFileName = s;
+                                                }
+                                            }
+                                            break;
+                                        case "Body":
+                                            {
+                                                if (arg.Value.Value is string s)
+                                                {
+                                                    templateBody = s;
+                                                }
+                                            }
+                                            break;
+                                        case "Language":
+                                            {
+                                                if (arg.Value.Value is string s)
+                                                {
+                                                    templateLanguage = s;
+                                                }
+                                            }
+                                            break;
+                                        case "Filter":
+                                            {
+                                                if (arg.Value.Value is string s)
+                                                {
+                                                    memberFilter = s;
+                                                }
+                                            }
+                                            break;
+                                    }
+                                }
+
+                                #endregion
+
+                                if (templateBody != null && templateBody.Trim().Length > 0)
+                                {
+                                    if (templateFileName != null && templateFileName.Trim().Length > 0)
+                                    {
+                                        Helpers.ReportDiagnostic(context, "BK-AG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                            );
+                                        continue;
+                                    }
+
+                                    Regex? rxMemberFilter = null;
+                                    if (memberFilter != null && memberFilter.Length > 0)
+                                    {
+                                        try
+                                        {
+                                            rxMemberFilter = new Regex(memberFilter, RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+                                        }
+                                        catch
+                                        {
+                                            Helpers.ReportDiagnostic(context, "BK-AG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                                memberFilter);
+                                            continue;
+                                        }
+                                    }
+
+                                    templateParts.Add(new PartialTemplate(memberTargets, rxMemberFilter, new TemplateDefinition(templateLanguage ?? "scriban", templateBody.Trim())));
+                                    if (danglingInterfaceTypesBySymbols.TryGetValue(symbol, out HashSet<INamedTypeSymbol> interfaceTypes) == false)
+                                    {
+                                        danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>();
+                                    }
+
+                                    interfaceTypes.Add(interfaceType);
+                                }
+                                else if (templateFileName != null && templateFileName.Trim().Length > 0)
+                                {
+                                    string? content = null;
+
+                                    AdditionalText? file = context.AdditionalFiles.FirstOrDefault(i => i.Path.EndsWith(templateFileName));
+                                    if (file != null)
+                                    {
+                                        content = file.GetText()?.ToString()?.Trim();
+                                        if (content == null)
+                                        {
+                                            content = "";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Helpers.ReportDiagnostic(context, "BK-AG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                            templateFileName);
+                                        continue;
+                                    }
+
+                                    if (string.IsNullOrEmpty(templateLanguage))
+                                    {
+                                        string extension = Path.GetExtension(templateFileName).ToLowerInvariant();
+                                        if (extension.StartsWith("."))
+                                        {
+                                            extension = extension.Substring(1);
+                                        }
+                                        templateLanguage = extension;
+                                    }
+
+                                    Regex? rxMemberFilter = null;
+                                    if (memberFilter != null && memberFilter.Length > 0)
+                                    {
+                                        try
+                                        {
+                                            rxMemberFilter = new Regex(memberFilter, RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture);
+                                        }
+                                        catch
+                                        {
+                                            Helpers.ReportDiagnostic(context, "BK-AG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                                memberFilter);
+                                            continue;
+                                        }
+                                    }
+
+                                    templateParts.Add(new PartialTemplate(memberTargets, rxMemberFilter, new TemplateDefinition(templateLanguage ?? "scriban", content)));
+                                    if (danglingInterfaceTypesBySymbols.TryGetValue(symbol, out HashSet<INamedTypeSymbol> interfaceTypes) == false)
+                                    {
+                                        danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>();
+                                    }
+
+                                    interfaceTypes.Add(interfaceType);
+                                }
+                                else
+                                {
+                                    Helpers.ReportDiagnostic(context, "BK-AG14", nameof(AutoInterfaceResource.AG14_title), nameof(AutoInterfaceResource.AG14_message), nameof(AutoInterfaceResource.AG14_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                        );
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                    157834);
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        Helpers.ReportDiagnostic(context, "BK-AG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                            type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        continue;
+                    }
+                }
+            }
+
             List<AutoInterfaceRecord> records = new List<AutoInterfaceRecord>();
 
             foreach (AttributeData attribute in symbol.GetAttributes())
             {
-                if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(attributeSymbol, SymbolEqualityComparer.Default))
+                if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(autoInterfaceAttributeSymbol, SymbolEqualityComparer.Default))
                 {
                     ITypeSymbol? type = null;
                     if (attribute.ConstructorArguments.Length == 0)
@@ -210,7 +374,7 @@ namespace BeaKona
 
                     if (type == null)
                     {
-                        ReportDiagnostic(context, "BK-AG07", nameof(AutoInterfaceResource.AG07_title), nameof(AutoInterfaceResource.AG07_message), nameof(AutoInterfaceResource.AG07_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax());
+                        Helpers.ReportDiagnostic(context, "BK-AG07", nameof(AutoInterfaceResource.AG07_title), nameof(AutoInterfaceResource.AG07_message), nameof(AutoInterfaceResource.AG07_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax());
                         continue;
                     }
                     else if (type.TypeKind == TypeKind.Interface)
@@ -220,6 +384,7 @@ namespace BeaKona
                             if (type is INamedTypeSymbol interfaceType)
                             {
                                 string? templateBody = null;
+                                string? templateFileName = null;
                                 string? templateLanguage = null;
 
                                 #region collect named arguments [only one argument for now]
@@ -228,55 +393,118 @@ namespace BeaKona
                                 {
                                     switch (arg.Key)
                                     {
+                                        case "TemplateFileName":
+                                            {
+                                                if (arg.Value.Value is string s)
+                                                {
+                                                    templateFileName = s;
+                                                }
+                                            }
+                                            break;
                                         case "TemplateBody":
                                             {
                                                 if (arg.Value.Value is string s)
                                                 {
                                                     templateBody = s;
                                                 }
-                                                break;
                                             }
+                                            break;
                                         case "TemplateLanguage":
                                             {
                                                 if (arg.Value.Value is string s)
                                                 {
                                                     templateLanguage = s;
                                                 }
-                                                break;
                                             }
+                                            break;
                                     }
                                 }
 
                                 #endregion
 
-                                TemplateSettings? template = null;
+                                TemplateDefinition? template = null;
                                 if (templateBody != null && templateBody.Trim().Length > 0)
                                 {
-                                    template = new TemplateSettings(templateLanguage ?? "scriban", templateBody.Trim());
+                                    if (templateFileName != null && templateFileName.Trim().Length > 0)
+                                    {
+                                        Helpers.ReportDiagnostic(context, "BK-AG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                            );
+                                        continue;
+                                    }
+
+                                    template = new TemplateDefinition(templateLanguage ?? "scriban", templateBody.Trim());
+                                }
+                                else if (templateFileName != null && templateFileName.Trim().Length > 0)
+                                {
+                                    string? content = null;
+
+                                    AdditionalText? file = context.AdditionalFiles.FirstOrDefault(i => i.Path.EndsWith(templateFileName));
+                                    if (file != null)
+                                    {
+                                        content = file.GetText()?.ToString()?.Trim();
+                                        if (content == null)
+                                        {
+                                            content = "";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Helpers.ReportDiagnostic(context, "BK-AG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                            templateFileName);
+                                        continue;
+                                    }
+
+                                    if (string.IsNullOrEmpty(templateLanguage))
+                                    {
+                                        string extension = Path.GetExtension(templateFileName).ToLowerInvariant();
+                                        if (extension.StartsWith("."))
+                                        {
+                                            extension = extension.Substring(1);
+                                        }
+                                        templateLanguage = extension;
+                                    }
+
+                                    if (templateParts.Count > 0)
+                                    {
+                                        Helpers.ReportDiagnostic(context, "BK-AG13", nameof(AutoInterfaceResource.AG13_title), nameof(AutoInterfaceResource.AG13_message), nameof(AutoInterfaceResource.AG13_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                            );
+                                        continue;
+                                    }
+
+                                    template = new TemplateDefinition(templateLanguage ?? "scriban", content);
                                 }
 
-                                records.Add(new AutoInterfaceRecord(symbol, receiverType, attribute, interfaceType, template));
+                                records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts));
+                                danglingInterfaceTypesBySymbols.Remove(symbol);
                             }
                             else
                             {
-                                ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                     157834);
                                 continue;
                             }
                         }
                         else
                         {
-                            ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                            Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                 receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
                     }
                     else
                     {
-                        ReportDiagnostic(context, "BK-AG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                        Helpers.ReportDiagnostic(context, "BK-AG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                             type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                         continue;
                     }
+                }
+            }
+
+            foreach (KeyValuePair<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypes in danglingInterfaceTypesBySymbols)
+            {
+                foreach (INamedTypeSymbol interfaceType in danglingInterfaceTypes.Value)
+                {
+                    records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts));
                 }
             }
 
@@ -289,7 +517,7 @@ namespace BeaKona
 
             SourceBuilder builder = new SourceBuilder();
 
-            ICodeTextWriter writer = new CSharpCodeTextWriter(compilation);
+            ICodeTextWriter writer = new CSharpCodeTextWriter(context, compilation);
             bool anyReasonToEmitSourceFile = false;
             bool error = false;
 
@@ -334,32 +562,68 @@ namespace BeaKona
                 ISourceTextGenerator? generator = null;
                 foreach (IMemberInfo reference in references)
                 {
-                    if (reference.Template is TemplateSettings ts)
+                    if (reference.Template is TemplateDefinition td)
                     {
                         if (generator is TemplatedSourceTextGenerator g)
                         {
-                            if (g.Settings.Equals(ts) == false)
+                            if (g.Template.Equals(td) == false)
                             {
                                 error = true;
-                                ReportDiagnostic(context, "BK-AG10", nameof(AutoInterfaceResource.AG10_title), nameof(AutoInterfaceResource.AG10_message), nameof(AutoInterfaceResource.AG10_description), DiagnosticSeverity.Error, reference.Member);
+                                Helpers.ReportDiagnostic(context, "BK-AG10", nameof(AutoInterfaceResource.AG10_title), nameof(AutoInterfaceResource.AG10_message), nameof(AutoInterfaceResource.AG10_description), DiagnosticSeverity.Error, reference.Member);
                                 continue;
                             }
                         }
                         else
                         {
-                            generator = new TemplatedSourceTextGenerator(ts);
+                            generator = new TemplatedSourceTextGenerator(td);
                         }
                     }
                 }
 
                 if (generator != null)
                 {
-                    Model model = new Model(writer, builder, group.Key, type, references, scope);
-                    generator.Emit(writer, builder, model, ref separatorRequired, out bool anyReasonToEmitSourceFileLocal);
-                    if (anyReasonToEmitSourceFileLocal)
+                    INamedTypeSymbol @interface = group.Key;
+
+                    StandaloneModel model = new StandaloneModel();
+
+                    model.Load(writer, builder, @interface, scope, references);
+
+                    MethodModel CreateMethod(IMethodSymbol method)
                     {
-                        anyReasonToEmitSourceFile = true;
+                        MethodModel m = new MethodModel();
+                        m.Load(writer, builder, method, scope, references);
+                        return m;
                     }
+
+
+                    PropertyModel CreateProperty(IPropertySymbol property)
+                    {
+                        PropertyModel m = new PropertyModel();
+                        m.Load(writer, builder, property, scope, references);
+                        return m;
+                    }
+
+                    IndexerModel CreateIndexer(IPropertySymbol indexer)
+                    {
+                        IndexerModel m = new IndexerModel();
+                        m.Load(writer, builder, indexer, scope, references);
+                        return m;
+                    }
+
+                    EventModel CreateEvent(IEventSymbol @event)
+                    {
+                        EventModel m = new EventModel();
+                        m.Load(writer, builder, @event, scope, references);
+                        return m;
+                    }
+
+                    model.Methods.AddRange(@interface.GetMethods().Where(i => type.IsMemberImplemented(i) == false).Select(CreateMethod));
+                    model.Properties.AddRange(@interface.GetProperties().Where(i => type.IsMemberImplemented(i) == false).Select(CreateProperty));
+                    model.Indexers.AddRange(@interface.GetIndexers().Where(i => type.IsMemberImplemented(i) == false).Select(CreateIndexer));
+                    model.Events.AddRange(@interface.GetEvents().Where(i => type.IsMemberImplemented(i) == false).Select(CreateEvent));
+
+                    generator.Emit(writer, builder, model, ref separatorRequired);
+                    anyReasonToEmitSourceFile = true;
 
                     if (separatorRequired)
                     {
@@ -440,31 +704,9 @@ namespace BeaKona
                 builder.AppendLine('}');
             }
 
-            //return error.ToString() + " " + anyReasonToEmitSourceFile.ToString();
             return error == false && anyReasonToEmitSourceFile ? builder.ToString() : null;
         }
 
-        private static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, SyntaxNode? node, params object?[] messageArgs)
-        {
-            AutoInterfaceSourceGenerator.ReportDiagnostic(context, id, title, message, description, severity, node?.GetLocation(), messageArgs);
-        }
-
-        private static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, ISymbol? member, params object?[] messageArgs)
-        {
-            AutoInterfaceSourceGenerator.ReportDiagnostic(context, id, title, message, description, severity, member != null && member.Locations.Length > 0 ? member.Locations[0] : null, messageArgs);
-        }
-
-        private static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, Location? location, params object?[] messageArgs)
-        {
-            LocalizableString ltitle = new LocalizableResourceString(title, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-            LocalizableString lmessage = new LocalizableResourceString(message, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-            LocalizableString? ldescription = new LocalizableResourceString(description, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-            string category = typeof(AutoInterfaceSourceGenerator).Namespace;
-            string? link = "https://github.com/beakona/AutoInterface";
-            DiagnosticDescriptor dd = new DiagnosticDescriptor(id, ltitle, lmessage, category, severity, true, ldescription, link, WellKnownDiagnosticTags.NotConfigurable);
-            Diagnostic d = Diagnostic.Create(dd, location, messageArgs);
-            context.ReportDiagnostic(d);
-        }
 
         /// <summary>
         /// Created on demand before each generation pass

@@ -1,8 +1,8 @@
-﻿namespace BeaKona.AutoInterfaceGenerator
+﻿namespace BeaKona.AutoInterfaceGenerator.Templates
 {
-    internal class TemplateSettings
+    internal class TemplateDefinition
     {
-        public TemplateSettings(string language, string body)
+        public TemplateDefinition(string language, string body)
         {
             this.Language = language ?? "";
             this.Body = body ?? "";
@@ -13,7 +13,7 @@
 
         public override bool Equals(object obj)
         {
-            if (obj is TemplateSettings o)
+            if (obj is TemplateDefinition o)
             {
                 if (this == o)
                 {

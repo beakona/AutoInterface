@@ -207,4 +207,58 @@
   <data name="AG10_title" xml:space="preserve">
     <value>Multiple AutoInterface templates.</value>
   </data>
+  <data name="AG11_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG11_message" xml:space="preserve">
+    <value>Template file '{0}' not found.</value>
+  </data>
+  <data name="AG11_title" xml:space="preserve">
+    <value>Template file not found.</value>
+  </data>
+  <data name="AG12_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG12_message" xml:space="preserve">
+    <value>Template should be specified either inline or from file but not both.</value>
+  </data>
+  <data name="AG12_title" xml:space="preserve">
+    <value>More than one template specified.</value>
+  </data>
+  <data name="AG13_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG13_message" xml:space="preserve">
+    <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.</value>
+  </data>
+  <data name="AG13_title" xml:space="preserve">
+    <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.</value>
+  </data>
+  <data name="AG14_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG14_message" xml:space="preserve">
+    <value>Template is missing.</value>
+  </data>
+  <data name="AG14_title" xml:space="preserve">
+    <value>Template is missing.</value>
+  </data>
+  <data name="AG15_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG15_message" xml:space="preserve">
+    <value>Filter '{0}' is not valid Regex expression.</value>
+  </data>
+  <data name="AG15_title" xml:space="preserve">
+    <value>Filter is not valid Regex expression.</value>
+  </data>
+  <data name="AG16_description" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AG16_message" xml:space="preserve">
+    <value>Multiple partial templates found for member: '{0}'.</value>
+  </data>
+  <data name="AG16_title" xml:space="preserve">
+    <value>Multiple partial templates found.</value>
+  </data>
 </root>

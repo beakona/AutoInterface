@@ -1,34 +1,32 @@
 ﻿using System;
 using System.Linq;
 
-namespace BeaKona.AutoInterfaceGenerator
+namespace BeaKona.AutoInterfaceGenerator.Templates
 {
     internal class TemplatedSourceTextGenerator : ISourceTextGenerator
     {
-        public TemplatedSourceTextGenerator(TemplateSettings settings)
+        public TemplatedSourceTextGenerator(TemplateDefinition template)
         {
-            this.Settings = settings;
+            this.Template = template;
         }
 
-        public TemplateSettings Settings { get; }
+        public TemplateDefinition Template { get; }
 
-        public void Emit(ICodeTextWriter writer, SourceBuilder builder, Model model, ref bool separatorRequired, out bool anyReasonToEmitSourceFile)
+        public void Emit(ICodeTextWriter writer, SourceBuilder builder, object? model, ref bool separatorRequired)
         {
-            Scriban.Template? template = (this.Settings.Language ?? "").ToLowerInvariant() switch
+            Scriban.Template? template = (this.Template.Language ?? "").ToLowerInvariant() switch
             {
-                "scriban" => Scriban.Template.Parse(this.Settings.Body),
-                "liquid" => Scriban.Template.ParseLiquid(this.Settings.Body),
+                "scriban" => Scriban.Template.Parse(this.Template.Body),
+                "liquid" => Scriban.Template.ParseLiquid(this.Template.Body),
                 _ => null,
             };
 
             if (template == null)
             {
-                throw new NotSupportedException($"Template language '{this.Settings.Language}' is not supported.");
+                throw new NotSupportedException($"Template language '{this.Template.Language}' is not supported.");
             }
 
             string text = template.Render(model);
-
-            anyReasonToEmitSourceFile = true;
 
             string[] lines = text.Split(new string[] { "\r\n", "\n\r", "\n", "\r" }, StringSplitOptions.None);
 

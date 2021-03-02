@@ -19,6 +19,14 @@
   <PropertyGroup>
     <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="InjectedCode.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="InjectedCode.cs" />
+  </ItemGroup>
     
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.8.0" PrivateAssets="all" />

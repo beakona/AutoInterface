@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="mytemplate.scriban" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="mytemplate.scriban" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Analyzer Include="..\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
   </ItemGroup>
 

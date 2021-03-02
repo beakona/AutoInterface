@@ -29,9 +29,11 @@ namespace BeaKona.AutoInterfaceGenerator
 
         void WriteHolderReference(SourceBuilder builder, ISymbol member, ScopeInfo scope);
 
-        void WriteMemberReference(SourceBuilder builder, IMemberInfo item, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
+        void WriteMemberReference(SourceBuilder builder, IMemberInfo reference, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
 
-        void WriteMethodCall(SourceBuilder builder, IMemberInfo item, IMethodSymbol method, ScopeInfo scope, bool async, bool typeIsNullable, bool allowCoalescing);
+        void WritePropertyCall(SourceBuilder builder, IMemberInfo reference, IPropertySymbol property, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
+
+        void WriteMethodCall(SourceBuilder builder, IMemberInfo reference, IMethodSymbol method, ScopeInfo scope, bool async, bool typeIsNullable, bool allowCoalescing);
 
         void WriteIdentifier(SourceBuilder builder, ISymbol symbol);
 
