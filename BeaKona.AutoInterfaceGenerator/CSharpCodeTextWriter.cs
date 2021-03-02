@@ -397,13 +397,13 @@ namespace BeaKona.AutoInterfaceGenerator
             AutoInterfaceTargets getterTarget, setterTarget;
             if (property.IsIndexer)
             {
-                getterTarget = AutoInterfaceTargets.PropertyGetter;
-                setterTarget = AutoInterfaceTargets.PropertySetter;
+                getterTarget = AutoInterfaceTargets.IndexerGetter;
+                setterTarget = AutoInterfaceTargets.IndexerSetter;
             }
             else
             {
-                getterTarget = AutoInterfaceTargets.IndexerGetter;
-                setterTarget = AutoInterfaceTargets.IndexerSetter;
+                getterTarget = AutoInterfaceTargets.PropertyGetter;
+                setterTarget = AutoInterfaceTargets.PropertySetter;
             }
 
             PartialTemplate? getterTemplate = this.GetMatchedTemplates(references, getterTarget, property.IsIndexer ? "this" : property.Name);

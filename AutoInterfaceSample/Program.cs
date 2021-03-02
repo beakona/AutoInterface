@@ -4,27 +4,45 @@
     {
         public static void Main()
         {
-            //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person_1.Info);
-            IPrintable p = new Proxy();
-            p.Print();
+            //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
+            IPrintable p = new Person();
+            p.Print1();
         }
     }
 
     public interface IPrintable
     {
-        void Print();
+        int Length { get; }
+        int Count { get; }
+        void Print1();
+        void Print2();
     }
 
-    public class Printer : IPrintable
+    public class PrinterV1 : IPrintable
     {
-        public void Print()
+        public int Length => 100;
+        public int Count => 200;
+        public void Print1()
+        {
+        }
+        public void Print2()
         {
         }
     }
 
-    public partial class Proxy : IPrintable
+    public partial class Person : IPrintable
     {
-        [BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
-        private IPrintable? aspect1 = new Printer();
+        private void LogDebug(string name)
+        {
+        }
+
+        [BeaKona.AutoInterface]
+        [BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.PropertyGetter, Filter = "Length", Language = "scriban", Body = "return 1;")]
+        [BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print(\\d)?", Body = "LogDebug(nameof({{interface}}.{{name}})); {{expression}};")]
+        private readonly IPrintable? aspect1 = new PrinterV1();
+
+        //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
+        //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
+        //private readonly IPrintable? aspect2 = new PrinterV1();
     }
 }
