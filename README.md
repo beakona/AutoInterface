@@ -1,6 +1,6 @@
 # AutoInterface
 
-C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md) which redirects all interface-calls to one or more backing members. Source code can be generated for a `class`, `record`, or `struct`. It can be generated automatically or by a custom template ([scriban](https://github.com/scriban/scriban), [liquid](https://github.com/scriban/scriban)).
+C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md) which redirects all interface-calls to one or more backing members. Source code can be generated for a `class`, `record`, or `struct`. It can be generated automatically or by a custom template ([scriban](https://github.com/scriban/scriban), liquid).
 <br>
 
 Manually written source:
