@@ -28,7 +28,7 @@ partial class Person
 ```
 <br>
 
-## Generate code from template
+## Generate code from a template
 
 Manually written source:
 
