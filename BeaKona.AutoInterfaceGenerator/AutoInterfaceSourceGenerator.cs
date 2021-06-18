@@ -26,7 +26,7 @@ namespace BeaKona.AutoInterfaceGenerator
         public void Execute(GeneratorExecutionContext context)
         {
             using Stream icStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BeaKona.AutoInterfaceGenerator.InjectedCode.cs");
-            using StreamReader icReader = new StreamReader(icStream);
+            using StreamReader icReader = new(icStream);
             
             SourceText txt = SourceText.From(icReader.ReadToEnd(), Encoding.UTF8);
 
@@ -50,7 +50,7 @@ namespace BeaKona.AutoInterfaceGenerator
                     if (compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceAttribute") is INamedTypeSymbol autoInterfaceAttributeSymbol && compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceTemplateAttribute") is INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
                     {
                         // loop over the candidates, and keep the ones that are actually annotated
-                        List<AutoInterfaceRecord> records = new List<AutoInterfaceRecord>();
+                        List<AutoInterfaceRecord> records = new();
 
                         foreach (MemberDeclarationSyntax candidate in receiver.Candidates)
                         {
@@ -125,7 +125,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
                             if (referencesWithMissingInterface.Count > 0)
                             {
-                                HashSet<INamedTypeSymbol> emitted = new HashSet<INamedTypeSymbol>();
+                                HashSet<INamedTypeSymbol> emitted = new();
                                 foreach (AutoInterfaceRecord itemWithMissingInterface in referencesWithMissingInterface)
                                 {
                                     if (emitted.Add(itemWithMissingInterface.InterfaceType))
@@ -161,7 +161,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
         //private static void GeneratePreview(GeneratorExecutionContext context, string name, string code)
         //{
-        //    StringBuilder output = new StringBuilder();
+        //    StringBuilder output = new();
         //    output.AppendLine("namespace BeaKona.Output {");
         //    output.AppendLine($"public static class Debug_{name}");
         //    output.AppendLine("{");
@@ -173,8 +173,8 @@ namespace BeaKona.AutoInterfaceGenerator
 
         private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
         {
-            List<PartialTemplate> templateParts = new List<PartialTemplate>();
-            Dictionary<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypesBySymbols = new Dictionary<ISymbol, HashSet<INamedTypeSymbol>>();
+            List<PartialTemplate> templateParts = new();
+            Dictionary<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypesBySymbols = new();
 
             foreach (AttributeData attribute in symbol.GetAttributes())
             {
@@ -353,7 +353,7 @@ namespace BeaKona.AutoInterfaceGenerator
                 }
             }
 
-            List<AutoInterfaceRecord> records = new List<AutoInterfaceRecord>();
+            List<AutoInterfaceRecord> records = new();
 
             foreach (AttributeData attribute in symbol.GetAttributes())
             {
@@ -513,9 +513,9 @@ namespace BeaKona.AutoInterfaceGenerator
 
         private static string? ProcessClass(GeneratorExecutionContext context, Compilation compilation, INamedTypeSymbol type, IEnumerable<IMemberInfo> infos)
         {
-            ScopeInfo scope = new ScopeInfo(type);
+            ScopeInfo scope = new(type);
 
-            SourceBuilder builder = new SourceBuilder();
+            SourceBuilder builder = new();
 
             ICodeTextWriter writer = new CSharpCodeTextWriter(context, compilation);
             bool anyReasonToEmitSourceFile = false;
@@ -523,14 +523,10 @@ namespace BeaKona.AutoInterfaceGenerator
 
             //bool isNullable = compilation.Options.NullableContextOptions == NullableContextOptions.Enable;
             builder.AppendLine("#nullable enable");
+            builder.AppendLine();
+            writer.WriteNamespaceBeginning(builder, type.ContainingNamespace);
 
-            ImmutableArray<INamespaceSymbol> namespaceParts = type.ContainingNamespace != null && type.ContainingNamespace.IsGlobalNamespace == false ? SemanticFacts.GetNamespaceParts(type.ContainingNamespace) : new ImmutableArray<INamespaceSymbol>();
-            if (namespaceParts.Length > 0)
-            {
-                writer.WriteNamespaceBeginning(builder, namespaceParts);
-            }
-
-            List<INamedTypeSymbol> containingTypes = new List<INamedTypeSymbol>();
+            List<INamedTypeSymbol> containingTypes = new();
             for (INamedTypeSymbol? ct = type.ContainingType; ct != null; ct = ct.ContainingType)
             {
                 containingTypes.Insert(0, ct);
@@ -584,13 +580,13 @@ namespace BeaKona.AutoInterfaceGenerator
                 {
                     INamedTypeSymbol @interface = group.Key;
 
-                    StandaloneModel model = new StandaloneModel();
+                    StandaloneModel model = new();
 
                     model.Load(writer, builder, @interface, scope, references);
 
                     MethodModel CreateMethod(IMethodSymbol method)
                     {
-                        MethodModel m = new MethodModel();
+                        MethodModel m = new();
                         m.Load(writer, builder, method, scope, references);
                         return m;
                     }
@@ -598,21 +594,21 @@ namespace BeaKona.AutoInterfaceGenerator
 
                     PropertyModel CreateProperty(IPropertySymbol property)
                     {
-                        PropertyModel m = new PropertyModel();
+                        PropertyModel m = new();
                         m.Load(writer, builder, property, scope, references);
                         return m;
                     }
 
                     IndexerModel CreateIndexer(IPropertySymbol indexer)
                     {
-                        IndexerModel m = new IndexerModel();
+                        IndexerModel m = new();
                         m.Load(writer, builder, indexer, scope, references);
                         return m;
                     }
 
                     EventModel CreateEvent(IEventSymbol @event)
                     {
-                        EventModel m = new EventModel();
+                        EventModel m = new();
                         m.Load(writer, builder, @event, scope, references);
                         return m;
                     }
@@ -697,7 +693,7 @@ namespace BeaKona.AutoInterfaceGenerator
                 builder.AppendLine('}');
             }
 
-            if (namespaceParts.Length > 0)
+            if (type.ContainingNamespace != null && type.ContainingNamespace.ConstituentNamespaces.Length > 0)
             {
                 builder.DecrementIndentation();
                 builder.AppendIndentation();
@@ -713,7 +709,7 @@ namespace BeaKona.AutoInterfaceGenerator
         /// </summary>
         private class SyntaxReceiver : ISyntaxReceiver
         {
-            public List<MemberDeclarationSyntax> Candidates { get; } = new List<MemberDeclarationSyntax>();
+            public List<MemberDeclarationSyntax> Candidates { get; } = new();
 
             /// <summary>
             /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation

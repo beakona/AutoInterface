@@ -53,7 +53,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public static ISymbol[] GetContainingSymbols(ITypeSymbol type, bool includeSelf)
         {
-            List<ISymbol> symbols = new List<ISymbol>();
+            List<ISymbol> symbols = new();
 
             for (ISymbol t = includeSelf ? type : type.ContainingSymbol; t != null; t = t.ContainingSymbol)
             {
@@ -147,16 +147,6 @@ namespace BeaKona.AutoInterfaceGenerator
             }
 
             return false;
-        }
-
-        public static ImmutableArray<INamespaceSymbol> GetNamespaceParts(INamespaceSymbol @namespace)
-        {
-            List<INamespaceSymbol> parts = new List<INamespaceSymbol>();
-            for (; @namespace != null && @namespace.IsGlobalNamespace == false; @namespace = @namespace.ContainingNamespace)
-            {
-                parts.Insert(0, @namespace);
-            }
-            return parts.ToImmutableArray();
         }
     }
 }

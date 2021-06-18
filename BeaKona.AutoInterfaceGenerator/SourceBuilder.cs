@@ -25,8 +25,8 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public SourceBuilderOptions Options { get; }
 
-        private readonly List<object> elements = new List<object>();
-        private readonly HashSet<string> aliases = new HashSet<string>();
+        private readonly List<object> elements = new();
+        private readonly HashSet<string> aliases = new();
 
         public void Clear()
         {
@@ -113,7 +113,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public SourceBuilder AppendNewBuilder(bool register = true)
         {
-            SourceBuilder builder = new SourceBuilder(this, this.Options);
+            SourceBuilder builder = new(this, this.Options);
             if (register)
             {
                 this.elements.Add(builder);
@@ -133,7 +133,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public override string ToString()
         {
-            StringBuilder text = new StringBuilder();
+            StringBuilder text = new();
             foreach (string alias in this.aliases.OrderByDescending(i => i))
             {
                 text.Append("extern alias ");
@@ -172,7 +172,7 @@ namespace BeaKona.AutoInterfaceGenerator
                                 int depth = indentation.Depth;
                                 if (cache.TryGetValue(depth, out string value) == false)
                                 {
-                                    StringBuilder sb = new StringBuilder();
+                                    StringBuilder sb = new();
                                     for (int i = 0; i < depth; i++)
                                     {
                                         sb.Append(this.Options.Identation);

@@ -25,7 +25,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
         void WriteTypeDeclarationBeginning(SourceBuilder builder, INamedTypeSymbol type, ScopeInfo scope);
 
-        void WriteNamespaceBeginning(SourceBuilder builder, IEnumerable<INamespaceSymbol> @namespace);
+        void WriteNamespaceBeginning(SourceBuilder builder, INamespaceSymbol @namespace);
 
         void WriteHolderReference(SourceBuilder builder, ISymbol member, ScopeInfo scope);
 

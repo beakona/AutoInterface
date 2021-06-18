@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
@@ -259,7 +260,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void WriteMethodDefinition(SourceBuilder builder, IMethodSymbol method, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references)
         {
-            ScopeInfo methodScope = new ScopeInfo(scope);
+            ScopeInfo methodScope = new(scope);
 
             if (method.IsGenericMethod)
             {
@@ -311,9 +312,9 @@ namespace BeaKona.AutoInterfaceGenerator
                 {
                     if (template != null)
                     {
-                        TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(template.Template);
+                        TemplatedSourceTextGenerator generator = new(template.Template);
 
-                        PartialMethodModel model = new PartialMethodModel();
+                        PartialMethodModel model = new();
                         model.Load(this, builder, @interface, scope, references);
                         model.Load(this, builder, method, methodScope, references);
 
@@ -472,7 +473,7 @@ namespace BeaKona.AutoInterfaceGenerator
                                 builder.IncrementIndentation();
                                 try
                                 {
-                                    TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(getterTemplate.Template);
+                                    TemplatedSourceTextGenerator generator = new(getterTemplate.Template);
 
                                     IPropertyModel model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
                                     if (model is IRootModel rootModel)
@@ -513,7 +514,7 @@ namespace BeaKona.AutoInterfaceGenerator
                             {
                                 if (setterTemplate != null)
                                 {
-                                    TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(setterTemplate.Template);
+                                    TemplatedSourceTextGenerator generator = new(setterTemplate.Template);
                                     IPropertyModel model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
                                     if (model is IRootModel rootModel)
                                     {
@@ -604,8 +605,8 @@ namespace BeaKona.AutoInterfaceGenerator
                         {
                             if (adderTemplate != null)
                             {
-                                TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(adderTemplate.Template);
-                                PartialEventModel model = new PartialEventModel();
+                                TemplatedSourceTextGenerator generator = new(adderTemplate.Template);
+                                PartialEventModel model = new();
                                 model.Load(this, builder, @interface, scope, references);
                                 model.Load(this, builder, @event, scope, references);
 
@@ -646,8 +647,8 @@ namespace BeaKona.AutoInterfaceGenerator
                         {
                             if (removerTemplate != null)
                             {
-                                TemplatedSourceTextGenerator generator = new TemplatedSourceTextGenerator(removerTemplate.Template);
-                                PartialEventModel model = new PartialEventModel();
+                                TemplatedSourceTextGenerator generator = new(removerTemplate.Template);
+                                PartialEventModel model = new();
                                 model.Load(this, builder, @interface, scope, references);
                                 model.Load(this, builder, @event, scope, references);
 
@@ -712,15 +713,18 @@ namespace BeaKona.AutoInterfaceGenerator
             this.WriteTypeReference(builder, type, scope);
         }
 
-        public void WriteNamespaceBeginning(SourceBuilder builder, IEnumerable<INamespaceSymbol> @namespace)
+        public void WriteNamespaceBeginning(SourceBuilder builder, INamespaceSymbol @namespace)
         {
-            builder.AppendIndentation();
-            builder.Append("namespace");
-            builder.Append(' ');
-            builder.AppendLine(string.Join(".", @namespace.Select(i => this.GetSourceIdentifier(i))));
-            builder.AppendIndentation();
-            builder.AppendLine('{');
-            builder.IncrementIndentation();
+            if (@namespace != null && @namespace.ConstituentNamespaces.Length > 0)
+            {
+                builder.AppendIndentation();
+                builder.Append("namespace");
+                builder.Append(' ');
+                builder.AppendLine(GetSourceIdentifier(@namespace));
+                builder.AppendIndentation();
+                builder.AppendLine('{');
+                builder.IncrementIndentation();
+            }
         }
 
         public void WriteHolderReference(SourceBuilder builder, ISymbol member, ScopeInfo scope)
@@ -864,107 +868,140 @@ namespace BeaKona.AutoInterfaceGenerator
 
         private string GetSourceIdentifier(ISymbol symbol)
         {
-            if (symbol is IPropertySymbol property && property.IsIndexer)
+            if (symbol is IPropertySymbol propertySymbol && propertySymbol.IsIndexer)
             {
                 return "this";
             }
-            else if (this.IsVerbatim(symbol))
-            {
-                return $"@{symbol.Name}";
-            }
             else
             {
-                return symbol.Name;
-            }
-        }
-
-        private bool IsVerbatim(ISymbol symbol)
-        {
-            foreach (SyntaxReference syntaxReference in symbol.DeclaringSyntaxReferences)
-            {
-                SyntaxNode syntax = syntaxReference.GetSyntax();
-                if (syntax is BaseTypeDeclarationSyntax type)
+                foreach (SyntaxReference syntaxReference in symbol.DeclaringSyntaxReferences)
                 {
-                    return type.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is MethodDeclarationSyntax method)
-                {
-                    return method.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is ParameterSyntax parameter)
-                {
-                    return parameter.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is VariableDeclaratorSyntax variableDeclarator)
-                {
-                    return variableDeclarator.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is VariableDeclarationSyntax variableDeclaration)
-                {
-                    foreach (var variable in variableDeclaration.Variables)
+                    SyntaxNode syntax = syntaxReference.GetSyntax();
+                    if (syntax is BaseTypeDeclarationSyntax type)
                     {
-                        if (variable.Identifier.IsVerbatimIdentifier())
+                        return this.GetSourceIdentifier(type.Identifier);
+                    }
+                    else if (syntax is MethodDeclarationSyntax method)
+                    {
+                        return this.GetSourceIdentifier(method.Identifier);
+                    }
+                    else if (syntax is ParameterSyntax parameter)
+                    {
+                        return this.GetSourceIdentifier(parameter.Identifier);
+                    }
+                    else if (syntax is VariableDeclaratorSyntax variableDeclarator)
+                    {
+                        return this.GetSourceIdentifier(variableDeclarator.Identifier);
+                    }
+                    else if (syntax is VariableDeclarationSyntax variableDeclaration)
+                    {
+                        if (variableDeclaration.Variables.Any(i => i.Identifier.IsVerbatimIdentifier()))
                         {
-                            return true;
+                            return "@" + symbol;
+                        }
+                        else
+                        {
+                            return symbol.ToString();
                         }
                     }
-
-                    return false;
-                }
-                else if (syntax is BaseFieldDeclarationSyntax field)
-                {
-                    foreach (var variable in field.Declaration.Variables)
+                    else if (syntax is BaseFieldDeclarationSyntax field)
                     {
-                        if (variable.Identifier.IsVerbatimIdentifier())
+                        if (field.Declaration.Variables.Any(i => i.Identifier.IsVerbatimIdentifier()))
                         {
-                            return true;
+                            return "@" + symbol;
+                        }
+                        else
+                        {
+                            return symbol.ToString();
                         }
                     }
-
-                    return false;
-                }
-                else if (syntax is PropertyDeclarationSyntax property)
-                {
-                    return property.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is IndexerDeclarationSyntax)
-                {
-                    throw new InvalidOperationException("trying to resolve indexer name");
-                }
-                else if (syntax is EventDeclarationSyntax @event)
-                {
-                    return @event.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is TypeParameterSyntax typeParameter)
-                {
-                    return typeParameter.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is TupleTypeSyntax)
-                {
-                    return false;
-                }
-                else if (syntax is TupleElementSyntax tupleElement)
-                {
-                    return tupleElement.Identifier.IsVerbatimIdentifier();
-                }
-                else if (syntax is NamespaceDeclarationSyntax @namespace)
-                {
-                    if (@namespace.Name is IdentifierNameSyntax identifier)
+                    else if (syntax is PropertyDeclarationSyntax property)
                     {
-                        return identifier.Identifier.IsVerbatimIdentifier();
+                        return this.GetSourceIdentifier(property.Identifier);
+                    }
+                    else if (syntax is IndexerDeclarationSyntax)
+                    {
+                        throw new InvalidOperationException("trying to resolve indexer name");
+                    }
+                    else if (syntax is EventDeclarationSyntax @event)
+                    {
+                        return this.GetSourceIdentifier(@event.Identifier);
+                    }
+                    else if (syntax is TypeParameterSyntax typeParameter)
+                    {
+                        return this.GetSourceIdentifier(typeParameter.Identifier);
+                    }
+                    else if (syntax is TupleTypeSyntax)
+                    {
+                        return symbol.Name;
+                    }
+                    else if (syntax is TupleElementSyntax tupleElement)
+                    {
+                        return this.GetSourceIdentifier(tupleElement.Identifier);
+                    }
+                    else if (syntax is NamespaceDeclarationSyntax @namespace)
+                    {
+                        return this.GetSourceIdentifier(@namespace.Name);
                     }
                     else
                     {
                         throw new NotSupportedException(syntax.GetType().ToString());
                     }
                 }
+
+                throw new NotSupportedException();
+            }
+        }
+
+        private string GetSourceIdentifier(SyntaxToken identifier)
+        {
+            if (identifier.IsVerbatimIdentifier())
+            {
+                return "@" + identifier.ValueText;
+            }
+            else
+            {
+                return identifier.ValueText;
+            }
+        }
+
+        private string GetSourceIdentifier(NameSyntax name)
+        {
+            if (name is SimpleNameSyntax simpleName)
+            {
+                return this.GetSourceIdentifier(simpleName.Identifier);
+            }
+            else if (name is QualifiedNameSyntax qualifiedName)
+            {
+                string left = this.GetSourceIdentifier(qualifiedName.Left);
+                string right = this.GetSourceIdentifier(qualifiedName.Right);
+                if (string.IsNullOrEmpty(left))
+                {
+                    if (string.IsNullOrEmpty(right))
+                    {
+                        throw new NotSupportedException("both are null_or_empty.");
+                    }
+                    else
+                    {
+                        return right;
+                    }
+                }
                 else
                 {
-                    throw new NotSupportedException(syntax.GetType().ToString());
+                    if (string.IsNullOrEmpty(right))
+                    {
+                        return left;
+                    }
+                    else
+                    {
+                        return left + "." + right;
+                    }
                 }
             }
-
-            return false;
+            else
+            {
+                throw new NotSupportedException(name.GetType().ToString());
+            }
         }
 
         #endregion

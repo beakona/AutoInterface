@@ -21,7 +21,7 @@ namespace BeaKona.AutoInterfaceGenerator
             LocalizableString? ldescription = new LocalizableResourceString(description, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
             string category = typeof(AutoInterfaceSourceGenerator).Namespace;
             string? link = "https://github.com/beakona/AutoInterface";
-            DiagnosticDescriptor dd = new DiagnosticDescriptor(id, ltitle, lmessage, category, severity, true, ldescription, link, WellKnownDiagnosticTags.NotConfigurable);
+            DiagnosticDescriptor dd = new(id, ltitle, lmessage, category, severity, true, ldescription, link, WellKnownDiagnosticTags.NotConfigurable);
             Diagnostic d = Diagnostic.Create(dd, location, messageArgs);
             context.ReportDiagnostic(d);
         }
