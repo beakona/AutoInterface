@@ -27,7 +27,7 @@ namespace BeaKona.AutoInterfaceGenerator
         {
             using Stream icStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BeaKona.AutoInterfaceGenerator.InjectedCode.cs");
             using StreamReader icReader = new(icStream);
-            
+
             SourceText txt = SourceText.From(icReader.ReadToEnd(), Encoding.UTF8);
 
             // add the attribute text
@@ -121,7 +121,7 @@ namespace BeaKona.AutoInterfaceGenerator
                                 continue;
                             }
 
-                            List<AutoInterfaceRecord> referencesWithMissingInterface = group.Where(i => type.Interfaces.Contains(i.InterfaceType, SymbolEqualityComparer.Default) == false).ToList();
+                            List<AutoInterfaceRecord> referencesWithMissingInterface = group.Where(i => type.AllInterfaces.Contains(i.InterfaceType, SymbolEqualityComparer.Default) == false).ToList();
 
                             if (referencesWithMissingInterface.Count > 0)
                             {
