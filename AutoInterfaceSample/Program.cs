@@ -44,15 +44,12 @@
         }
 
         [BeaKona.AutoInterface]
-        [BeaKona.AutoInterface]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.PropertyGetter, Filter = "Length", Language = "scriban", Body = "return 1;")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print(\\d)?", Body = "LogDebug(nameof({{interface}}.{{name}})); {{expression}};")]
         private readonly IPrintable? aspect1 = new PrinterV1();
 
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
-        [BeaKona.AutoInterface]
-        [BeaKona.AutoInterface]
-        private readonly IPrintable? aspect2 = new PrinterV1();
+        //private readonly IPrintable? aspect2 = new PrinterV1();
     }
 }
