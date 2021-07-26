@@ -82,6 +82,17 @@ namespace BeaKona.AutoInterfaceGenerator
                                 }
                             }
                         }
+                        //inject records of derived interfaces
+                        List<AutoInterfaceRecord> derived = records
+                            .SelectMany(x => x.ReceiverType.AllInterfaces
+                            //.Select(d => new AutoInterfaceRecord(x.Member, d, d, x.Template, x.TemplateParts.ToList())))  <- may be used to prevent explicit cast
+                            .Select(d => new AutoInterfaceRecord(x.Member, x.ReceiverType, d, x.Template, x.TemplateParts.ToList())))
+                            .ToList();
+
+                        foreach (var d in derived)
+                        {
+                            if (!records.Contains(d)) records.Add(d);
+                        }
 
                         // group the elements by class, and generate the source
                         foreach (IGrouping<INamedTypeSymbol, AutoInterfaceRecord> group in records.GroupBy(i => i.Member.ContainingType))
