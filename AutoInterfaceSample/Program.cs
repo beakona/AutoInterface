@@ -9,8 +9,11 @@
             p.Print1();
         }
     }
-
-    public interface IPrintable
+    public interface ITestable
+    {
+        void Test();
+    }
+    public interface IPrintable : ITestable
     {
         int Length { get; }
         int Count { get; }
@@ -28,6 +31,10 @@
         public void Print2()
         {
         }
+        public void Test()
+        {
+
+        }
     }
 
     public partial class Person : IPrintable
@@ -36,7 +43,8 @@
         {
         }
 
-        [BeaKona.AutoInterface]
+        [BeaKona.AutoInterface(typeof(ITestable))]
+        [BeaKona.AutoInterface(typeof(IPrintable))]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.PropertyGetter, Filter = "Length", Language = "scriban", Body = "return 1;")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print(\\d)?", Body = "LogDebug(nameof({{interface}}.{{name}})); {{expression}};")]
         private readonly IPrintable? aspect1 = new PrinterV1();
