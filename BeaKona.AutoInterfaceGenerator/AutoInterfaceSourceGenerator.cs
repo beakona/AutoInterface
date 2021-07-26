@@ -564,7 +564,7 @@ namespace BeaKona.AutoInterfaceGenerator
 
             foreach (IGrouping<INamedTypeSymbol, IMemberInfo> group in infos.GroupBy(i => i.InterfaceType))
             {
-                List<IMemberInfo> references = group.ToList();
+                List<IMemberInfo> references = group.DistinctBy(x => x.Member.ContainingType).ToList();
 
                 ISourceTextGenerator? generator = null;
                 foreach (IMemberInfo reference in references)
