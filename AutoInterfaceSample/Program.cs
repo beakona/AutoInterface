@@ -5,12 +5,17 @@
         public static void Main()
         {
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
-            IPrintable p = new Person();
+            IPrintable<int> p = new Person();
             p.Print1();
         }
     }
 
-    public interface IPrintable
+    public interface ITestable
+    {
+        void PrintTest();
+    }
+
+    public interface IPrintable<T> : ITestable
     {
         int Length { get; }
         int Count { get; }
@@ -18,7 +23,12 @@
         void Print2();
     }
 
-    public class PrinterV1 : IPrintable
+    public interface IPrintable2
+    {
+        void Print3();
+    }
+
+    public class PrinterV1 : IPrintable<int>, IPrintable2
     {
         public int Length => 100;
         public int Count => 200;
@@ -28,21 +38,36 @@
         public void Print2()
         {
         }
+        public void Print3()
+        {
+        }
+        public void PrintTest()
+        {
+        }
     }
 
-    public partial class Person : IPrintable
+    public partial class Person //: IPrintable//, IPrintable2
     {
         private void LogDebug(string name)
         {
         }
 
         [BeaKona.AutoInterface]
+        //[BeaKona.AutoInterface(typeof(ITestable))]
+        //[BeaKona.AutoInterface(typeof(ITestable))]
+        //[BeaKona.AutoInterface(typeof(IPrintable), true)]
+        //[BeaKona.AutoInterface(typeof(IPrintable), false)]
+        //[BeaKona.AutoInterface(typeof(IPrintable))]//, TemplateBody = "void TestB1() {}"
+        //[BeaKona.AutoInterface(typeof(IPrintable2))]//, TemplateBody = "void TestB2() {}"
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.PropertyGetter, Filter = "Length", Language = "scriban", Body = "return 1;")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print(\\d)?", Body = "LogDebug(nameof({{interface}}.{{name}})); {{expression}};")]
-        private readonly IPrintable? aspect1 = new PrinterV1();
+        private readonly IPrintable<int>? aspect1 = new PrinterV1();
 
+        [BeaKona.AutoInterface(typeof(IPrintable<int>), true)]
+        [BeaKona.AutoInterface(typeof(IPrintable2))]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
-        //private readonly IPrintable? aspect2 = new PrinterV1();
+        //[BeaKona.AutoInterface(typeof(ITestable))]
+        private readonly PrinterV1? aspect2 = new PrinterV1();
     }
 }

@@ -10,12 +10,24 @@ namespace BeaKona
         {
         }
 
+        public AutoInterfaceAttribute(bool includeBaseInterfaces)
+        {
+            this.IncludeBaseInterfaces = includeBaseInterfaces;
+        }
+
         public AutoInterfaceAttribute(Type type)
         {
             this.Type = type;
         }
 
+        public AutoInterfaceAttribute(Type type, bool includeBaseInterfaces)
+        {
+            this.Type = type;
+            this.IncludeBaseInterfaces = includeBaseInterfaces;
+        }
+
         public Type? Type { get; }
+        public bool IncludeBaseInterfaces { get; }
         public string? TemplateLanguage { get; set; }
         public string? TemplateBody { get; set; }
         public string? TemplateFileName { get; set; }

@@ -1,6 +1,8 @@
-﻿namespace BeaKona.AutoInterfaceGenerator.Templates
+﻿using System;
+
+namespace BeaKona.AutoInterfaceGenerator.Templates
 {
-    internal class TemplateDefinition
+    internal class TemplateDefinition : IEquatable<TemplateDefinition>
     {
         public TemplateDefinition(string language, string body)
         {
@@ -11,26 +13,36 @@
         public string Language { get; }
         public string Body { get; }
 
+        public bool Equals(TemplateDefinition other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (this == other)
+            {
+                return true;
+            }
+
+            if (this.Language != other.Language)
+            {
+                return false;
+            }
+
+            if (this.Body != other.Body)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is TemplateDefinition o)
             {
-                if (this == o)
-                {
-                    return true;
-                }
-
-                if (this.Language != o.Language)
-                {
-                    return false;
-                }
-
-                if (this.Body != o.Body)
-                {
-                    return false;
-                }
-
-                return true;
+                return this.Equals(o);
             }
             else
             {

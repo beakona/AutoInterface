@@ -27,7 +27,7 @@ namespace BeaKona.AutoInterfaceGenerator
         {
             using Stream icStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BeaKona.AutoInterfaceGenerator.InjectedCode.cs");
             using StreamReader icReader = new(icStream);
-            
+
             SourceText txt = SourceText.From(icReader.ReadToEnd(), Encoding.UTF8);
 
             // add the attribute text
@@ -46,7 +46,7 @@ namespace BeaKona.AutoInterfaceGenerator
                 //retrieve the populated receiver
                 if (context.SyntaxReceiver is SyntaxReceiver receiver)
                 {
-                    // get the newly bound attribute
+                    // get newly bound attribute
                     if (compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceAttribute") is INamedTypeSymbol autoInterfaceAttributeSymbol && compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceTemplateAttribute") is INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
                     {
                         // loop over the candidates, and keep the ones that are actually annotated
@@ -59,7 +59,7 @@ namespace BeaKona.AutoInterfaceGenerator
                             {
                                 foreach (VariableDeclaratorSyntax variableSyntax in fieldSyntax.Declaration.Variables)
                                 {
-                                    // Get the symbol being declared by the member, and keep it if its annotated
+                                    // get symbol being declared by the member, and keep it if its annotated
                                     if (model.GetDeclaredSymbol(variableSyntax) is IFieldSymbol field)
                                     {
                                         records.AddRange(CollectRecords(context, field, field.Type, autoInterfaceAttributeSymbol, autoInterfaceTemplateAttributeSymbol));
@@ -68,7 +68,7 @@ namespace BeaKona.AutoInterfaceGenerator
                             }
                             else if (candidate is PropertyDeclarationSyntax propertySyntax)
                             {
-                                // Get the symbol being declared by the member, and keep it if its annotated
+                                // get symbol being declared by the member, and keep it if its annotated
                                 if (model.GetDeclaredSymbol(propertySyntax) is IPropertySymbol property)
                                 {
                                     if (property.IsWriteOnly)
@@ -83,74 +83,44 @@ namespace BeaKona.AutoInterfaceGenerator
                             }
                         }
 
-                        // group the elements by class, and generate the source
-                        foreach (IGrouping<INamedTypeSymbol, AutoInterfaceRecord> group in records.GroupBy(i => i.Member.ContainingType))
+                        // group elements by the containing class, and generate the source
+                        foreach (IGrouping<INamedTypeSymbol, AutoInterfaceRecord> recordsByContainingType in records.GroupBy(i => i.Member.ContainingType))
                         {
-                            INamedTypeSymbol type = group.Key;
+                            INamedTypeSymbol containingType = recordsByContainingType.Key;
 
-                            bool isPartial = false;
-                            foreach (SyntaxReference syntax in type.DeclaringSyntaxReferences)
+                            if (containingType.IsPartial() == false)
                             {
-                                if (syntax.GetSyntax() is MemberDeclarationSyntax declaration)
-                                {
-                                    if (declaration.Modifiers.Any(i => i.IsKind(SyntaxKind.PartialKeyword)))
-                                    {
-                                        isPartial = true;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (isPartial == false)
-                            {
-                                Helpers.ReportDiagnostic(context, "BK-AG01", nameof(AutoInterfaceResource.AG01_title), nameof(AutoInterfaceResource.AG01_message), nameof(AutoInterfaceResource.AG01_description), DiagnosticSeverity.Error, type,
-                                    type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                                Helpers.ReportDiagnostic(context, "BK-AG01", nameof(AutoInterfaceResource.AG01_title), nameof(AutoInterfaceResource.AG01_message), nameof(AutoInterfaceResource.AG01_description), DiagnosticSeverity.Error, containingType,
+                                    containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                                 continue;
                             }
 
-                            if (type.IsStatic)
+                            if (containingType.IsStatic)
                             {
-                                Helpers.ReportDiagnostic(context, "BK-AG02", nameof(AutoInterfaceResource.AG02_title), nameof(AutoInterfaceResource.AG02_message), nameof(AutoInterfaceResource.AG02_description), DiagnosticSeverity.Error, type,
-                                    type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                                Helpers.ReportDiagnostic(context, "BK-AG02", nameof(AutoInterfaceResource.AG02_title), nameof(AutoInterfaceResource.AG02_message), nameof(AutoInterfaceResource.AG02_description), DiagnosticSeverity.Error, containingType,
+                                    containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                                 continue;
                             }
 
-                            if (type.TypeKind != TypeKind.Class && type.TypeKind != TypeKind.Struct)
+                            if (containingType.TypeKind != TypeKind.Class && containingType.TypeKind != TypeKind.Struct)
                             {
-                                Helpers.ReportDiagnostic(context, "BK-AG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, group.First().Member);
-                                continue;
-                            }
-
-                            List<AutoInterfaceRecord> referencesWithMissingInterface = group.Where(i => type.Interfaces.Contains(i.InterfaceType, SymbolEqualityComparer.Default) == false).ToList();
-
-                            if (referencesWithMissingInterface.Count > 0)
-                            {
-                                HashSet<INamedTypeSymbol> emitted = new();
-                                foreach (AutoInterfaceRecord itemWithMissingInterface in referencesWithMissingInterface)
-                                {
-                                    if (emitted.Add(itemWithMissingInterface.InterfaceType))
-                                    {
-                                        Helpers.ReportDiagnostic(context, "BK-AG05", nameof(AutoInterfaceResource.AG05_title), nameof(AutoInterfaceResource.AG05_message), nameof(AutoInterfaceResource.AG05_description), DiagnosticSeverity.Error, itemWithMissingInterface.Member,
-                                            itemWithMissingInterface.InterfaceType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
-                                    }
-                                }
-
+                                Helpers.ReportDiagnostic(context, "BK-AG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, recordsByContainingType.First().Member);
                                 continue;
                             }
 
                             try
                             {
-                                string? code = AutoInterfaceSourceGenerator.ProcessClass(context, compilation, group.Key, group);
+                                string? code = AutoInterfaceSourceGenerator.ProcessClass(context, compilation, containingType, recordsByContainingType);
                                 if (code != null)
                                 {
-                                    string name = group.Key.Arity > 0 ? $"{group.Key.Name}_{group.Key.Arity}" : group.Key.Name;
+                                    string name = containingType.Arity > 0 ? $"{containingType.Name}_{containingType.Arity}" : containingType.Name;
                                     //GeneratePreview(context, name, code);
                                     context.AddSource($"{name}_AutoInterface.cs", SourceText.From(code, Encoding.UTF8));
                                 }
                             }
                             catch (Exception ex)
                             {
-                                Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, type,
+                                Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, containingType,
                                     ex.ToString().Replace("\r", "").Replace("\n", ""));
                             }
                         }
@@ -360,15 +330,32 @@ namespace BeaKona.AutoInterfaceGenerator
                 if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(autoInterfaceAttributeSymbol, SymbolEqualityComparer.Default))
                 {
                     ITypeSymbol? type = null;
+                    bool? includeBaseInterfaces = null;
+
                     if (attribute.ConstructorArguments.Length == 0)
                     {
                         type = receiverType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+                    }
+                    else if (attribute.ConstructorArguments.Length == 1)
+                    {
+                        if (attribute.ConstructorArguments[0].Value is ITypeSymbol targetType)
+                        {
+                            type = targetType;
+                        }
+                        else if (attribute.ConstructorArguments[0].Value is bool includeBaseInterfaces2)
+                        {
+                            includeBaseInterfaces = includeBaseInterfaces2;
+                        }
                     }
                     else
                     {
                         if (attribute.ConstructorArguments[0].Value is ITypeSymbol targetType)
                         {
                             type = targetType;
+                        }
+                        if (attribute.ConstructorArguments[1].Value is bool includeBaseInterfaces2)
+                        {
+                            includeBaseInterfaces = includeBaseInterfaces2;
                         }
                     }
 
@@ -474,8 +461,15 @@ namespace BeaKona.AutoInterfaceGenerator
                                     template = new TemplateDefinition(templateLanguage ?? "scriban", content);
                                 }
 
-                                records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts));
                                 danglingInterfaceTypesBySymbols.Remove(symbol);
+                                records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts));
+                                if (includeBaseInterfaces.GetValueOrDefault(false))
+                                {
+                                    foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
+                                    {
+                                        records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts));
+                                    }
+                                }
                             }
                             else
                             {
@@ -544,6 +538,15 @@ namespace BeaKona.AutoInterfaceGenerator
 
             builder.AppendIndentation();
             writer.WriteTypeDeclarationBeginning(builder, type, scope);
+            {
+                bool first = true;
+                foreach (INamedTypeSymbol missingInterfaceType in infos.Select(i => i.InterfaceType).Where(i => type.AllInterfaces.Contains(i, SymbolEqualityComparer.Default) == false).ToHashSet())
+                {
+                    builder.Append(first ? " : " : ", ");
+                    first = false;
+                    writer.WriteTypeReference(builder, missingInterfaceType, scope);
+                }
+            }
             builder.AppendLine();
             builder.AppendIndentation();
             builder.AppendLine('{');
@@ -553,10 +556,8 @@ namespace BeaKona.AutoInterfaceGenerator
 
             foreach (IGrouping<INamedTypeSymbol, IMemberInfo> group in infos.GroupBy(i => i.InterfaceType))
             {
-                List<IMemberInfo> references = group.ToList();
-
                 ISourceTextGenerator? generator = null;
-                foreach (IMemberInfo reference in references)
+                foreach (IMemberInfo reference in group)
                 {
                     if (reference.Template is TemplateDefinition td)
                     {
@@ -576,10 +577,11 @@ namespace BeaKona.AutoInterfaceGenerator
                     }
                 }
 
+                INamedTypeSymbol @interface = group.Key;
+                List<IMemberInfo> references = group.DistinctBy(i => i.Member).ToList();
+
                 if (generator != null)
                 {
-                    INamedTypeSymbol @interface = group.Key;
-
                     StandaloneModel model = new();
 
                     model.Load(writer, builder, @interface, scope, references);
@@ -590,7 +592,6 @@ namespace BeaKona.AutoInterfaceGenerator
                         m.Load(writer, builder, method, scope, references);
                         return m;
                     }
-
 
                     PropertyModel CreateProperty(IPropertySymbol property)
                     {
@@ -629,7 +630,7 @@ namespace BeaKona.AutoInterfaceGenerator
                 }
                 else
                 {
-                    foreach (IMethodSymbol method in group.Key.GetMethods().Where(i => type.IsMemberImplemented(i) == false))
+                    foreach (IMethodSymbol method in @interface.GetMethods().Where(i => type.IsMemberImplemented(i) == false))
                     {
                         anyReasonToEmitSourceFile = true;
 
@@ -637,11 +638,11 @@ namespace BeaKona.AutoInterfaceGenerator
                         {
                             builder.AppendLine();
                         }
-                        writer.WriteMethodDefinition(builder, method, scope, group.Key, references);
+                        writer.WriteMethodDefinition(builder, method, scope, @interface, references);
                         separatorRequired = true;
                     }
 
-                    foreach (IPropertySymbol property in group.Key.GetProperties().Where(i => type.IsMemberImplemented(i) == false))
+                    foreach (IPropertySymbol property in @interface.GetProperties().Where(i => type.IsMemberImplemented(i) == false))
                     {
                         anyReasonToEmitSourceFile = true;
 
@@ -650,11 +651,11 @@ namespace BeaKona.AutoInterfaceGenerator
                             builder.AppendLine();
                         }
 
-                        writer.WritePropertyDefinition(builder, property, scope, group.Key, references);
+                        writer.WritePropertyDefinition(builder, property, scope, @interface, references);
                         separatorRequired = true;
                     }
 
-                    foreach (IPropertySymbol indexer in group.Key.GetIndexers().Where(i => type.IsMemberImplemented(i) == false))
+                    foreach (IPropertySymbol indexer in @interface.GetIndexers().Where(i => type.IsMemberImplemented(i) == false))
                     {
                         anyReasonToEmitSourceFile = true;
 
@@ -663,11 +664,11 @@ namespace BeaKona.AutoInterfaceGenerator
                             builder.AppendLine();
                         }
 
-                        writer.WritePropertyDefinition(builder, indexer, scope, group.Key, references);
+                        writer.WritePropertyDefinition(builder, indexer, scope, @interface, references);
                         separatorRequired = true;
                     }
 
-                    foreach (IEventSymbol @event in group.Key.GetEvents().Where(i => type.IsMemberImplemented(i) == false))
+                    foreach (IEventSymbol @event in @interface.GetEvents().Where(i => type.IsMemberImplemented(i) == false))
                     {
                         anyReasonToEmitSourceFile = true;
 
@@ -676,7 +677,7 @@ namespace BeaKona.AutoInterfaceGenerator
                             builder.AppendLine();
                         }
 
-                        writer.WriteEventDefinition(builder, @event, scope, group.Key, references);
+                        writer.WriteEventDefinition(builder, @event, scope, @interface, references);
                         separatorRequired = true;
                     }
                 }
