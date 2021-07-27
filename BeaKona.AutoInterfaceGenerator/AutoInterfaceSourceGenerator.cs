@@ -336,26 +336,11 @@ namespace BeaKona.AutoInterfaceGenerator
                     {
                         type = receiverType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
                     }
-                    else if (attribute.ConstructorArguments.Length == 1)
-                    {
-                        if (attribute.ConstructorArguments[0].Value is ITypeSymbol targetType)
-                        {
-                            type = targetType;
-                        }
-                        else if (attribute.ConstructorArguments[0].Value is bool includeBaseInterfaces2)
-                        {
-                            includeBaseInterfaces = includeBaseInterfaces2;
-                        }
-                    }
                     else
                     {
                         if (attribute.ConstructorArguments[0].Value is ITypeSymbol targetType)
                         {
                             type = targetType;
-                        }
-                        if (attribute.ConstructorArguments[1].Value is bool includeBaseInterfaces2)
-                        {
-                            includeBaseInterfaces = includeBaseInterfaces2;
                         }
                     }
 
@@ -374,7 +359,7 @@ namespace BeaKona.AutoInterfaceGenerator
                                 string? templateFileName = null;
                                 string? templateLanguage = null;
 
-                                #region collect named arguments [only one argument for now]
+                                #region collect named arguments
 
                                 foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
                                 {
@@ -401,6 +386,14 @@ namespace BeaKona.AutoInterfaceGenerator
                                                 if (arg.Value.Value is string s)
                                                 {
                                                     templateLanguage = s;
+                                                }
+                                            }
+                                            break;
+                                        case "IncludeBaseInterfaces":
+                                            {
+                                                if (arg.Value.Value is bool b)
+                                                {
+                                                    includeBaseInterfaces = b;
                                                 }
                                             }
                                             break;

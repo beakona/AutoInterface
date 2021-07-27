@@ -52,8 +52,8 @@
         {
         }
 
-        [BeaKona.AutoInterface]
-        //[BeaKona.AutoInterface(typeof(ITestable))]
+        //[BeaKona.AutoInterface]
+        [BeaKona.AutoInterface(typeof(ITestable))]
         //[BeaKona.AutoInterface(typeof(ITestable))]
         //[BeaKona.AutoInterface(typeof(IPrintable), true)]
         //[BeaKona.AutoInterface(typeof(IPrintable), false)]
@@ -63,7 +63,7 @@
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print(\\d)?", Body = "LogDebug(nameof({{interface}}.{{name}})); {{expression}};")]
         private readonly IPrintable<int>? aspect1 = new PrinterV1();
 
-        [BeaKona.AutoInterface(typeof(IPrintable<int>), true)]
+        [BeaKona.AutoInterface(typeof(IPrintable<int>), IncludeBaseInterfaces = false)]
         [BeaKona.AutoInterface(typeof(IPrintable2))]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
