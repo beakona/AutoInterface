@@ -949,6 +949,11 @@ namespace BeaKona.AutoInterfaceGenerator
                     }
                 }
 
+                if (symbol.DeclaringSyntaxReferences.Length == 0)
+                {
+                    return symbol.Name;
+                }
+
                 throw new NotSupportedException();
             }
         }

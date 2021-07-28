@@ -1,4 +1,6 @@
-﻿namespace AutoInterfaceSample
+﻿using TestInterfaces;
+
+namespace AutoInterfaceSample
 {
     public class Program
     {
@@ -8,24 +10,6 @@
             IPrintable<int> p = new Person();
             p.Print1();
         }
-    }
-
-    public interface ITestable
-    {
-        void PrintTest();
-    }
-
-    public interface IPrintable<T> : ITestable
-    {
-        int Length { get; }
-        int Count { get; }
-        void Print1();
-        void Print2();
-    }
-
-    public interface IPrintable2
-    {
-        void Print3();
     }
 
     public class PrinterV1 : IPrintable<int>, IPrintable2

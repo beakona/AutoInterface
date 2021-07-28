@@ -18,4 +18,8 @@
     <Analyzer Include="..\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TestInterfaces\TestInterfaces.csproj" />
+  </ItemGroup>
+
 </Project>
