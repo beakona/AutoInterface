@@ -1,4 +1,4 @@
-﻿//using TestInterfaces.A.B;
+﻿using TestInterfaces.A.B;
 
 namespace X.C
 {
@@ -24,12 +24,12 @@ namespace AutoInterfaceSample
         public static void Main()
         {
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
-            TestInterfaces.A.B.IPrintable<int> p = new Person();
+            IPrintable<int> p = new Person();
             p.Print1();
         }
     }
 
-    public class PrinterV1 : TestInterfaces.A.B.IPrintable<int>, X.C.D.E.F.G.IPrintable2
+    public class PrinterV1 : IPrintable<int>, X.C.D.E.F.G.IPrintable2
     {
         public int Length => 100;
         public int Count => 200;
@@ -54,7 +54,7 @@ namespace AutoInterfaceSample
         }
 
         //[BeaKona.AutoInterface]
-        [BeaKona.AutoInterface(typeof(TestInterfaces.A.B.ITestable))]
+        [BeaKona.AutoInterface(typeof(ITestable))]
         //[BeaKona.AutoInterface(typeof(ITestable))]
         //[BeaKona.AutoInterface(typeof(IPrintable), true)]
         //[BeaKona.AutoInterface(typeof(IPrintable), false)]
@@ -62,9 +62,9 @@ namespace AutoInterfaceSample
         //[BeaKona.AutoInterface(typeof(IPrintable2))]//, TemplateBody = "void TestB2() {}"
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.PropertyGetter, Filter = "Length", Language = "scriban", Body = "return 1;")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print(\\d)?", Body = "LogDebug(nameof({{interface}}.{{name}})); {{expression}};")]
-        private readonly TestInterfaces.A.B.IPrintable<int>? aspect1 = new PrinterV1();
+        private readonly IPrintable<int>? aspect1 = new PrinterV1();
 
-        [BeaKona.AutoInterface(typeof(TestInterfaces.A.B.IPrintable<int>), IncludeBaseInterfaces = false)]
+        [BeaKona.AutoInterface(typeof(IPrintable<int>), IncludeBaseInterfaces = false)]
         [BeaKona.AutoInterface(typeof(X.C.D.E.F.G.IPrintable2))]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
         //[BeaKona.AutoInterfaceTemplate(BeaKona.AutoInterfaceTargets.Method, Filter = "Print2", Body = "/* */")]
