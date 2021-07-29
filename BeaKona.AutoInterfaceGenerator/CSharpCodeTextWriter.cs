@@ -716,13 +716,22 @@ namespace BeaKona.AutoInterfaceGenerator
         {
             if (@namespace != null && @namespace.ConstituentNamespaces.Length > 0)
             {
-                builder.AppendIndentation();
-                builder.Append("namespace");
-                builder.Append(' ');
-                builder.AppendLine(GetSourceIdentifier(@namespace));
-                builder.AppendIndentation();
-                builder.AppendLine('{');
-                builder.IncrementIndentation();
+                List<INamespaceSymbol> containingNamespaces = new();
+                for (INamespaceSymbol? ct = @namespace; ct != null && ct.IsGlobalNamespace == false; ct = ct.ContainingNamespace)
+                {
+                    containingNamespaces.Insert(0, ct);
+                }
+
+                if (containingNamespaces.Count > 0)
+                {
+                    builder.AppendIndentation();
+                    builder.Append("namespace");
+                    builder.Append(' ');
+                    builder.AppendLine(string.Join(".", containingNamespaces.Select(i => GetSourceIdentifier(i))));
+                    builder.AppendIndentation();
+                    builder.AppendLine('{');
+                    builder.IncrementIndentation();
+                }
             }
         }
 
