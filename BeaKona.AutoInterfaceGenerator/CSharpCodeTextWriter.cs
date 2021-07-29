@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace BeaKona.AutoInterfaceGenerator
 {
@@ -445,14 +444,14 @@ namespace BeaKona.AutoInterfaceGenerator
                     {
                         IMemberInfo reference = references.First();
 
-                        if (property.GetMethod is IMethodSymbol)
+                        if (property.GetMethod is not null)
                         {
                             builder.AppendIndentation();
                             builder.Append("get => ");
                             this.WritePropertyCall(builder, reference, property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
                             builder.AppendLine(';');
                         }
-                        if (property.SetMethod is IMethodSymbol)
+                        if (property.SetMethod is not null)
                         {
                             builder.AppendIndentation();
                             builder.Append("set => ");
@@ -462,7 +461,7 @@ namespace BeaKona.AutoInterfaceGenerator
                     }
                     else
                     {
-                        if (property.GetMethod is IMethodSymbol)
+                        if (property.GetMethod is not null)
                         {
                             builder.AppendIndentation();
                             if (getterTemplate != null)
@@ -503,7 +502,7 @@ namespace BeaKona.AutoInterfaceGenerator
                                 builder.AppendLine(';');
                             }
                         }
-                        if (property.SetMethod is IMethodSymbol)
+                        if (property.SetMethod is not null)
                         {
                             builder.AppendIndentation();
                             builder.AppendLine("set");
@@ -872,6 +871,16 @@ namespace BeaKona.AutoInterfaceGenerator
             {
                 return "this";
             }
+            else if (symbol is INamespaceSymbol ns)
+            {
+                return ns.Name;
+                //return string.Join("+", ns.ConstituentNamespaces.Select(i => i.Name));
+                //return $"<{@namespace.Name};{symbol}>" + this.GetSourceIdentifier(@namespace.Name);
+            }
+            else if (symbol.DeclaringSyntaxReferences.Length == 0)
+            {
+                return symbol.Name;
+            }
             else
             {
                 foreach (SyntaxReference syntaxReference in symbol.DeclaringSyntaxReferences)
@@ -941,17 +950,12 @@ namespace BeaKona.AutoInterfaceGenerator
                     }
                     else if (syntax is NamespaceDeclarationSyntax @namespace)
                     {
-                        return this.GetSourceIdentifier(@namespace.Name);
+                        throw new NotSupportedException(syntax.GetType().ToString());
                     }
                     else
                     {
                         throw new NotSupportedException(syntax.GetType().ToString());
                     }
-                }
-
-                if (symbol.DeclaringSyntaxReferences.Length == 0)
-                {
-                    return symbol.Name;
                 }
 
                 throw new NotSupportedException();

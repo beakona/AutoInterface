@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TestInterfaces
+namespace TestInterfaces.A.B
 {
     public interface ITestable
     {
@@ -13,10 +13,5 @@ namespace TestInterfaces
         int Count { get; }
         void Print1();
         void Print2();
-    }
-
-    public interface IPrintable2
-    {
-        void Print3();
     }
 }
