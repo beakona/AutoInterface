@@ -144,7 +144,7 @@ namespace BeaKona.AutoInterfaceGenerator
         private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
         {
             List<PartialTemplate> templateParts = new();
-            Dictionary<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypesBySymbols = new();
+            Dictionary<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypesBySymbols = new(SymbolEqualityComparer.Default);
 
             foreach (AttributeData attribute in symbol.GetAttributes())
             {
@@ -235,7 +235,7 @@ namespace BeaKona.AutoInterfaceGenerator
                                     templateParts.Add(new PartialTemplate(memberTargets, rxMemberFilter, new TemplateDefinition(templateLanguage ?? "scriban", templateBody.Trim())));
                                     if (danglingInterfaceTypesBySymbols.TryGetValue(symbol, out HashSet<INamedTypeSymbol> interfaceTypes) == false)
                                     {
-                                        danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>();
+                                        danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
                                     }
 
                                     interfaceTypes.Add(interfaceType);
@@ -288,7 +288,7 @@ namespace BeaKona.AutoInterfaceGenerator
                                     templateParts.Add(new PartialTemplate(memberTargets, rxMemberFilter, new TemplateDefinition(templateLanguage ?? "scriban", content)));
                                     if (danglingInterfaceTypesBySymbols.TryGetValue(symbol, out HashSet<INamedTypeSymbol> interfaceTypes) == false)
                                     {
-                                        danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>();
+                                        danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
                                     }
 
                                     interfaceTypes.Add(interfaceType);

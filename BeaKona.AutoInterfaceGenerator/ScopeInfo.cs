@@ -25,11 +25,11 @@ namespace BeaKona.AutoInterfaceGenerator
         public ITypeSymbol Type { get; }
 
         private readonly HashSet<string> usedTypeArguments;
-        private readonly Dictionary<ITypeSymbol, string> aliasTypeParameterNameByCanonicalType = new Dictionary<ITypeSymbol, string>(SymbolEqualityComparer.Default);
+        private readonly Dictionary<ITypeSymbol, string> aliasTypeParameterNameByCanonicalType = new(SymbolEqualityComparer.Default);
 
         private static ImmutableList<ITypeSymbol> AllTypeArguments(ISymbol symbol)
         {
-            List<ITypeSymbol> types = new List<ITypeSymbol>();
+            List<ITypeSymbol> types = new();
 
             for (ISymbol s = symbol; s != null; s = s.ContainingType)
             {
@@ -78,7 +78,7 @@ namespace BeaKona.AutoInterfaceGenerator
             return this.aliasTypeParameterNameByCanonicalType.TryGetValue(symbol, out alias);
         }
 
-        private static readonly Regex rxSplitter = new Regex(@"^\s*(?<n>\w+)(?<value>\d+)\s*$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Singleline | RegexOptions.CultureInvariant);
+        private static readonly Regex rxSplitter = new(@"^\s*(?<n>\w+)(?<value>\d+)\s*$", RegexOptions.Compiled | RegexOptions.ExplicitCapture | RegexOptions.Singleline | RegexOptions.CultureInvariant);
 
         private static bool TrySplitAsBaseNameAndInteger(string name, /*[NotNullWhen(true)]*/ out string? baseName, /*[NotNullWhen(true)]*/ out int? value)
         {
