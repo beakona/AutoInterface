@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "BeaKona.AutoInterfaceGenerator": {
+      "commandName": "DebugRoslynComponent",
+      "nativeDebugging": true,
+      "targetProject": "..\\AutoInterfaceSample\\AutoInterfaceSample.csproj"
+    }
+  }
+}
