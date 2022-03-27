@@ -1,8 +1,7 @@
-﻿namespace BeaKona.AutoInterfaceGenerator.Templates
+﻿namespace BeaKona.AutoInterfaceGenerator.Templates;
+
+internal interface IEventModel : ILocalExpressionModel
 {
-    internal interface IEventModel : ILocalExpressionModel
-    {
-        string? Name { get; set; }
-        string? Type { get; set; }
-    }
+    string? Name { get; set; }
+    string? Type { get; set; }
 }

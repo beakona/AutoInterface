@@ -41,8 +41,8 @@ namespace AutoInterfaceSample.Test.TT
                 public static void Main()
                 {
                     //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
-                    IPrintable<int> p = new Person();
-                    p.Print1();
+                    //IPrintable<int> p = new Person();
+                    //p.Print1();
                 }
             }
 

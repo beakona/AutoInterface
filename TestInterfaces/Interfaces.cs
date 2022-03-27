@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TestInterfaces.A.B
+﻿namespace TestInterfaces.A.B
 {
     public interface ITestable
     {

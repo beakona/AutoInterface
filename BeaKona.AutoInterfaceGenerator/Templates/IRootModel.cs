@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
+﻿namespace BeaKona.AutoInterfaceGenerator.Templates;
 
-namespace BeaKona.AutoInterfaceGenerator.Templates
+internal interface IRootModel
 {
-    internal interface IRootModel
-    {
-        string? Interface { get; set; }
+    string? Interface { get; set; }
 
-        List<string> References { get; }
-        string? Reference { get; }
-    }
+    List<string> References { get; }
+    string? Reference { get; }
 }

@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -14,9 +14,10 @@
     <AdditionalFiles Include="mytemplate.scriban" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Analyzer Include="..\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
-  </ItemGroup>
+	<ItemGroup>
+		<Analyzer Include="..\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
+		<ProjectReference Include="..\BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+	</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TestInterfaces\TestInterfaces.csproj" />

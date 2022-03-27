@@ -1,42 +1,38 @@
-﻿using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
+﻿namespace BeaKona.AutoInterfaceGenerator;
 
-namespace BeaKona.AutoInterfaceGenerator
+internal interface ICodeTextWriter
 {
-    internal interface ICodeTextWriter
-    {
-        Compilation Compilation { get; }
+    Compilation Compilation { get; }
 
-        void WriteTypeReference(SourceBuilder builder, ITypeSymbol type, ScopeInfo scope);
+    void WriteTypeReference(SourceBuilder builder, ITypeSymbol type, ScopeInfo scope);
 
-        void WriteTypeArgumentsCall(SourceBuilder builder, IEnumerable<ITypeSymbol> typeArguments, ScopeInfo scope);
+    void WriteTypeArgumentsCall(SourceBuilder builder, IEnumerable<ITypeSymbol> typeArguments, ScopeInfo scope);
 
-        void WriteTypeArgumentsDefinition(SourceBuilder builder, IEnumerable<ITypeSymbol> typeArguments, ScopeInfo scope);
+    void WriteTypeArgumentsDefinition(SourceBuilder builder, IEnumerable<ITypeSymbol> typeArguments, ScopeInfo scope);
 
-        void WriteParameterDefinition(SourceBuilder builder, ScopeInfo scope, IEnumerable<IParameterSymbol> parameters);
+    void WriteParameterDefinition(SourceBuilder builder, ScopeInfo scope, IEnumerable<IParameterSymbol> parameters);
 
-        void WriteCallParameters(SourceBuilder builder, IEnumerable<IParameterSymbol> parameters);
+    void WriteCallParameters(SourceBuilder builder, IEnumerable<IParameterSymbol> parameters);
 
-        void WriteMethodDefinition(SourceBuilder builder, IMethodSymbol method, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
+    void WriteMethodDefinition(SourceBuilder builder, IMethodSymbol method, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
 
-        void WritePropertyDefinition(SourceBuilder builder, IPropertySymbol property, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
+    void WritePropertyDefinition(SourceBuilder builder, IPropertySymbol property, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
 
-        void WriteEventDefinition(SourceBuilder builder, IEventSymbol @event, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
+    void WriteEventDefinition(SourceBuilder builder, IEventSymbol @event, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references);
 
-        void WriteTypeDeclarationBeginning(SourceBuilder builder, INamedTypeSymbol type, ScopeInfo scope);
+    void WriteTypeDeclarationBeginning(SourceBuilder builder, INamedTypeSymbol type, ScopeInfo scope);
 
-        void WriteNamespaceBeginning(SourceBuilder builder, INamespaceSymbol @namespace);
+    void WriteNamespaceBeginning(SourceBuilder builder, INamespaceSymbol @namespace);
 
-        void WriteHolderReference(SourceBuilder builder, ISymbol member, ScopeInfo scope);
+    void WriteHolderReference(SourceBuilder builder, ISymbol member, ScopeInfo scope);
 
-        void WriteMemberReference(SourceBuilder builder, IMemberInfo reference, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
+    void WriteMemberReference(SourceBuilder builder, IMemberInfo reference, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
 
-        void WritePropertyCall(SourceBuilder builder, IMemberInfo reference, IPropertySymbol property, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
+    void WritePropertyCall(SourceBuilder builder, IMemberInfo reference, IPropertySymbol property, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing);
 
-        void WriteMethodCall(SourceBuilder builder, IMemberInfo reference, IMethodSymbol method, ScopeInfo scope, bool async, bool typeIsNullable, bool allowCoalescing);
+    void WriteMethodCall(SourceBuilder builder, IMemberInfo reference, IMethodSymbol method, ScopeInfo scope, bool async, bool typeIsNullable, bool allowCoalescing);
 
-        void WriteIdentifier(SourceBuilder builder, ISymbol symbol);
+    void WriteIdentifier(SourceBuilder builder, ISymbol symbol);
 
-        void WriteRefKind(SourceBuilder builder, RefKind kind);
-    }
+    void WriteRefKind(SourceBuilder builder, RefKind kind);
 }

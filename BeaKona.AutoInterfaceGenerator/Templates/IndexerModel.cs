@@ -1,8 +1,7 @@
-﻿namespace BeaKona.AutoInterfaceGenerator.Templates
+﻿namespace BeaKona.AutoInterfaceGenerator.Templates;
+
+internal class IndexerModel : PropertyModel, IIndexerModel
 {
-    internal class IndexerModel : PropertyModel, IIndexerModel
-    {
-        public string? ParametersDefinition { get; set; }
-        public string? CallParameters { get; set; }
-    }
+    public string? ParametersDefinition { get; set; }
+    public string? CallParameters { get; set; }
 }

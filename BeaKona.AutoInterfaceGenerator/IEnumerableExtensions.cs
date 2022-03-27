@@ -1,32 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace BeaKona.AutoInterfaceGenerator;
 
-namespace BeaKona.AutoInterfaceGenerator
+internal static class IEnumerableExtensions
 {
-    internal static class IEnumerableExtensions
+    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> @this)
     {
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> @this)
+        if (@this == null)
         {
-            if (@this == null)
-            {
-                return new HashSet<T>();
-            }
-            else
-            {
-                return new HashSet<T>(@this);
-            }
+            return new HashSet<T>();
         }
-
-        public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+        else
         {
-            HashSet<TKey> seenKeys = new();
+            return new HashSet<T>(@this);
+        }
+    }
 
-            foreach (TSource element in source)
+    public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+    {
+        HashSet<TKey> seenKeys = new();
+
+        foreach (TSource element in source)
+        {
+            if (seenKeys.Add(keySelector(element)))
             {
-                if (seenKeys.Add(keySelector(element)))
-                {
-                    yield return element;
-                }
+                yield return element;
             }
         }
     }

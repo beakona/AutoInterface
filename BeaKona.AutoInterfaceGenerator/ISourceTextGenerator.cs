@@ -1,7 +1,6 @@
-﻿namespace BeaKona.AutoInterfaceGenerator
+﻿namespace BeaKona.AutoInterfaceGenerator;
+
+internal interface ISourceTextGenerator
 {
-    internal interface ISourceTextGenerator
-    {
-        void Emit(ICodeTextWriter writer, SourceBuilder builder, object? model, ref bool separatorRequired);
-    }
+    void Emit(ICodeTextWriter writer, SourceBuilder builder, object? model, ref bool separatorRequired);
 }

@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
+﻿namespace BeaKona.AutoInterfaceGenerator.Templates;
 
-namespace BeaKona.AutoInterfaceGenerator.Templates
+internal interface ILocalExpressionModel
 {
-    internal interface ILocalExpressionModel
-    {
-        List<string> Expressions { get; }
-        string? Expression { get; }
-    }
+    List<string> Expressions { get; }
+    string? Expression { get; }
 }

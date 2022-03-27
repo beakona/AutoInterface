@@ -1,58 +1,55 @@
-﻿using System;
+﻿namespace BeaKona.AutoInterfaceGenerator.Templates;
 
-namespace BeaKona.AutoInterfaceGenerator.Templates
+internal class TemplateDefinition : IEquatable<TemplateDefinition>
 {
-    internal class TemplateDefinition : IEquatable<TemplateDefinition>
+    public TemplateDefinition(string language, string body)
     {
-        public TemplateDefinition(string language, string body)
+        this.Language = language ?? "";
+        this.Body = body ?? "";
+    }
+
+    public string Language { get; }
+    public string Body { get; }
+
+    public bool Equals(TemplateDefinition other)
+    {
+        if (other == null)
         {
-            this.Language = language ?? "";
-            this.Body = body ?? "";
+            return false;
         }
 
-        public string Language { get; }
-        public string Body { get; }
-
-        public bool Equals(TemplateDefinition other)
+        if (this == other)
         {
-            if (other == null)
-            {
-                return false;
-            }
-
-            if (this == other)
-            {
-                return true;
-            }
-
-            if (this.Language != other.Language)
-            {
-                return false;
-            }
-
-            if (this.Body != other.Body)
-            {
-                return false;
-            }
-
             return true;
         }
 
-        public override bool Equals(object obj)
+        if (this.Language != other.Language)
         {
-            if (obj is TemplateDefinition o)
-            {
-                return this.Equals(o);
-            }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
-        public override int GetHashCode()
+        if (this.Body != other.Body)
         {
-            return this.GetType().GetHashCode() + this.Language.GetHashCode() + this.Body.GetHashCode();
+            return false;
         }
+
+        return true;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is TemplateDefinition o)
+        {
+            return this.Equals(o);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return this.GetType().GetHashCode() + this.Language.GetHashCode() + this.Body.GetHashCode();
     }
 }

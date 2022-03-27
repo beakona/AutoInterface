@@ -1,15 +1,13 @@
 ﻿using BeaKona.AutoInterfaceGenerator.Templates;
-using Microsoft.CodeAnalysis;
 
-namespace BeaKona.AutoInterfaceGenerator
+namespace BeaKona.AutoInterfaceGenerator;
+
+internal interface IMemberInfo
 {
-    internal interface IMemberInfo
-    {
-        ISymbol Member { get; }
-        ITypeSymbol ReceiverType { get; }
-        INamedTypeSymbol InterfaceType { get; }
-        TemplateDefinition? Template { get; }
-        PartialTemplate[] TemplateParts { get; }
-        bool CastRequired { get; }
-    }
+    ISymbol Member { get; }
+    ITypeSymbol ReceiverType { get; }
+    INamedTypeSymbol InterfaceType { get; }
+    TemplateDefinition? Template { get; }
+    PartialTemplate[] TemplateParts { get; }
+    bool CastRequired { get; }
 }

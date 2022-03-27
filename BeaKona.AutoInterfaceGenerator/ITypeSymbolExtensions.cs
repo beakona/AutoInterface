@@ -1,71 +1,67 @@
-﻿using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
+﻿namespace BeaKona.AutoInterfaceGenerator;
 
-namespace BeaKona.AutoInterfaceGenerator
+internal static class ITypeSymbolExtensions
 {
-    internal static class ITypeSymbolExtensions
+    public static IEnumerable<IMethodSymbol> GetMethods(this ITypeSymbol @this)
     {
-        public static IEnumerable<IMethodSymbol> GetMethods(this ITypeSymbol @this)
+        foreach (ISymbol member in @this.GetMembers())
         {
-            foreach (ISymbol member in @this.GetMembers())
+            if (member is IMethodSymbol method)
             {
-                if (member is IMethodSymbol method)
+                if (method.MethodKind == MethodKind.Ordinary)
                 {
-                    if (method.MethodKind == MethodKind.Ordinary)
-                    {
-                        yield return method;
-                    }
+                    yield return method;
                 }
             }
         }
+    }
 
-        public static IEnumerable<IPropertySymbol> GetProperties(this ITypeSymbol @this)
+    public static IEnumerable<IPropertySymbol> GetProperties(this ITypeSymbol @this)
+    {
+        foreach (ISymbol member in @this.GetMembers())
         {
-            foreach (ISymbol member in @this.GetMembers())
+            if (member is IPropertySymbol property)
             {
-                if (member is IPropertySymbol property)
+                if (property.IsIndexer == false)
                 {
-                    if (property.IsIndexer == false)
-                    {
-                        yield return property;
-                    }
+                    yield return property;
                 }
             }
         }
+    }
 
-        public static IEnumerable<IPropertySymbol> GetIndexers(this ITypeSymbol @this)
+    public static IEnumerable<IPropertySymbol> GetIndexers(this ITypeSymbol @this)
+    {
+        foreach (ISymbol member in @this.GetMembers())
         {
-            foreach (ISymbol member in @this.GetMembers())
+            if (member is IPropertySymbol property)
             {
-                if (member is IPropertySymbol property)
+                if (property.IsIndexer)
                 {
-                    if (property.IsIndexer)
-                    {
-                        yield return property;
-                    }
+                    yield return property;
                 }
             }
         }
+    }
 
-        public static IEnumerable<IEventSymbol> GetEvents(this ITypeSymbol @this)
+    public static IEnumerable<IEventSymbol> GetEvents(this ITypeSymbol @this)
+    {
+        foreach (ISymbol member in @this.GetMembers())
         {
-            foreach (ISymbol member in @this.GetMembers())
+            if (member is IEventSymbol @event)
             {
-                if (member is IEventSymbol @event)
-                {
-                    yield return @event;
-                }
+                yield return @event;
             }
         }
+    }
 
-        public static bool IsMemberImplemented(this ITypeSymbol @this, ISymbol member)
+    public static bool IsMemberImplemented(this ITypeSymbol @this, ISymbol member)
+    {
+        if (@this.FindImplementationForInterfaceMember(member) is IMethodSymbol memberImplementation)
         {
-            if (@this.FindImplementationForInterfaceMember(member) is IMethodSymbol memberImplementation)
-            {
-                return memberImplementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default) && memberImplementation.MethodKind == MethodKind.ExplicitInterfaceImplementation;
-            }
-
-            return false;
+            return memberImplementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default) && memberImplementation.MethodKind == MethodKind.ExplicitInterfaceImplementation;
         }
+
+        return false;
     }
 }
