@@ -5,10 +5,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -25,29 +23,14 @@ namespace BeaKona.AutoInterfaceGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            using Stream icStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BeaKona.AutoInterfaceGenerator.InjectedCode.cs");
-            using StreamReader icReader = new(icStream);
-
-            SourceText txt = SourceText.From(icReader.ReadToEnd(), Encoding.UTF8);
-
-            // add the attribute text
-            context.AddSource("AutoInterfaceAttribute", txt);
-
             Compilation compilation = context.Compilation;
-            if (compilation is CSharpCompilation c)
+            if (compilation is CSharpCompilation)
             {
-                // we're going to create a new compilation that contains the attribute.
-                // TODO: we should allow source generators to provide source during initialize, so that this step isn't required.
-                if (c.SyntaxTrees.Length > 0 && c.SyntaxTrees[0].Options is CSharpParseOptions options)
-                {
-                    compilation = compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(txt, options));
-                }
-
                 //retrieve the populated receiver
                 if (context.SyntaxReceiver is SyntaxReceiver receiver)
                 {
                     // get newly bound attribute
-                    if (compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceAttribute") is INamedTypeSymbol autoInterfaceAttributeSymbol && compilation.GetTypeByMetadataName("BeaKona.AutoInterfaceTemplateAttribute") is INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
+                    if (compilation.GetTypeByMetadataName(typeof(AutoInterfaceAttribute).FullName) is INamedTypeSymbol autoInterfaceAttributeSymbol && compilation.GetTypeByMetadataName(typeof(AutoInterfaceTemplateAttribute).FullName) is INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
                     {
                         // loop over the candidates, and keep the ones that are actually annotated
                         List<AutoInterfaceRecord> records = new();

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -20,14 +20,6 @@
   <PropertyGroup>
     <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="InjectedCode.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="InjectedCode.cs" />
-  </ItemGroup>
     
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.10.0" PrivateAssets="all" />
@@ -35,6 +27,10 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
     <PackageReference Include="Scriban" Version="4.0.1" PrivateAssets="all" IncludeAssets="build" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="all" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <ProjectReference Include="..\BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,6 +51,8 @@
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceGenerator.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceAttributes.dll" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceAttributes.dll" PackagePath="lib/netstandard2.0" />
     </ItemGroup>
   </Target>
 

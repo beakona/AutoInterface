@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30626.31
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGenerator", "BeaKona.AutoInterfaceGenerator\BeaKona.AutoInterfaceGenerator.csproj", "{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}"
 EndProject
@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaKona.AutoInterfaceAttributes", "BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj", "{8EB5E4A3-F09E-42A8-9846-C000B2D5286C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{E271DF85-2B8E-48C4-8EB0-37FBF60A2E15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E271DF85-2B8E-48C4-8EB0-37FBF60A2E15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E271DF85-2B8E-48C4-8EB0-37FBF60A2E15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EB5E4A3-F09E-42A8-9846-C000B2D5286C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EB5E4A3-F09E-42A8-9846-C000B2D5286C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EB5E4A3-F09E-42A8-9846-C000B2D5286C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EB5E4A3-F09E-42A8-9846-C000B2D5286C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
