@@ -9,5 +9,5 @@ internal interface IMemberInfo
     INamedTypeSymbol InterfaceType { get; }
     TemplateDefinition? Template { get; }
     PartialTemplate[] TemplateParts { get; }
-    bool CastRequired { get; }
+    bool BySignature { get; }
 }

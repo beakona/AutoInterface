@@ -745,8 +745,10 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     public void WriteMemberReference(SourceBuilder builder, IMemberInfo item, ScopeInfo scope, bool typeIsNullable, bool allowCoalescing)
     {
+        static bool CastRequired(IMemberInfo info) => info.InterfaceType.Equals(info.ReceiverType, SymbolEqualityComparer.Default) == false;
+
         bool expressionIsNullable;
-        if (item.CastRequired)
+        if (item.BySignature == false && CastRequired(item))
         {
             builder.Append('(');
             this.WriteHolderReference(builder, item.Member, scope);

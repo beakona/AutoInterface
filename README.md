@@ -28,6 +28,40 @@ partial class Person
 ```
 <br>
 
+## Ad-hoc adapter pattern
+
+In this example `PersonPrinterV1` does not implement `IPrintable` but does have all members that are required by that interface.
+
+Manually written source:
+
+```csharp
+interface IPrintable
+{
+   void Print();
+}
+
+class PersonPrinterV1
+{
+   void Print() { ... }
+}
+
+public partial class Person
+{
+   [BeaKona.AutoInterface(typeof(IPrintable))]
+   private readonly PersonPrinterV1 aspect1 = new PersonPrinterV1();
+}
+```
+
+Auto-generated accompanying source:
+
+```csharp
+partial class Person : IPrintable
+{
+   void IPrintable.Print() => this.aspect1.Print();
+}
+```
+<br>
+
 ## Generate code from a template
 
 Manually written source:

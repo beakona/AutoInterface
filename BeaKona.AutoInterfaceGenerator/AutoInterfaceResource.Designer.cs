@@ -19,7 +19,7 @@ namespace BeaKona.AutoInterfaceGenerator {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class AutoInterfaceResource {
@@ -151,7 +151,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to cast from type &apos;{0}&apos; to &apos;{1}&apos;..
+        ///   Looks up a localized string similar to Unable to cast from type &apos;{0}&apos; to &apos;{1}&apos; or type &apos;{0}&apos; does not expose all members required by interface &apos;{1}&apos;..
         /// </summary>
         internal static string AG04_message {
             get {
@@ -160,7 +160,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to cast..
+        ///   Looks up a localized string similar to Unable to cast or missing member..
         /// </summary>
         internal static string AG04_title {
             get {

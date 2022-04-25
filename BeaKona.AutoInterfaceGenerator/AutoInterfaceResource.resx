@@ -148,10 +148,10 @@
     <value />
   </data>
   <data name="AG04_message" xml:space="preserve">
-    <value>Unable to cast from type '{0}' to '{1}'.</value>
+    <value>Unable to cast from type '{0}' to '{1}' or type '{0}' does not expose all members required by interface '{1}'.</value>
   </data>
   <data name="AG04_title" xml:space="preserve">
-    <value>Unable to cast.</value>
+    <value>Unable to cast or missing member.</value>
   </data>
   <data name="AG05_description" xml:space="preserve">
     <value />

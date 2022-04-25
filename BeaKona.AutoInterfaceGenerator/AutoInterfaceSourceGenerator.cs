@@ -135,9 +135,9 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
 
                 if (type.TypeKind == TypeKind.Interface)
                 {
-                    if (receiverType.Equals(type, SymbolEqualityComparer.Default) || receiverType.AllInterfaces.Contains(type, SymbolEqualityComparer.Default))
+                    if (type is INamedTypeSymbol interfaceType)
                     {
-                        if (type is INamedTypeSymbol interfaceType)
+                        if (receiverType.IsMatchByTypeOrImplementsInterface(type))
                         {
                             string? templateBody = null;
                             string? templateFileName = null;
@@ -281,15 +281,15 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                         }
                         else
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                157834);
+                            Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                            receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                            157834);
                         continue;
                     }
                 }
@@ -330,130 +330,149 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                 }
                 else if (type.TypeKind == TypeKind.Interface)
                 {
-                    if (receiverType.Equals(type, SymbolEqualityComparer.Default) || receiverType.AllInterfaces.Contains(type, SymbolEqualityComparer.Default))
+                    if (type is INamedTypeSymbol interfaceType)
                     {
-                        if (type is INamedTypeSymbol interfaceType)
+                        string? templateBody = null;
+                        string? templateFileName = null;
+                        string? templateLanguage = null;
+
+                        #region collect named arguments
+
+                        foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
                         {
-                            string? templateBody = null;
-                            string? templateFileName = null;
-                            string? templateLanguage = null;
-
-                            #region collect named arguments
-
-                            foreach (KeyValuePair<string, TypedConstant> arg in attribute.NamedArguments)
+                            switch (arg.Key)
                             {
-                                switch (arg.Key)
-                                {
-                                    case "TemplateFileName":
-                                        {
-                                            if (arg.Value.Value is string s)
-                                            {
-                                                templateFileName = s;
-                                            }
-                                        }
-                                        break;
-                                    case "TemplateBody":
-                                        {
-                                            if (arg.Value.Value is string s)
-                                            {
-                                                templateBody = s;
-                                            }
-                                        }
-                                        break;
-                                    case "TemplateLanguage":
-                                        {
-                                            if (arg.Value.Value is string s)
-                                            {
-                                                templateLanguage = s;
-                                            }
-                                        }
-                                        break;
-                                    case "IncludeBaseInterfaces":
-                                        {
-                                            if (arg.Value.Value is bool b)
-                                            {
-                                                includeBaseInterfaces = b;
-                                            }
-                                        }
-                                        break;
-                                }
-                            }
-
-                            #endregion
-
-                            TemplateDefinition? template = null;
-                            if (templateBody != null && templateBody.Trim().Length > 0)
-                            {
-                                if (templateFileName != null && templateFileName.Trim().Length > 0)
-                                {
-                                    Helpers.ReportDiagnostic(context, "BK-AG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
-                                        );
-                                    continue;
-                                }
-
-                                template = new TemplateDefinition(templateLanguage ?? "scriban", templateBody.Trim());
-                            }
-                            else if (templateFileName != null && templateFileName.Trim().Length > 0)
-                            {
-                                string? content = null;
-
-                                AdditionalText? file = context.AdditionalFiles.FirstOrDefault(i => i.Path.EndsWith(templateFileName));
-                                if (file != null)
-                                {
-                                    content = file.GetText()?.ToString()?.Trim();
-                                    if (content == null)
+                                case "TemplateFileName":
                                     {
-                                        content = "";
+                                        if (arg.Value.Value is string s)
+                                        {
+                                            templateFileName = s;
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    Helpers.ReportDiagnostic(context, "BK-AG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                        templateFileName);
-                                    continue;
-                                }
-
-                                if (string.IsNullOrEmpty(templateLanguage))
-                                {
-                                    string extension = Path.GetExtension(templateFileName).ToLowerInvariant();
-                                    if (extension.StartsWith("."))
+                                    break;
+                                case "TemplateBody":
                                     {
-                                        extension = extension.Substring(1);
+                                        if (arg.Value.Value is string s)
+                                        {
+                                            templateBody = s;
+                                        }
                                     }
-                                    templateLanguage = extension;
-                                }
+                                    break;
+                                case "TemplateLanguage":
+                                    {
+                                        if (arg.Value.Value is string s)
+                                        {
+                                            templateLanguage = s;
+                                        }
+                                    }
+                                    break;
+                                case "IncludeBaseInterfaces":
+                                    {
+                                        if (arg.Value.Value is bool b)
+                                        {
+                                            includeBaseInterfaces = b;
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
 
-                                if (templateParts.Count > 0)
-                                {
-                                    Helpers.ReportDiagnostic(context, "BK-AG13", nameof(AutoInterfaceResource.AG13_title), nameof(AutoInterfaceResource.AG13_message), nameof(AutoInterfaceResource.AG13_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
-                                        );
-                                    continue;
-                                }
+                        #endregion
 
-                                template = new TemplateDefinition(templateLanguage ?? "scriban", content);
+                        TemplateDefinition? template = null;
+                        if (templateBody != null && templateBody.Trim().Length > 0)
+                        {
+                            if (templateFileName != null && templateFileName.Trim().Length > 0)
+                            {
+                                Helpers.ReportDiagnostic(context, "BK-AG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                    );
+                                continue;
                             }
 
+                            template = new TemplateDefinition(templateLanguage ?? "scriban", templateBody.Trim());
+                        }
+                        else if (templateFileName != null && templateFileName.Trim().Length > 0)
+                        {
+                            string? content = null;
+
+                            AdditionalText? file = context.AdditionalFiles.FirstOrDefault(i => i.Path.EndsWith(templateFileName));
+                            if (file != null)
+                            {
+                                content = file.GetText()?.ToString()?.Trim();
+                                if (content == null)
+                                {
+                                    content = "";
+                                }
+                            }
+                            else
+                            {
+                                Helpers.ReportDiagnostic(context, "BK-AG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                    templateFileName);
+                                continue;
+                            }
+
+                            if (string.IsNullOrEmpty(templateLanguage))
+                            {
+                                string extension = Path.GetExtension(templateFileName).ToLowerInvariant();
+                                if (extension.StartsWith("."))
+                                {
+                                    extension = extension.Substring(1);
+                                }
+                                templateLanguage = extension;
+                            }
+
+                            if (templateParts.Count > 0)
+                            {
+                                Helpers.ReportDiagnostic(context, "BK-AG13", nameof(AutoInterfaceResource.AG13_title), nameof(AutoInterfaceResource.AG13_message), nameof(AutoInterfaceResource.AG13_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                    );
+                                continue;
+                            }
+
+                            template = new TemplateDefinition(templateLanguage ?? "scriban", content);
+                        }
+
+                        if (includeBaseInterfaces == null)
+                        {
+                            includeBaseInterfaces = false;
+                        }
+
+                        if (receiverType.IsMatchByTypeOrImplementsInterface(type))
+                        {
                             danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts));
-                            if (includeBaseInterfaces.GetValueOrDefault(false))
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false));
+                            if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts));
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false));
+                                }
+                            }
+                        }
+                        else if (receiverType.IsAllInterfaceMembersImplementedBySignature(type) && 
+                            (includeBaseInterfaces.Value == false || interfaceType.AllInterfaces.All(i => receiverType.IsMatchByTypeOrImplementsInterface(i) || receiverType.IsAllInterfaceMembersImplementedBySignature(i))))
+                        {
+                            danglingInterfaceTypesBySymbols.Remove(symbol);
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true));
+                            if (includeBaseInterfaces.Value)
+                            {
+                                foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
+                                {
+                                    bool byType = receiverType.IsMatchByTypeOrImplementsInterface(baseInterfaceType);
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType));
                                 }
                             }
                         }
                         else
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                157834);
+                            Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                            receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                        Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                            157834);
                         continue;
                     }
                 }
@@ -470,7 +489,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
         {
             foreach (INamedTypeSymbol interfaceType in danglingInterfaceTypes.Value)
             {
-                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts));
+                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts, false));
             }
         }
 
@@ -517,6 +536,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                 builder.Append(first ? " : " : ", ");
                 first = false;
                 writer.WriteTypeReference(builder, missingInterfaceType, scope);
+                anyReasonToEmitSourceFile = true;
             }
         }
         builder.AppendLine();

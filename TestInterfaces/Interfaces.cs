@@ -2,14 +2,11 @@
 {
     public interface ITestable
     {
-        void PrintTest();
+        void Test();
     }
 
-    public interface IPrintable<T> : ITestable
+    public interface IPrintable
     {
-        int Length { get; }
-        int Count { get; }
-        void Print1();
-        void Print2();
+        void Print();
     }
 }
