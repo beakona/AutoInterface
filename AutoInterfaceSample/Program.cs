@@ -1,4 +1,5 @@
-﻿using TestInterfaces.A.B;
+﻿using System.Runtime.InteropServices;
+using TestInterfaces.A.B;
 
 namespace AutoInterfaceSample
 {
@@ -8,14 +9,17 @@ namespace AutoInterfaceSample
         {
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
             IArbitrary p = new Person();
-            p.Method2();
+            int f;
+            int? g = 0;
+            p.Method2(1, out f, ref g, new PrinterV1(), null, 5);
         }
     }
 
     public interface IArbitrary
     {
+        int Length { get; }
         void Method1();
-        void Method2();
+        int Method2(int a, out int b, ref int? c, IPrintable e1, IPrintable? e2, in int f);
     }
 
     public class PrinterV1 : IPrintable
@@ -28,8 +32,12 @@ namespace AutoInterfaceSample
         {
         }
 
-        public void Method2()
+        public int Length => 1;
+
+        public int Method2([In] int b, out int c, ref int? d, IPrintable e1, IPrintable? e2, in int f)
         {
+            c = b;
+            return b;
         }
     }
 

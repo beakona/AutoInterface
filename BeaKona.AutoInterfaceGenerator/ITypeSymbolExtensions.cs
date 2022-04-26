@@ -195,7 +195,7 @@ internal static class ITypeSymbolExtensions
                 IParameterSymbol v2 = (IParameterSymbol)s2;
                 if (SameType(v1.Type, v1.NullableAnnotation, v2.Type, v2.NullableAnnotation))
                 {
-                    return v1.RefKind == v2.RefKind && v1.IsParams == v2.IsParams && v1.IsOptional == v2.IsOptional && v1.IsThis == v2.IsThis && v1.IsNullChecked == v2.IsNullChecked;
+                    return v1.RefKind == v2.RefKind && v1.IsParams == v2.IsParams && v1.IsOptional == v2.IsOptional && v1.IsThis == v2.IsThis /*&& v1.IsNullChecked == v2.IsNullChecked*/;
                 }
             }
         }
