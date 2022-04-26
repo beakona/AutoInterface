@@ -17,6 +17,7 @@ public sealed class AutoInterfaceAttribute : Attribute
     }
 
     public Type? Type { get; }
+    public bool PreferCoalesce { get; set; }
     public bool IncludeBaseInterfaces { get; set; }
     public string? TemplateLanguage { get; set; }
     public string? TemplateBody { get; set; }

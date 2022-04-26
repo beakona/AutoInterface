@@ -219,7 +219,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
             }
             else
             {
-                this.WriteRefKind(builder, parameter.RefKind);
+                this.WriteRefKind(builder, parameter.RefKind, false);
                 builder.AppendSpaceIfNeccessary();
             }
 
@@ -236,6 +236,8 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     public void WriteCallParameters(SourceBuilder builder, IEnumerable<IParameterSymbol> parameters)
     {
+        bool dynamicExists = parameters.Any(Helpers.IsDynamic);
+
         bool first = true;
         foreach (IParameterSymbol parameter in parameters)
         {
@@ -247,7 +249,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
             {
                 builder.Append(", ");
             }
-            this.WriteRefKind(builder, parameter.RefKind);
+            this.WriteRefKind(builder, parameter.RefKind, dynamicExists);
             builder.AppendSpaceIfNeccessary();
             this.WriteIdentifier(builder, parameter);
         }
@@ -291,10 +293,10 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         this.WriteParameterDefinition(builder, methodScope, method.Parameters);
         builder.Append(")");
 
-        if (rcount == 1 && template == null)
+        if (rcount == 1 && template == null && (references.First().PreferCoalesce == false || Helpers.HasOutParameters(method) == false))
         {
             builder.Append(" => ");
-            this.WriteMethodCall(builder, references.First(), method, methodScope, false, SemanticFacts.IsNullable(this.Compilation, method.ReturnType), true);
+            this.WriteMethodCall(builder, references.First(), method, methodScope, false, SemanticFacts.IsNullable(this.Compilation, method.ReturnType), references.First().PreferCoalesce);
             builder.AppendLine(';');
         }
         else
@@ -322,6 +324,13 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 }
                 else
                 {
+                    foreach (IParameterSymbol parameter in method.Parameters.Where(i => i.RefKind == RefKind.Out))
+                    {
+                        builder.AppendIndentation();
+                        this.WriteIdentifier(builder, parameter);
+                        builder.AppendLine(" = default;");
+                    }
+
                     if (isAsync && canUseAsync)
                     {
                         {
@@ -372,7 +381,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                                 builder.Append(' ');
                             }
 
-                            this.WriteMethodCall(builder, reference, method, methodScope, false, SemanticFacts.IsNullable(this.Compilation, method.ReturnType), true);
+                            this.WriteMethodCall(builder, reference, method, methodScope, false, SemanticFacts.IsNullable(this.Compilation, method.ReturnType), reference.PreferCoalesce);
                             builder.AppendLine(';');
                             index++;
                         }
@@ -425,7 +434,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         if (property.SetMethod == null && getterTemplate == null)
         {
             builder.Append(" => ");
-            this.WritePropertyCall(builder, references.First(), property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
+            this.WritePropertyCall(builder, references.First(), property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), references.First().PreferCoalesce);
             builder.AppendLine(';');
         }
         else
@@ -444,7 +453,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     {
                         builder.AppendIndentation();
                         builder.Append("get => ");
-                        this.WritePropertyCall(builder, reference, property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
+                        this.WritePropertyCall(builder, reference, property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), reference.PreferCoalesce);
                         builder.AppendLine(';');
                     }
                     if (property.SetMethod is not null)
@@ -494,7 +503,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                         else
                         {
                             builder.Append("get => ");
-                            this.WritePropertyCall(builder, references.Last(), property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), true);
+                            this.WritePropertyCall(builder, references.Last(), property, scope, SemanticFacts.IsNullable(this.Compilation, property.Type), references.Last().PreferCoalesce);
                             builder.AppendLine(';');
                         }
                     }
@@ -852,15 +861,26 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         builder.Append(this.GetSourceIdentifier(symbol));
     }
 
-    public void WriteRefKind(SourceBuilder builder, RefKind kind)
+    public void WriteRefKind(SourceBuilder builder, RefKind kind, bool dynamicExists)
     {
         switch (kind)
         {
             default: throw new NotSupportedException(nameof(WriteRefKind));
-            case RefKind.None: break;
-            case RefKind.In: builder.Append("in"); break;
-            case RefKind.Out: builder.Append("out"); break;
-            case RefKind.Ref: builder.Append("ref"); break;
+            case RefKind.None:
+                break;
+            case RefKind.In:
+                if (dynamicExists == false)
+                {
+                    builder.Append("in");
+                }
+                break;
+            case RefKind.Out:
+                builder.Append("out");
+                break;
+            case RefKind.Ref:
+                builder.Append("ref");
+                break;
+
         }
     }
 

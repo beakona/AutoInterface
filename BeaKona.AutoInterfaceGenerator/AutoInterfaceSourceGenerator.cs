@@ -1,4 +1,6 @@
-﻿using BeaKona.AutoInterfaceGenerator.Templates;
+﻿#define PEEK_0
+
+using BeaKona.AutoInterfaceGenerator.Templates;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -93,8 +95,11 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                             if (code != null)
                             {
                                 string name = containingType.Arity > 0 ? $"{containingType.Name}_{containingType.Arity}" : containingType.Name;
-                                //GeneratePreview(context, name, code);
+#if PEEK_1
+                                GeneratePreview(context, name, code);
+#else
                                 context.AddSource($"{name}_AutoInterface.cs", SourceText.From(code, Encoding.UTF8));
+#endif
                             }
                         }
                         catch (Exception ex)
@@ -108,17 +113,19 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
         }
     }
 
-    //private static void GeneratePreview(GeneratorExecutionContext context, string name, string code)
-    //{
-    //    StringBuilder output = new();
-    //    output.AppendLine("namespace BeaKona.Output {");
-    //    output.AppendLine($"public static class Debug_{name}");
-    //    output.AppendLine("{");
-    //    output.AppendLine($"public static readonly string Info = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(\"{Convert.ToBase64String(Encoding.UTF8.GetBytes(code ?? ""))}\"));");
-    //    output.AppendLine("}");
-    //    output.AppendLine("}");
-    //    context.AddSource($"Output_Debug_{name}.cs", SourceText.From(output.ToString(), Encoding.UTF8));
-    //}
+#if PEEK_1
+    private static void GeneratePreview(GeneratorExecutionContext context, string name, string code)
+    {
+        StringBuilder output = new();
+        output.AppendLine("namespace BeaKona.Output {");
+        output.AppendLine($"public static class Debug_{name}");
+        output.AppendLine("{");
+        output.AppendLine($"public static readonly string Info = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(\"{Convert.ToBase64String(Encoding.UTF8.GetBytes(code ?? ""))}\"));");
+        output.AppendLine("}");
+        output.AppendLine("}");
+        context.AddSource($"Output_Debug_{name}.cs", SourceText.From(output.ToString(), Encoding.UTF8));
+    }
+#endif
 
     private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
     {
@@ -310,6 +317,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
             {
                 ITypeSymbol? type = null;
                 bool? includeBaseInterfaces = null;
+                bool? preferCoalesce = null;
 
                 if (attribute.ConstructorArguments.Length == 0)
                 {
@@ -371,6 +379,14 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                                         if (arg.Value.Value is bool b)
                                         {
                                             includeBaseInterfaces = b;
+                                        }
+                                    }
+                                    break;
+                                case "PreferCoalesce":
+                                    {
+                                        if (arg.Value.Value is bool b)
+                                        {
+                                            preferCoalesce = b;
                                         }
                                     }
                                     break;
@@ -436,15 +452,20 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                             includeBaseInterfaces = false;
                         }
 
+                        if (preferCoalesce == null)
+                        {
+                            preferCoalesce = true;
+                        }
+
                         if (receiverType.IsMatchByTypeOrImplementsInterface(type))
                         {
                             danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false));
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false, preferCoalesce.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false));
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false, preferCoalesce.Value));
                                 }
                             }
                         }
@@ -452,13 +473,13 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                             (includeBaseInterfaces.Value == false || interfaceType.AllInterfaces.All(i => receiverType.IsMatchByTypeOrImplementsInterface(i) || receiverType.IsAllInterfaceMembersImplementedBySignature(i))))
                         {
                             danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true));
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true, preferCoalesce.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
                                     bool byType = receiverType.IsMatchByTypeOrImplementsInterface(baseInterfaceType);
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType));
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType, preferCoalesce.Value));
                                 }
                             }
                         }
@@ -489,7 +510,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
         {
             foreach (INamedTypeSymbol interfaceType in danglingInterfaceTypes.Value)
             {
-                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts, false));
+                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts, false, false));
             }
         }
 

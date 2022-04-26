@@ -34,5 +34,5 @@ internal interface ICodeTextWriter
 
     void WriteIdentifier(SourceBuilder builder, ISymbol symbol);
 
-    void WriteRefKind(SourceBuilder builder, RefKind kind);
+    void WriteRefKind(SourceBuilder builder, RefKind kind, bool dynamicExists);
 }

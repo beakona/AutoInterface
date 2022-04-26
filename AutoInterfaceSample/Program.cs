@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using TestInterfaces.A.B;
+﻿using System;
 
 namespace AutoInterfaceSample
 {
@@ -8,42 +7,57 @@ namespace AutoInterfaceSample
         public static void Main()
         {
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
-            IArbitrary p = new Person();
+            IArbitrary<int> p = new Person();
             int f;
-            int? g = 0;
-            p.Method2(1, out f, ref g, new PrinterV1(), null, 5);
+            int g = 0;
+            p.Method(1, out f, ref g, "t", 1, 2, 3);
         }
     }
 
-    public interface IArbitrary
+
+    public class SignalPlotXYConst<TX, TY, T> where TX : struct, IComparable
     {
-        int Length { get; }
-        void Method1();
-        int Method2(int a, out int b, ref int? c, IPrintable e1, IPrintable? e2, in int f);
     }
 
-    public class PrinterV1 : IPrintable
+    public interface ISome
+    {
+    }
+
+    public interface ISome2
+    {
+    }
+
+    public interface IArbitrary<T>
+    {
+        T Length { get; }
+        int? Method(int a, out int b, ref int c, dynamic d, params int[] p);
+
+        SignalPlotXYConst<TXi, TYi?, T>? Method2<TXi, TYi>(TXi x, TYi[] ys, in int s) where TXi : struct, IComparable where TYi : struct, IComparable, ISome, ISome2;
+    }
+
+    public class PrinterV1
     {
         public void Print()
         {
         }
 
-        public void Method1()
-        {
-        }
-
         public int Length => 1;
 
-        public int Method2([In] int b, out int c, ref int? d, IPrintable e1, IPrintable? e2, in int f)
+        public int? Method(int a, out int b, ref int c, dynamic d, params int[] p)
         {
-            c = b;
-            return b;
+            b = a;
+            return a;
+        }
+
+        public SignalPlotXYConst<TXc, TYc?, int>? Method2<TXc, TYc>(TXc x, TYc[] ys, in int s) where TXc : struct, IComparable where TYc : struct, IComparable, ISome, ISome2
+        {
+            return null;
         }
     }
 
     public partial class Person
     {
-        [BeaKona.AutoInterface(typeof(IArbitrary))]
+        [BeaKona.AutoInterface(typeof(IArbitrary<int>), PreferCoalesce = true)]
         //[BeaKona.AutoInterface(typeof(ITestable))]
         //[BeaKona.AutoInterface(typeof(IPrintable), true)]
         //[BeaKona.AutoInterface(typeof(IPrintable), false)]

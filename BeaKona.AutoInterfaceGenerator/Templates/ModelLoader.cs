@@ -56,7 +56,7 @@ internal static class ModelLoader
             }
             else
             {
-                writer.WriteMethodCall(builder2, reference, method, methodScope, false, SemanticFacts.IsNullable(writer.Compilation, method.ReturnType), true);
+                writer.WriteMethodCall(builder2, reference, method, methodScope, false, SemanticFacts.IsNullable(writer.Compilation, method.ReturnType), reference.PreferCoalesce);
             }
             @this.Expressions.Add(builder2.ToString());
         }
@@ -97,7 +97,7 @@ internal static class ModelLoader
         foreach (IMemberInfo reference in references)
         {
             SourceBuilder builder2 = builder.AppendNewBuilder(false);
-            writer.WritePropertyCall(builder2, reference, property, scope, SemanticFacts.IsNullable(writer.Compilation, property.Type), true);
+            writer.WritePropertyCall(builder2, reference, property, scope, SemanticFacts.IsNullable(writer.Compilation, property.Type), reference.PreferCoalesce);
             @this.GetExpressions.Add(builder2.ToString());
         }
 

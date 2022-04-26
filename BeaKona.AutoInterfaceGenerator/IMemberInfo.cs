@@ -10,4 +10,5 @@ internal interface IMemberInfo
     TemplateDefinition? Template { get; }
     PartialTemplate[] TemplateParts { get; }
     bool BySignature { get; }
+    bool PreferCoalesce { get; }
 }
