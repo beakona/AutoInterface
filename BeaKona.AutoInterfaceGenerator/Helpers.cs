@@ -28,13 +28,13 @@ public static class Helpers
 
     public static bool EqualSets<T>(ImmutableArray<T> x, ImmutableArray<T> y, IEqualityComparer<T>? comparer = null)
     {
-        if (x.IsEmpty)
+        if (x.IsDefaultOrEmpty)
         {
-            return y.IsEmpty;
+            return y.IsDefaultOrEmpty;
         }
         else
         {
-            if (y.IsEmpty)
+            if (y.IsDefaultOrEmpty)
             {
                 return false;
             }
@@ -89,13 +89,13 @@ public static class Helpers
 
     public static bool EqualCollections<T>(ImmutableArray<T> x, ImmutableArray<T> y, IEqualityComparer<T>? comparer = null)
     {
-        if (x.IsEmpty)
+        if (x.IsDefaultOrEmpty)
         {
-            return y.IsEmpty;
+            return y.IsDefaultOrEmpty;
         }
         else
         {
-            if (y.IsEmpty)
+            if (y.IsDefaultOrEmpty)
             {
                 return false;
             }

@@ -27,12 +27,23 @@ namespace AutoInterfaceSample
     {
     }
 
+    public struct Heatmap
+    {
+    }
+
+    public class Colormap
+    {
+    }
+
     public interface IArbitrary<T>
     {
         T Length { get; }
         int? Method(int a, out int b, ref int c, dynamic d, params int[] p);
 
         SignalPlotXYConst<TXi, TYi?, T>? Method2<TXi, TYi>(TXi x, TYi[] ys, in int s) where TXi : struct, IComparable where TYi : struct, IComparable, ISome, ISome2;
+
+        Heatmap AddHeatmap(double?[,] intensities, Colormap? colormap = null, bool? lockScales = true);
+        Heatmap AddHeatmap(double[,] intensities, Colormap? colormap = null, bool? lockScales = null);
     }
 
     public class PrinterV1
@@ -52,6 +63,16 @@ namespace AutoInterfaceSample
         public SignalPlotXYConst<TXc, TYc?, int>? Method2<TXc, TYc>(TXc x, TYc[] ys, in int s) where TXc : struct, IComparable where TYc : struct, IComparable, ISome, ISome2
         {
             return null;
+        }
+
+        public Heatmap AddHeatmap(double?[,] intensities, Colormap? colormap = null, bool? lockScales = true)
+        {
+            return new Heatmap();
+        }
+
+        public Heatmap AddHeatmap(double[,] intensities, Colormap? colormap = null, bool? lockScales = null)
+        {
+            return new Heatmap();
         }
     }
 

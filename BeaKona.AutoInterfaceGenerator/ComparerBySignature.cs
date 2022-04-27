@@ -203,14 +203,11 @@ public class ComparerBySignature : IEqualityComparer<ISymbol>
                 {
                     if (Helpers.EqualCollections(a1.Sizes, a2.Sizes))
                     {
-                        if (a1.IsSZArray == a2.IsSZArray)
+                        if (Helpers.EqualCollections(a1.LowerBounds, a2.LowerBounds))
                         {
-                            if (a1.IsSZArray || Helpers.EqualCollections(a1.LowerBounds, a2.LowerBounds))
+                            if (this.Equals(a1.ElementType, a2.ElementType))
                             {
-                                if (this.Equals(a1.ElementType, a2.ElementType))
-                                {
-                                    return true;
-                                }
+                                return true;
                             }
                         }
                     }
