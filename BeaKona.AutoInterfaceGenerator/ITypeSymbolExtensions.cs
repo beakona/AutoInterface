@@ -59,15 +59,16 @@ internal static class ITypeSymbolExtensions
     {
         ISymbol? implementation = @this.FindImplementationForInterfaceMember(member);
 
-        if (implementation is null || !implementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default))
+        if (implementation is null || implementation.IsStatic || !implementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default))
         {
             return false;
         }
 
         return implementation switch
         {
-            IMethodSymbol memberImplementation => memberImplementation.MethodKind == MethodKind.ExplicitInterfaceImplementation,
+            IMethodSymbol methodImplementation => methodImplementation.MethodKind == MethodKind.ExplicitInterfaceImplementation,
             IPropertySymbol propertyImplementation => propertyImplementation.ExplicitInterfaceImplementations.Any(),
+            IEventSymbol eventImplementation => eventImplementation.ExplicitInterfaceImplementations.Any(),
             _ => false,
         };
     }
