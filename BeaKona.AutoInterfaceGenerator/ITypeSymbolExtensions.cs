@@ -57,12 +57,19 @@ internal static class ITypeSymbolExtensions
 
     public static bool IsMemberImplemented(this ITypeSymbol @this, ISymbol member)
     {
-        if (@this.FindImplementationForInterfaceMember(member) is IMethodSymbol memberImplementation)
+        ISymbol? implementation = @this.FindImplementationForInterfaceMember(member);
+
+        if (implementation is null || !implementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default))
         {
-            return memberImplementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default) && memberImplementation.MethodKind == MethodKind.ExplicitInterfaceImplementation;
+            return false;
         }
 
-        return false;
+        return implementation switch
+        {
+            IMethodSymbol memberImplementation => memberImplementation.MethodKind == MethodKind.ExplicitInterfaceImplementation,
+            IPropertySymbol propertyImplementation => propertyImplementation.ExplicitInterfaceImplementations.Any(),
+            _ => false,
+        };
     }
 
     public static ISymbol? FindImplementationForInterfaceMemberBySignature(this ITypeSymbol @this, ISymbol interfaceMember)
