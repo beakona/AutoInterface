@@ -98,7 +98,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
 #if PEEK_1
                                 GeneratePreview(context, name, code);
 #else
-                                context.AddSource($"{name}_AutoInterface.cs", SourceText.From(code, Encoding.UTF8));
+                                context.AddSource($"{name}_AutoInterface.g.cs", SourceText.From(code, Encoding.UTF8));
 #endif
                             }
                         }
