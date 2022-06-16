@@ -98,7 +98,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
 #if PEEK_1
                                 GeneratePreview(context, name, code);
 #else
-                                context.AddSource($"{name}_AutoInterface.cs", SourceText.From(code, Encoding.UTF8));
+                                context.AddSource($"{name}_AutoInterface.g.cs", SourceText.From(code, Encoding.UTF8));
 #endif
                             }
                         }
@@ -123,7 +123,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
         output.AppendLine($"public static readonly string Info = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(\"{Convert.ToBase64String(Encoding.UTF8.GetBytes(code ?? ""))}\"));");
         output.AppendLine("}");
         output.AppendLine("}");
-        context.AddSource($"Output_Debug_{name}.cs", SourceText.From(output.ToString(), Encoding.UTF8));
+        context.AddSource($"Output_Debug_{name}.g.cs", SourceText.From(output.ToString(), Encoding.UTF8));
     }
 #endif
 
