@@ -9,7 +9,7 @@ namespace AutoInterfaceSample
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
             //IArbitrary<int> p = new Person();
             //int f;
-            //int g = 0;
+            //int g = 1;
             //p.Method(1, out f, ref g, "t", 1, 2, 3);
 
             IPrintableComplex p = new Person2();
