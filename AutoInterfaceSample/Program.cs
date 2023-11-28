@@ -13,7 +13,7 @@ namespace AutoInterfaceSample
             //p.Method(1, out f, ref g, "t", 1, 2, 3);
 
             IPrintableComplex p = new Person2();
-            p.Print();
+            //p.Print();
             p.PrintComplex();
         }
     }
