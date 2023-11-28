@@ -13,22 +13,54 @@ namespace AutoInterfaceSample
             //p.Method(1, out f, ref g, "t", 1, 2, 3);
 
             IPrintableComplex p = new Person2();
-            //p.Print();
+            p.Print();
             p.PrintComplex();
         }
     }
 
     interface IPrintableComplex
     {
-        //[Obsolete("ok")]
+        [Obsolete("ok", false)]
         void Print();
         void PrintComplex();
+
+        [Obsolete("12")]
+        int Count
+        {
+            get;
+            [Obsolete("ok3")]
+            set;
+        }
+
+        int Count2
+        {
+            //[Obsolete("cd2")]
+            get;
+        }
+
+        [Obsolete("cd")]
+        int this[int a]
+        {
+            [Obsolete("cd3")]
+            get;
+        }
     }
+
     public class SimplePrinter
     {
         public void Print() { Console.WriteLine("OK"); }
-        public void PrintComplex() { Console.WriteLine("OK"); }
+        public void PrintComplex() { Console.WriteLine("OK2"); }
+
+        public int Count
+        {
+            get;
+            set;
+        }
+
+        public int Count2 => 10;
+        public int this[int a] => 10;
     }
+
     public partial class Person2 : IPrintableComplex
     {
         [BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = false)]
