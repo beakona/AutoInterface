@@ -61,7 +61,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG01..
         /// </summary>
         internal static string AG01_description {
             get {
@@ -88,7 +88,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG02..
         /// </summary>
         internal static string AG02_description {
             get {
@@ -115,7 +115,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG03..
         /// </summary>
         internal static string AG03_description {
             get {
@@ -142,7 +142,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG04..
         /// </summary>
         internal static string AG04_description {
             get {
@@ -169,7 +169,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG05..
         /// </summary>
         internal static string AG05_description {
             get {
@@ -196,7 +196,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG06..
         /// </summary>
         internal static string AG06_description {
             get {
@@ -223,7 +223,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG07..
         /// </summary>
         internal static string AG07_description {
             get {
@@ -250,7 +250,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG08..
         /// </summary>
         internal static string AG08_description {
             get {
@@ -277,7 +277,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG09..
         /// </summary>
         internal static string AG09_description {
             get {
@@ -304,7 +304,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG10..
         /// </summary>
         internal static string AG10_description {
             get {
@@ -331,7 +331,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG11..
         /// </summary>
         internal static string AG11_description {
             get {
@@ -358,7 +358,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG12..
         /// </summary>
         internal static string AG12_description {
             get {
@@ -385,7 +385,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG13..
         /// </summary>
         internal static string AG13_description {
             get {
@@ -412,7 +412,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG14..
         /// </summary>
         internal static string AG14_description {
             get {
@@ -439,7 +439,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG15..
         /// </summary>
         internal static string AG15_description {
             get {
@@ -466,7 +466,7 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to AG16..
         /// </summary>
         internal static string AG16_description {
             get {

@@ -16,13 +16,13 @@ public static class Helpers
 
     public static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, Location? location, params object?[] messageArgs)
     {
-        LocalizableString ltitle = new LocalizableResourceString(title, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-        LocalizableString lmessage = new LocalizableResourceString(message, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-        LocalizableString? ldescription = new LocalizableResourceString(description, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-        string category = typeof(AutoInterfaceSourceGenerator).Namespace;
-        string? link = "https://github.com/beakona/AutoInterface";
-        DiagnosticDescriptor dd = new(id, ltitle, lmessage, category, severity, true, ldescription, link, WellKnownDiagnosticTags.NotConfigurable);
-        Diagnostic d = Diagnostic.Create(dd, location, messageArgs);
+        var lTitle = new LocalizableResourceString(title, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
+        var lMessage = new LocalizableResourceString(message, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
+        var lDescription = new LocalizableResourceString(description, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
+        var category = typeof(AutoInterfaceSourceGenerator).Namespace;
+        var link = "https://github.com/beakona/AutoInterface";
+        var dd = new DiagnosticDescriptor(id, lTitle, lMessage, category, severity, true, lDescription, link, WellKnownDiagnosticTags.NotConfigurable);
+        var d = Diagnostic.Create(dd, location, messageArgs);
         context.ReportDiagnostic(d);
     }
 
@@ -58,20 +58,17 @@ public static class Helpers
 
         if (length > 0)
         {
-            if (comparer == null)
-            {
-                comparer = EqualityComparer<T>.Default;
-            }
+            comparer ??= EqualityComparer<T>.Default;
 
-            while(length > 0)
+            while (length > 0)
             {
                 bool matched = false;
-                for (int i = length-1; i >= 0; i--)
+                for (int i = length - 1; i >= 0; i--)
                 {
-                    if (comparer.Equals(x[length-1], y[i]))
+                    if (comparer.Equals(x[length - 1], y[i]))
                     {
                         matched = true;
-                        x.RemoveAt(length-1);
+                        x.RemoveAt(length - 1);
                         y.RemoveAt(i);
                         length--;
                         break;
@@ -116,10 +113,7 @@ public static class Helpers
 
         if (length > 0)
         {
-            if (comparer == null)
-            {
-                comparer = EqualityComparer<T>.Default;
-            }
+            comparer ??= EqualityComparer<T>.Default;
 
             for (int i = 0; i < length; i++)
             {

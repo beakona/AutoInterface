@@ -11,4 +11,5 @@ internal interface IMemberInfo
     PartialTemplate[] TemplateParts { get; }
     bool BySignature { get; }
     bool PreferCoalesce { get; }
+    bool AllowMissingMembers { get; }
 }

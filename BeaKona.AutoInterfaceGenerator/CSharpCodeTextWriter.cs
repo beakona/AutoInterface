@@ -220,7 +220,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
             else
             {
                 this.WriteRefKind(builder, parameter.RefKind, false);
-                builder.AppendSpaceIfNeccessary();
+                builder.AppendSpaceIfNecessary();
             }
 
             this.WriteTypeReference(builder, parameter.Type, scope);
@@ -250,14 +250,14 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 builder.Append(", ");
             }
             this.WriteRefKind(builder, parameter.RefKind, dynamicExists);
-            builder.AppendSpaceIfNeccessary();
+            builder.AppendSpaceIfNecessary();
             this.WriteIdentifier(builder, parameter);
         }
     }
 
     public void WriteMethodDefinition(SourceBuilder builder, IMethodSymbol method, ScopeInfo scope, INamedTypeSymbol @interface, IEnumerable<IMemberInfo> references)
     {
-        ScopeInfo methodScope = new(scope);
+        var methodScope = new ScopeInfo(scope);
 
         if (method.IsGenericMethod)
         {
@@ -268,12 +268,12 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
         PartialTemplate? template = this.GetMatchedTemplates(references, AutoInterfaceTargets.Method, method.Name);
 
-        int rcount = references.Count();
-        bool canUseAsync = template != null || rcount > 1;
+        int refCount = references.Count();
+        bool canUseAsync = template != null || refCount > 1;
         bool returnsValue = (isAsync && methodReturnsValue == false) ? canUseAsync == false : methodReturnsValue;
 
         builder.AppendIndentation();
-        if (isAsync && canUseAsync && (template != null || rcount > 1))
+        if (isAsync && canUseAsync && (template != null || refCount > 1))
         {
             builder.Append("async");
             builder.Append(' ');
@@ -293,7 +293,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         this.WriteParameterDefinition(builder, methodScope, method.Parameters);
         builder.Append(")");
 
-        if (rcount == 1 && template == null && (references.First().PreferCoalesce == false || Helpers.HasOutParameters(method) == false))
+        if (refCount == 1 && template == null && (references.First().PreferCoalesce == false || Helpers.HasOutParameters(method) == false))
         {
             builder.Append(" => ");
             this.WriteMethodCall(builder, references.First(), method, methodScope, false, SemanticFacts.IsNullable(this.Compilation, method.ReturnType), references.First().PreferCoalesce);
@@ -309,9 +309,9 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
             {
                 if (template != null)
                 {
-                    TemplatedSourceTextGenerator generator = new(template.Template);
+                    var generator = new TemplatedSourceTextGenerator(template.Template);
 
-                    PartialMethodModel model = new();
+                    var model = new PartialMethodModel();
                     model.Load(this, builder, @interface, scope, references);
                     model.Load(this, builder, method, methodScope, references);
 
@@ -351,7 +351,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                             int index = 0;
                             foreach (IMemberInfo reference in references)
                             {
-                                bool last = index + 1 == rcount;
+                                bool last = index + 1 == refCount;
 
                                 builder.AppendIndentation();
                                 if (returnsValue && last)
@@ -372,7 +372,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                         int index = 0;
                         foreach (IMemberInfo reference in references)
                         {
-                            bool last = index + 1 == rcount;
+                            bool last = index + 1 == refCount;
 
                             builder.AppendIndentation();
                             if (returnsValue && last)
@@ -477,9 +477,9 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                             builder.IncrementIndentation();
                             try
                             {
-                                TemplatedSourceTextGenerator generator = new(getterTemplate.Template);
+                                var generator = new TemplatedSourceTextGenerator(getterTemplate.Template);
 
-                                IPropertyModel model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
+                                var model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
                                 if (model is IRootModel rootModel)
                                 {
                                     rootModel.Load(this, builder, @interface, scope, references);
@@ -518,8 +518,8 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                         {
                             if (setterTemplate != null)
                             {
-                                TemplatedSourceTextGenerator generator = new(setterTemplate.Template);
-                                IPropertyModel model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
+                                var generator = new TemplatedSourceTextGenerator(setterTemplate.Template);
+                                var model = property.IsIndexer ? new PartialIndexerModel() : (IPropertyModel)new PartialPropertyModel();
                                 if (model is IRootModel rootModel)
                                 {
                                     rootModel.Load(this, builder, @interface, scope, references);
@@ -609,8 +609,8 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     {
                         if (adderTemplate != null)
                         {
-                            TemplatedSourceTextGenerator generator = new(adderTemplate.Template);
-                            PartialEventModel model = new();
+                            var generator = new TemplatedSourceTextGenerator(adderTemplate.Template);
+                            var model = new PartialEventModel();
                             model.Load(this, builder, @interface, scope, references);
                             model.Load(this, builder, @event, scope, references);
 
@@ -651,8 +651,8 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     {
                         if (removerTemplate != null)
                         {
-                            TemplatedSourceTextGenerator generator = new(removerTemplate.Template);
-                            PartialEventModel model = new();
+                            var generator = new TemplatedSourceTextGenerator(removerTemplate.Template);
+                            var model = new PartialEventModel();
                             model.Load(this, builder, @interface, scope, references);
                             model.Load(this, builder, @event, scope, references);
 
@@ -721,7 +721,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
     {
         if (@namespace != null && @namespace.ConstituentNamespaces.Length > 0)
         {
-            List<INamespaceSymbol> containingNamespaces = new();
+            List<INamespaceSymbol> containingNamespaces = [];
             for (INamespaceSymbol? ct = @namespace; ct != null && ct.IsGlobalNamespace == false; ct = ct.ContainingNamespace)
             {
                 containingNamespaces.Insert(0, ct);

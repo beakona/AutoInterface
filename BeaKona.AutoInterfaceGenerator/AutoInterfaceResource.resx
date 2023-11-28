@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AG01_description" xml:space="preserve">
-    <value />
+    <value>AG01.</value>
   </data>
   <data name="AG01_message" xml:space="preserve">
     <value>Type '{0}' is not marked as partial.</value>
@@ -127,7 +127,7 @@
     <value>Type is not marked as partial.</value>
   </data>
   <data name="AG02_description" xml:space="preserve">
-    <value />
+    <value>AG02.</value>
   </data>
   <data name="AG02_message" xml:space="preserve">
     <value>Type '{0}' is static.</value>
@@ -136,7 +136,7 @@
     <value>Type is static.</value>
   </data>
   <data name="AG03_description" xml:space="preserve">
-    <value />
+    <value>AG03.</value>
   </data>
   <data name="AG03_message" xml:space="preserve">
     <value>Type '{0}' is not an interface.</value>
@@ -145,7 +145,7 @@
     <value>Type is not an interface.</value>
   </data>
   <data name="AG04_description" xml:space="preserve">
-    <value />
+    <value>AG04.</value>
   </data>
   <data name="AG04_message" xml:space="preserve">
     <value>Unable to cast from type '{0}' to '{1}' or type '{0}' does not expose all members required by interface '{1}'.</value>
@@ -154,7 +154,7 @@
     <value>Unable to cast or missing member.</value>
   </data>
   <data name="AG05_description" xml:space="preserve">
-    <value />
+    <value>AG05.</value>
   </data>
   <data name="AG05_message" xml:space="preserve">
     <value>Type does not implement interface '{0}'.</value>
@@ -163,7 +163,7 @@
     <value>Type does not implement a defined interface(s).</value>
   </data>
   <data name="AG06_description" xml:space="preserve">
-    <value />
+    <value>AG06.</value>
   </data>
   <data name="AG06_message" xml:space="preserve">
     <value>Member '{0}' does not have getter.</value>
@@ -172,7 +172,7 @@
     <value>Target member is writeonly.</value>
   </data>
   <data name="AG07_description" xml:space="preserve">
-    <value />
+    <value>AG07.</value>
   </data>
   <data name="AG07_message" xml:space="preserve">
     <value>Type cannot be null.</value>
@@ -181,7 +181,7 @@
     <value>Type should be an interface.</value>
   </data>
   <data name="AG08_description" xml:space="preserve">
-    <value />
+    <value>AG08.</value>
   </data>
   <data name="AG08_message" xml:space="preserve">
     <value>Only class, record or struct can auto-implement interface.</value>
@@ -190,7 +190,7 @@
     <value>Type is not a class, record, or struct.</value>
   </data>
   <data name="AG09_description" xml:space="preserve">
-    <value />
+    <value>AG09.</value>
   </data>
   <data name="AG09_message" xml:space="preserve">
     <value>Internal exception [{0}].</value>
@@ -199,7 +199,7 @@
     <value>Internal exception.</value>
   </data>
   <data name="AG10_description" xml:space="preserve">
-    <value />
+    <value>AG10.</value>
   </data>
   <data name="AG10_message" xml:space="preserve">
     <value>AutoInterface template for single interface should be defined at most once.</value>
@@ -208,7 +208,7 @@
     <value>Multiple AutoInterface templates.</value>
   </data>
   <data name="AG11_description" xml:space="preserve">
-    <value />
+    <value>AG11.</value>
   </data>
   <data name="AG11_message" xml:space="preserve">
     <value>Template file '{0}' not found.</value>
@@ -217,7 +217,7 @@
     <value>Template file not found.</value>
   </data>
   <data name="AG12_description" xml:space="preserve">
-    <value />
+    <value>AG12.</value>
   </data>
   <data name="AG12_message" xml:space="preserve">
     <value>Template should be specified either inline or from file but not both.</value>
@@ -226,7 +226,7 @@
     <value>More than one template specified.</value>
   </data>
   <data name="AG13_description" xml:space="preserve">
-    <value />
+    <value>AG13.</value>
   </data>
   <data name="AG13_message" xml:space="preserve">
     <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.</value>
@@ -235,7 +235,7 @@
     <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.</value>
   </data>
   <data name="AG14_description" xml:space="preserve">
-    <value />
+    <value>AG14.</value>
   </data>
   <data name="AG14_message" xml:space="preserve">
     <value>Template is missing.</value>
@@ -244,7 +244,7 @@
     <value>Template is missing.</value>
   </data>
   <data name="AG15_description" xml:space="preserve">
-    <value />
+    <value>AG15.</value>
   </data>
   <data name="AG15_message" xml:space="preserve">
     <value>Filter '{0}' is not valid Regex expression.</value>
@@ -253,7 +253,7 @@
     <value>Filter is not valid Regex expression.</value>
   </data>
   <data name="AG16_description" xml:space="preserve">
-    <value />
+    <value>AG16.</value>
   </data>
   <data name="AG16_message" xml:space="preserve">
     <value>Multiple partial templates found for member: '{0}'.</value>

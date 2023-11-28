@@ -4,10 +4,6 @@ namespace BeaKona.AutoInterfaceGenerator;
 
 internal sealed class SourceBuilder
 {
-    public SourceBuilder() : this(SourceBuilderOptions.Default)
-    {
-    }
-
     public SourceBuilder(SourceBuilderOptions options)
     {
         this.Options = options;
@@ -22,8 +18,8 @@ internal sealed class SourceBuilder
 
     public SourceBuilderOptions Options { get; }
 
-    private readonly List<object> elements = new();
-    private readonly HashSet<string> aliases = new();
+    private readonly List<object> elements = [];
+    private readonly HashSet<string> aliases = [];
 
     public void Clear()
     {
@@ -81,12 +77,12 @@ internal sealed class SourceBuilder
     {
         if (text != null)
         {
-            this.AppendSpaceIfNeccessary();
+            this.AppendSpaceIfNecessary();
             this.Append(text);
         }
     }
 
-    public void AppendSpaceIfNeccessary()
+    public void AppendSpaceIfNecessary()
     {
         this.elements.Add(new FlexibleSpaceMarker());
     }
@@ -110,7 +106,7 @@ internal sealed class SourceBuilder
 
     public SourceBuilder AppendNewBuilder(bool register = true)
     {
-        SourceBuilder builder = new(this, this.Options);
+        var builder = new SourceBuilder(this, this.Options);
         if (register)
         {
             this.elements.Add(builder);
@@ -130,7 +126,7 @@ internal sealed class SourceBuilder
 
     public override string ToString()
     {
-        StringBuilder text = new();
+        var text = new StringBuilder();
         foreach (string alias in this.aliases.OrderByDescending(i => i))
         {
             text.Append("extern alias ");
@@ -162,17 +158,14 @@ internal sealed class SourceBuilder
                         break;
                     case IndentationMarker indentation:
                         {
-                            if (cache == null)
-                            {
-                                cache = new Dictionary<int, string>();
-                            }
+                            cache ??= [];
                             int depth = indentation.Depth;
                             if (cache.TryGetValue(depth, out string value) == false)
                             {
-                                StringBuilder sb = new();
+                                var sb = new StringBuilder();
                                 for (int i = 0; i < depth; i++)
                                 {
-                                    sb.Append(this.Options.Identation);
+                                    sb.Append(this.Options.Indentation);
                                 }
                                 cache[depth] = value = sb.ToString();
                             }
@@ -214,11 +207,11 @@ internal sealed class SourceBuilder
         }
     }
 
-    private class LineSeparatorMarker
+    private sealed class LineSeparatorMarker
     {
     }
 
-    private class IndentationMarker
+    private sealed class IndentationMarker
     {
         public IndentationMarker(int depth)
         {
@@ -228,7 +221,7 @@ internal sealed class SourceBuilder
         public readonly int Depth;
     }
 
-    private class FlexibleSpaceMarker
+    private sealed class FlexibleSpaceMarker
     {
     }
 }

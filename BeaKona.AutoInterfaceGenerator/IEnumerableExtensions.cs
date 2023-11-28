@@ -6,7 +6,7 @@ internal static class IEnumerableExtensions
     {
         if (@this == null)
         {
-            return new HashSet<T>();
+            return [];
         }
         else
         {
@@ -16,7 +16,7 @@ internal static class IEnumerableExtensions
 
     public static IEnumerable<TSource> DistinctBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
     {
-        HashSet<TKey> seenKeys = new();
+        HashSet<TKey> seenKeys = [];
 
         foreach (TSource element in source)
         {

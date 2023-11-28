@@ -1,6 +1,6 @@
 ﻿namespace BeaKona.AutoInterfaceGenerator;
 
-public class ComparerBySignature : IEqualityComparer<ISymbol>
+public sealed class ComparerBySignature : IEqualityComparer<ISymbol>
 {
     private readonly Dictionary<ITypeParameterSymbol, List<ITypeParameterSymbol>> aliasesByKey = new(SymbolEqualityComparer.Default);
 
@@ -48,7 +48,7 @@ public class ComparerBySignature : IEqualityComparer<ISymbol>
 
                         if (match)
                         {
-                            toRemove = new();
+                            toRemove = [];
 
                             for (int i = 0; i < v1.Arity; i++)
                             {
@@ -57,7 +57,7 @@ public class ComparerBySignature : IEqualityComparer<ISymbol>
 
                                 if (this.aliasesByKey.TryGetValue(t1, out var aliases) == false)
                                 {
-                                    this.aliasesByKey[t1] = aliases = new();
+                                    this.aliasesByKey[t1] = aliases = [];
                                 }
                                 aliases.Add(t2);
 

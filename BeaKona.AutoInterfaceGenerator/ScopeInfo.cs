@@ -25,7 +25,7 @@ internal sealed class ScopeInfo
 
     private static ImmutableList<ITypeSymbol> AllTypeArguments(ISymbol symbol)
     {
-        List<ITypeSymbol> types = new();
+        List<ITypeSymbol> types = [];
 
         for (ISymbol s = symbol; s != null; s = s.ContainingType)
         {

@@ -43,12 +43,12 @@ internal static class SemanticFacts
             }
         }
 
-        return new ISymbol[0];
+        return [];
     }
 
     public static ISymbol[] GetContainingSymbols(ITypeSymbol type, bool includeSelf)
     {
-        List<ISymbol> symbols = new();
+        List<ISymbol> symbols = [];
 
         for (ISymbol t = includeSelf ? type : type.ContainingSymbol; t != null; t = t.ContainingSymbol)
         {
@@ -63,7 +63,7 @@ internal static class SemanticFacts
             symbols.Insert(0, t);
         }
 
-        return symbols.ToArray();
+        return [.. symbols];
     }
 
     internal static (bool isAsync, bool returnsValue) IsAsyncAndGetReturnType(Compilation compilation, IMethodSymbol method)

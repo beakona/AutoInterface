@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 namespace BeaKona.AutoInterfaceGenerator;
 
 [Generator]
-public class AutoInterfaceSourceGenerator : ISourceGenerator
+public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -31,7 +31,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                 if (compilation.GetTypeByMetadataName(typeof(AutoInterfaceAttribute).FullName) is INamedTypeSymbol autoInterfaceAttributeSymbol && compilation.GetTypeByMetadataName(typeof(AutoInterfaceTemplateAttribute).FullName) is INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
                 {
                     // loop over the candidates, and keep the ones that are actually annotated
-                    List<AutoInterfaceRecord> records = new();
+                    List<AutoInterfaceRecord> records = [];
 
                     foreach (MemberDeclarationSyntax candidate in receiver.Candidates)
                     {
@@ -116,7 +116,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
 #if PEEK_1
     private static void GeneratePreview(GeneratorExecutionContext context, string name, string code)
     {
-        StringBuilder output = new();
+        var output = new StringBuilder();
         output.AppendLine("namespace BeaKona.Output {");
         output.AppendLine($"public static class Debug_{name}");
         output.AppendLine("{");
@@ -129,8 +129,8 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
 
     private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
     {
-        List<PartialTemplate> templateParts = new();
-        Dictionary<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypesBySymbols = new(SymbolEqualityComparer.Default);
+        List<PartialTemplate> templateParts = [];
+        var danglingInterfaceTypesBySymbols = new Dictionary<ISymbol, HashSet<INamedTypeSymbol>>(SymbolEqualityComparer.Default);
 
         foreach (AttributeData attribute in symbol.GetAttributes())
         {
@@ -233,11 +233,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                                 AdditionalText? file = context.AdditionalFiles.FirstOrDefault(i => i.Path.EndsWith(templateFileName));
                                 if (file != null)
                                 {
-                                    content = file.GetText()?.ToString()?.Trim();
-                                    if (content == null)
-                                    {
-                                        content = "";
-                                    }
+                                    content = file.GetText()?.ToString()?.Trim() ?? "";
                                 }
                                 else
                                 {
@@ -309,7 +305,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
             }
         }
 
-        List<AutoInterfaceRecord> records = new();
+        List<AutoInterfaceRecord> records = [];
 
         foreach (AttributeData attribute in symbol.GetAttributes())
         {
@@ -318,6 +314,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                 ITypeSymbol? type = null;
                 bool? includeBaseInterfaces = null;
                 bool? preferCoalesce = null;
+                bool? allowMissingMembers = null;
 
                 if (attribute.ConstructorArguments.Length == 0)
                 {
@@ -350,7 +347,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                         {
                             switch (arg.Key)
                             {
-                                case "TemplateFileName":
+                                case nameof(AutoInterfaceAttribute.TemplateFileName):
                                     {
                                         if (arg.Value.Value is string s)
                                         {
@@ -358,7 +355,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                                         }
                                     }
                                     break;
-                                case "TemplateBody":
+                                case nameof(AutoInterfaceAttribute.TemplateBody):
                                     {
                                         if (arg.Value.Value is string s)
                                         {
@@ -366,7 +363,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                                         }
                                     }
                                     break;
-                                case "TemplateLanguage":
+                                case nameof(AutoInterfaceAttribute.TemplateLanguage):
                                     {
                                         if (arg.Value.Value is string s)
                                         {
@@ -374,7 +371,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                                         }
                                     }
                                     break;
-                                case "IncludeBaseInterfaces":
+                                case nameof(AutoInterfaceAttribute.IncludeBaseInterfaces):
                                     {
                                         if (arg.Value.Value is bool b)
                                         {
@@ -382,11 +379,19 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                                         }
                                     }
                                     break;
-                                case "PreferCoalesce":
+                                case nameof(AutoInterfaceAttribute.PreferCoalesce):
                                     {
                                         if (arg.Value.Value is bool b)
                                         {
                                             preferCoalesce = b;
+                                        }
+                                    }
+                                    break;
+                                case nameof(AutoInterfaceAttribute.AllowMissingMembers):
+                                    {
+                                        if (arg.Value.Value is bool b)
+                                        {
+                                            allowMissingMembers = b;
                                         }
                                     }
                                     break;
@@ -414,11 +419,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                             AdditionalText? file = context.AdditionalFiles.FirstOrDefault(i => i.Path.EndsWith(templateFileName));
                             if (file != null)
                             {
-                                content = file.GetText()?.ToString()?.Trim();
-                                if (content == null)
-                                {
-                                    content = "";
-                                }
+                                content = file.GetText()?.ToString()?.Trim() ?? "";
                             }
                             else
                             {
@@ -447,39 +448,32 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                             template = new TemplateDefinition(templateLanguage ?? "scriban", content);
                         }
 
-                        if (includeBaseInterfaces == null)
-                        {
-                            includeBaseInterfaces = false;
-                        }
+                        includeBaseInterfaces ??= false;
+                        preferCoalesce ??= true;
+                        allowMissingMembers ??= false;
 
-                        if (preferCoalesce == null)
-                        {
-                            preferCoalesce = true;
-                        }
-
-                        if (receiverType.IsMatchByTypeOrImplementsInterface(type))
+                        if (IsImplementedDirectly(receiverType, type))
                         {
                             danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false, preferCoalesce.Value));
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false, preferCoalesce.Value));
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value));
                                 }
                             }
                         }
-                        else if (receiverType.IsAllInterfaceMembersImplementedBySignature(type) && 
-                            (includeBaseInterfaces.Value == false || interfaceType.AllInterfaces.All(i => receiverType.IsMatchByTypeOrImplementsInterface(i) || receiverType.IsAllInterfaceMembersImplementedBySignature(i))))
+                        else if (IsDuckImplementation(receiverType, type, includeBaseInterfaces.Value, allowMissingMembers.Value))
                         {
                             danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true, preferCoalesce.Value));
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true, preferCoalesce.Value, allowMissingMembers.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
                                     bool byType = receiverType.IsMatchByTypeOrImplementsInterface(baseInterfaceType);
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType, preferCoalesce.Value));
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType, preferCoalesce.Value, allowMissingMembers.Value));
                                 }
                             }
                         }
@@ -510,18 +504,37 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
         {
             foreach (INamedTypeSymbol interfaceType in danglingInterfaceTypes.Value)
             {
-                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts, false, false));
+                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts, false, false, false));
             }
         }
 
         return records;
     }
 
-    private static string? ProcessClass(GeneratorExecutionContext context, Compilation compilation, INamedTypeSymbol type, IEnumerable<IMemberInfo> infos)
+    private static bool IsImplementedDirectly(ITypeSymbol receiverType, ITypeSymbol interfaceType)
     {
-        ScopeInfo scope = new(type);
+        return receiverType.IsMatchByTypeOrImplementsInterface(interfaceType);
+    }
 
-        SourceBuilder builder = new();
+    private static bool IsDuckImplementation(ITypeSymbol receiverType, ITypeSymbol interfaceType, bool includeBaseInterfaces, bool allowMissingMembers)
+    {
+        if (allowMissingMembers)
+        {
+            return true;
+        }
+        else
+        {
+            return receiverType.IsAllInterfaceMembersImplementedBySignature(interfaceType) &&
+                (includeBaseInterfaces == false || interfaceType.AllInterfaces.All(i => receiverType.IsMatchByTypeOrImplementsInterface(i) || receiverType.IsAllInterfaceMembersImplementedBySignature(i)));
+        }
+    }
+
+    private static string? ProcessClass(GeneratorExecutionContext context, Compilation compilation, INamedTypeSymbol type, IEnumerable<IMemberInfo> members)
+    {
+        var scope = new ScopeInfo(type);
+
+        var options = SourceBuilderOptions.Load(context, null);
+        var builder = new SourceBuilder(options);
 
         ICodeTextWriter writer = new CSharpCodeTextWriter(context, compilation);
         bool anyReasonToEmitSourceFile = false;
@@ -533,7 +546,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
         builder.AppendLine();
         writer.WriteNamespaceBeginning(builder, type.ContainingNamespace);
 
-        List<INamedTypeSymbol> containingTypes = new();
+        List<INamedTypeSymbol> containingTypes = [];
         for (INamedTypeSymbol? ct = type.ContainingType; ct != null; ct = ct.ContainingType)
         {
             containingTypes.Insert(0, ct);
@@ -553,7 +566,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
         writer.WriteTypeDeclarationBeginning(builder, type, scope);
         {
             bool first = true;
-            foreach (INamedTypeSymbol missingInterfaceType in infos.Select(i => i.InterfaceType).Where(i => type.AllInterfaces.Contains(i, SymbolEqualityComparer.Default) == false).ToHashSet())
+            foreach (INamedTypeSymbol missingInterfaceType in members.Select(i => i.InterfaceType).Where(i => type.AllInterfaces.Contains(i, SymbolEqualityComparer.Default) == false).ToHashSet())
             {
                 builder.Append(first ? " : " : ", ");
                 first = false;
@@ -568,7 +581,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
 
         bool separatorRequired = false;
 
-        foreach (IGrouping<INamedTypeSymbol, IMemberInfo> group in infos.GroupBy<IMemberInfo, INamedTypeSymbol>(i => i.InterfaceType, SymbolEqualityComparer.Default))
+        foreach (IGrouping<INamedTypeSymbol, IMemberInfo> group in members.GroupBy<IMemberInfo, INamedTypeSymbol>(i => i.InterfaceType, SymbolEqualityComparer.Default))
         {
             ISourceTextGenerator? generator = null;
             foreach (IMemberInfo reference in group)
@@ -594,44 +607,75 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
             INamedTypeSymbol @interface = group.Key;
             List<IMemberInfo> references = group.DistinctBy(i => i.Member).ToList();
 
+            var allowAnyMissingMember = references.Any(i => i.AllowMissingMembers);
+            var allowAnyStrict = references.Any(i => i.AllowMissingMembers == false);
+
+            bool ShouldGenerate(ISymbol member)
+            {
+                if (allowAnyStrict)
+                {
+                    //any strict case
+                    return type.IsMemberImplementedExplicitly(member) == false;
+                }
+                else
+                {
+                    //at least one AllowMissingMembers case
+                    return allowAnyMissingMember && type.IsMemberImplemented(member) == false;
+                }
+            }
+
+            bool ShouldBeReferenced(ISymbol member, IMemberInfo reference)
+            {
+                if (reference.AllowMissingMembers == false)
+                {
+                    //strict case
+                    return true;
+                }
+                else
+                {
+                    //AllowMissingMembers case
+                    return reference.ReceiverType.IsMemberImplementedBySignature(member);
+                }
+            }
+
             if (generator != null)
             {
-                StandaloneModel model = new();
+                var model = new StandaloneModel();
 
                 model.Load(writer, builder, @interface, scope, references);
 
                 MethodModel CreateMethod(IMethodSymbol method)
                 {
-                    MethodModel m = new();
-                    m.Load(writer, builder, method, scope, references);
+                    var m = new MethodModel();
+                    m.Load(writer, builder, method, scope, references.Where(r => ShouldBeReferenced(method, r)).ToList());
                     return m;
                 }
 
                 PropertyModel CreateProperty(IPropertySymbol property)
                 {
-                    PropertyModel m = new();
-                    m.Load(writer, builder, property, scope, references);
+                    var m = new PropertyModel();
+                    m.Load(writer, builder, property, scope, references.Where(r => ShouldBeReferenced(property, r)).ToList());
                     return m;
                 }
 
                 IndexerModel CreateIndexer(IPropertySymbol indexer)
                 {
-                    IndexerModel m = new();
-                    m.Load(writer, builder, indexer, scope, references);
+                    var m = new IndexerModel();
+                    m.Load(writer, builder, indexer, scope, references.Where(r => ShouldBeReferenced(indexer, r)).ToList());
                     return m;
                 }
 
                 EventModel CreateEvent(IEventSymbol @event)
                 {
-                    EventModel m = new();
-                    m.Load(writer, builder, @event, scope, references);
+                    var m = new EventModel();
+                    m.Load(writer, builder, @event, scope, references.Where(r => ShouldBeReferenced(@event, r)).ToList());
                     return m;
                 }
 
-                model.Methods.AddRange(@interface.GetMethods().Where(i => type.IsMemberImplemented(i) == false).Select(CreateMethod));
-                model.Properties.AddRange(@interface.GetProperties().Where(i => type.IsMemberImplemented(i) == false).Select(CreateProperty));
-                model.Indexers.AddRange(@interface.GetIndexers().Where(i => type.IsMemberImplemented(i) == false).Select(CreateIndexer));
-                model.Events.AddRange(@interface.GetEvents().Where(i => type.IsMemberImplemented(i) == false).Select(CreateEvent));
+                model.Methods.AddRange(@interface.GetMethods().Where(ShouldGenerate).Select(CreateMethod));
+                model.Properties.AddRange(@interface.GetProperties().Where(ShouldGenerate).Select(CreateProperty));
+                model.Indexers.AddRange(@interface.GetIndexers().Where(ShouldGenerate).Select(CreateIndexer));
+                model.Events.AddRange(@interface.GetEvents().Where(ShouldGenerate).Select(CreateEvent));
 
                 generator.Emit(writer, builder, model, ref separatorRequired);
                 anyReasonToEmitSourceFile = true;
@@ -644,7 +688,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
             }
             else
             {
-                foreach (IMethodSymbol method in @interface.GetMethods().Where(i => type.IsMemberImplemented(i) == false))
+                foreach (IMethodSymbol method in @interface.GetMethods().Where(ShouldGenerate))
                 {
                     anyReasonToEmitSourceFile = true;
 
@@ -652,11 +696,11 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                     {
                         builder.AppendLine();
                     }
-                    writer.WriteMethodDefinition(builder, method, scope, @interface, references);
+                    writer.WriteMethodDefinition(builder, method, scope, @interface, references.Where(r => ShouldBeReferenced(method, r)).ToList());
                     separatorRequired = true;
                 }
 
-                foreach (IPropertySymbol property in @interface.GetProperties().Where(i => type.IsMemberImplemented(i) == false))
+                foreach (IPropertySymbol property in @interface.GetProperties().Where(ShouldGenerate))
                 {
                     anyReasonToEmitSourceFile = true;
 
@@ -665,11 +709,11 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                         builder.AppendLine();
                     }
 
-                    writer.WritePropertyDefinition(builder, property, scope, @interface, references);
+                    writer.WritePropertyDefinition(builder, property, scope, @interface, references.Where(r => ShouldBeReferenced(property, r)).ToList());
                     separatorRequired = true;
                 }
 
-                foreach (IPropertySymbol indexer in @interface.GetIndexers().Where(i => type.IsMemberImplemented(i) == false))
+                foreach (IPropertySymbol indexer in @interface.GetIndexers().Where(ShouldGenerate))
                 {
                     anyReasonToEmitSourceFile = true;
 
@@ -678,11 +722,11 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                         builder.AppendLine();
                     }
 
-                    writer.WritePropertyDefinition(builder, indexer, scope, @interface, references);
+                    writer.WritePropertyDefinition(builder, indexer, scope, @interface, references.Where(r => ShouldBeReferenced(indexer, r)).ToList());
                     separatorRequired = true;
                 }
 
-                foreach (IEventSymbol @event in @interface.GetEvents().Where(i => type.IsMemberImplemented(i) == false))
+                foreach (IEventSymbol @event in @interface.GetEvents().Where(ShouldGenerate))
                 {
                     anyReasonToEmitSourceFile = true;
 
@@ -691,7 +735,7 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
                         builder.AppendLine();
                     }
 
-                    writer.WriteEventDefinition(builder, @event, scope, @interface, references);
+                    writer.WriteEventDefinition(builder, @event, scope, @interface, references.Where(r => ShouldBeReferenced(@event, r)).ToList());
                     separatorRequired = true;
                 }
             }
@@ -699,20 +743,27 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
 
         builder.DecrementIndentation();
         builder.AppendIndentation();
-        builder.AppendLine('}');
+        builder.Append('}');
 
         for (int i = 0; i < containingTypes.Count; i++)
         {
+            builder.AppendLine();
             builder.DecrementIndentation();
             builder.AppendIndentation();
-            builder.AppendLine('}');
+            builder.Append('}');
         }
 
         if (type.ContainingNamespace != null && type.ContainingNamespace.ConstituentNamespaces.Length > 0)
         {
+            builder.AppendLine();
             builder.DecrementIndentation();
             builder.AppendIndentation();
-            builder.AppendLine('}');
+            builder.Append('}');
+        }
+
+        if (builder.Options.InsertFinalNewLine)
+        {
+            builder.AppendLine();
         }
 
         return error == false && anyReasonToEmitSourceFile ? builder.ToString() : null;
@@ -722,9 +773,9 @@ public class AutoInterfaceSourceGenerator : ISourceGenerator
     /// <summary>
     /// Created on demand before each generation pass
     /// </summary>
-    private class SyntaxReceiver : ISyntaxReceiver
+    private sealed class SyntaxReceiver : ISyntaxReceiver
     {
-        public List<MemberDeclarationSyntax> Candidates { get; } = new();
+        public List<MemberDeclarationSyntax> Candidates { get; } = [];
 
         /// <summary>
         /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation

@@ -7,11 +7,34 @@ namespace AutoInterfaceSample
         public static void Main()
         {
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_Person.Info);
-            IArbitrary<int> p = new Person();
-            int f;
-            int g = 0;
-            p.Method(1, out f, ref g, "t", 1, 2, 3);
+            //IArbitrary<int> p = new Person();
+            //int f;
+            //int g = 0;
+            //p.Method(1, out f, ref g, "t", 1, 2, 3);
+
+            IPrintableComplex p = new Person2();
+            //p.Print();
+            p.PrintComplex();
         }
+    }
+
+    interface IPrintableComplex
+    {
+        //[Obsolete("ok")]
+        void Print();
+        void PrintComplex();
+    }
+    public class SimplePrinter
+    {
+        public void Print() { Console.WriteLine("OK"); }
+        public void PrintComplex() { Console.WriteLine("OK"); }
+    }
+    public partial class Person2 : IPrintableComplex
+    {
+        [BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = false)]
+        private readonly SimplePrinter aspect1 = new SimplePrinter();
+
+        public void PrintComplex() { Console.WriteLine("Oh, K."); }
     }
 
 
