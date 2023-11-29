@@ -11,7 +11,7 @@ on:
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  DOTNET_VERSION: 6.0.x
+  DOTNET_VERSION: 8.0.x
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 jobs:
@@ -19,9 +19,10 @@ jobs:
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v2
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Install dependencies
@@ -35,9 +36,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v2
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Pack
@@ -58,8 +60,8 @@ jobs:
     needs: pack
     runs-on: ubuntu-latest
     steps:
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v2
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Download Artifact
