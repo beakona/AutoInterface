@@ -54,7 +54,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                             {
                                 if (property.IsWriteOnly)
                                 {
-                                    Helpers.ReportDiagnostic(context, "BK-AG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
+                                    Helpers.ReportDiagnostic(context, "BKAG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
                                         property.Name);
                                     continue;
                                 }
@@ -71,21 +71,21 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
                         if (containingType.IsPartial() == false)
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG01", nameof(AutoInterfaceResource.AG01_title), nameof(AutoInterfaceResource.AG01_message), nameof(AutoInterfaceResource.AG01_description), DiagnosticSeverity.Error, containingType,
+                            Helpers.ReportDiagnostic(context, "BKAG01", nameof(AutoInterfaceResource.AG01_title), nameof(AutoInterfaceResource.AG01_message), nameof(AutoInterfaceResource.AG01_description), DiagnosticSeverity.Error, containingType,
                                 containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
 
                         if (containingType.IsStatic)
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG02", nameof(AutoInterfaceResource.AG02_title), nameof(AutoInterfaceResource.AG02_message), nameof(AutoInterfaceResource.AG02_description), DiagnosticSeverity.Error, containingType,
+                            Helpers.ReportDiagnostic(context, "BKAG02", nameof(AutoInterfaceResource.AG02_title), nameof(AutoInterfaceResource.AG02_message), nameof(AutoInterfaceResource.AG02_description), DiagnosticSeverity.Error, containingType,
                                 containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
 
                         if (containingType.TypeKind != TypeKind.Class && containingType.TypeKind != TypeKind.Struct)
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, recordsByContainingType.First().Member);
+                            Helpers.ReportDiagnostic(context, "BKAG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, recordsByContainingType.First().Member);
                             continue;
                         }
 
@@ -104,7 +104,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         }
                         catch (Exception ex)
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, containingType,
+                            Helpers.ReportDiagnostic(context, "BKAG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, containingType,
                                 ex.ToString().Replace("\r", "").Replace("\n", ""));
                         }
                     }
@@ -144,7 +144,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                 {
                     if (type is INamedTypeSymbol interfaceType)
                     {
-                        if (receiverType.IsMatchByTypeOrImplementsInterface(type))
+                        if (IsImplementedDirectly(receiverType, interfaceType))
                         {
                             string? templateBody = null;
                             string? templateFileName = null;
@@ -198,7 +198,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                             {
                                 if (templateFileName != null && templateFileName.Trim().Length > 0)
                                 {
-                                    Helpers.ReportDiagnostic(context, "BK-AG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                    Helpers.ReportDiagnostic(context, "BKAG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
                                         );
                                     continue;
                                 }
@@ -212,7 +212,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                     }
                                     catch
                                     {
-                                        Helpers.ReportDiagnostic(context, "BK-AG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                        Helpers.ReportDiagnostic(context, "BKAG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                             memberFilter);
                                         continue;
                                     }
@@ -237,7 +237,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                 }
                                 else
                                 {
-                                    Helpers.ReportDiagnostic(context, "BK-AG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                    Helpers.ReportDiagnostic(context, "BKAG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                         templateFileName);
                                     continue;
                                 }
@@ -261,7 +261,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                     }
                                     catch
                                     {
-                                        Helpers.ReportDiagnostic(context, "BK-AG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                        Helpers.ReportDiagnostic(context, "BKAG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                             memberFilter);
                                         continue;
                                     }
@@ -277,28 +277,28 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                             }
                             else
                             {
-                                Helpers.ReportDiagnostic(context, "BK-AG14", nameof(AutoInterfaceResource.AG14_title), nameof(AutoInterfaceResource.AG14_message), nameof(AutoInterfaceResource.AG14_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                Helpers.ReportDiagnostic(context, "BKAG14", nameof(AutoInterfaceResource.AG14_title), nameof(AutoInterfaceResource.AG14_message), nameof(AutoInterfaceResource.AG14_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
                                     );
                                 continue;
                             }
                         }
                         else
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                            Helpers.ReportDiagnostic(context, "BKAG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                 receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                        Helpers.ReportDiagnostic(context, "BKAG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                             157834);
                         continue;
                     }
                 }
                 else
                 {
-                    Helpers.ReportDiagnostic(context, "BK-AG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                    Helpers.ReportDiagnostic(context, "BKAG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                         type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                     continue;
                 }
@@ -315,6 +315,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                 bool? includeBaseInterfaces = null;
                 bool? preferCoalesce = null;
                 bool? allowMissingMembers = null;
+                MemberMatchTypes? memberMatch = null;
 
                 if (attribute.ConstructorArguments.Length == 0)
                 {
@@ -330,7 +331,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
                 if (type == null)
                 {
-                    Helpers.ReportDiagnostic(context, "BK-AG07", nameof(AutoInterfaceResource.AG07_title), nameof(AutoInterfaceResource.AG07_message), nameof(AutoInterfaceResource.AG07_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax());
+                    Helpers.ReportDiagnostic(context, "BKAG07", nameof(AutoInterfaceResource.AG07_title), nameof(AutoInterfaceResource.AG07_message), nameof(AutoInterfaceResource.AG07_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax());
                     continue;
                 }
                 else if (type.TypeKind == TypeKind.Interface)
@@ -395,6 +396,14 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                         }
                                     }
                                     break;
+                                case nameof(AutoInterfaceAttribute.MemberMatch):
+                                    {
+                                        if (arg.Value.Value is object value)
+                                        {
+                                            memberMatch = (MemberMatchTypes)Convert.ChangeType(value, typeof(MemberMatchTypes).GetEnumUnderlyingType());
+                                        }
+                                    }
+                                    break;
                             }
                         }
 
@@ -405,7 +414,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         {
                             if (templateFileName != null && templateFileName.Trim().Length > 0)
                             {
-                                Helpers.ReportDiagnostic(context, "BK-AG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                Helpers.ReportDiagnostic(context, "BKAG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
                                     );
                                 continue;
                             }
@@ -423,7 +432,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                             }
                             else
                             {
-                                Helpers.ReportDiagnostic(context, "BK-AG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                                Helpers.ReportDiagnostic(context, "BKAG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                     templateFileName);
                                 continue;
                             }
@@ -440,7 +449,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
                             if (templateParts.Count > 0)
                             {
-                                Helpers.ReportDiagnostic(context, "BK-AG13", nameof(AutoInterfaceResource.AG13_title), nameof(AutoInterfaceResource.AG13_message), nameof(AutoInterfaceResource.AG13_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
+                                Helpers.ReportDiagnostic(context, "BKAG13", nameof(AutoInterfaceResource.AG13_title), nameof(AutoInterfaceResource.AG13_message), nameof(AutoInterfaceResource.AG13_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
                                     );
                                 continue;
                             }
@@ -451,49 +460,50 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         includeBaseInterfaces ??= false;
                         preferCoalesce ??= true;
                         allowMissingMembers ??= false;
+                        memberMatch ??= MemberMatchTypes.Explicit;
 
                         if (IsImplementedDirectly(receiverType, type))
                         {
                             danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value));
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value));
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                                 }
                             }
                         }
                         else if (IsDuckImplementation(receiverType, type, includeBaseInterfaces.Value, allowMissingMembers.Value))
                         {
                             danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true, preferCoalesce.Value, allowMissingMembers.Value));
+                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
                                     bool byType = receiverType.IsMatchByTypeOrImplementsInterface(baseInterfaceType);
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType, preferCoalesce.Value, allowMissingMembers.Value));
+                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                                 }
                             }
                         }
                         else
                         {
-                            Helpers.ReportDiagnostic(context, "BK-AG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                            Helpers.ReportDiagnostic(context, "BKAG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                                 receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BK-AG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                        Helpers.ReportDiagnostic(context, "BKAG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                             157834);
                         continue;
                     }
                 }
                 else
                 {
-                    Helpers.ReportDiagnostic(context, "BK-AG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
+                    Helpers.ReportDiagnostic(context, "BKAG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
                         type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                     continue;
                 }
@@ -504,7 +514,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
         {
             foreach (INamedTypeSymbol interfaceType in danglingInterfaceTypes.Value)
             {
-                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts, false, false, false));
+                records.Add(new AutoInterfaceRecord(danglingInterfaceTypes.Key, receiverType, interfaceType, null, templateParts, false, false, false, MemberMatchTypes.Explicit));
             }
         }
 
@@ -593,7 +603,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         if (g.Template.Equals(td) == false)
                         {
                             error = true;
-                            Helpers.ReportDiagnostic(context, "BK-AG10", nameof(AutoInterfaceResource.AG10_title), nameof(AutoInterfaceResource.AG10_message), nameof(AutoInterfaceResource.AG10_description), DiagnosticSeverity.Error, reference.Member);
+                            Helpers.ReportDiagnostic(context, "BKAG10", nameof(AutoInterfaceResource.AG10_title), nameof(AutoInterfaceResource.AG10_message), nameof(AutoInterfaceResource.AG10_description), DiagnosticSeverity.Error, reference.Member);
                             continue;
                         }
                     }
@@ -607,35 +617,56 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
             INamedTypeSymbol @interface = group.Key;
             List<IMemberInfo> references = group.DistinctBy(i => i.Member).ToList();
 
-            var allowAnyMissingMember = references.Any(i => i.AllowMissingMembers);
-            var allowAnyStrict = references.Any(i => i.AllowMissingMembers == false);
-
             bool ShouldGenerate(ISymbol member)
             {
-                if (allowAnyStrict)
+                foreach (var reference in references)
                 {
-                    //any strict case
-                    return type.IsMemberImplementedExplicitly(member) == false;
+                    if (reference.AllowMissingMembers)
+                    {
+                        if (reference.ReceiverType.IsMemberImplementedBySignature(member) == false)
+                        {
+                            return false;
+                        }
+                    }
                 }
-                else
+
+                var memberImplementedBySignature = type.IsMemberImplementedBySignature(member);
+                var memberImplementedExplicitly = type.IsMemberImplementedExplicitly(member);
+
+                foreach (var reference in references)
                 {
-                    //at least one AllowMissingMembers case
-                    return allowAnyMissingMember && type.IsMemberImplemented(member) == false;
+                    if (IsMemberImplemented(reference.MemberMatch, memberImplementedBySignature, memberImplementedExplicitly))
+                    {
+                        return false;
+                    }
                 }
+
+                return true;
             }
 
             bool ShouldBeReferenced(ISymbol member, IMemberInfo reference)
             {
-                if (reference.AllowMissingMembers == false)
-                {
-                    //strict case
-                    return true;
-                }
-                else
+                if (reference.AllowMissingMembers)
                 {
                     //AllowMissingMembers case
                     return reference.ReceiverType.IsMemberImplementedBySignature(member);
                 }
+                else
+                {
+                    //strict case
+                    return true;
+                }
+            }
+
+            static bool IsMemberImplemented(MemberMatchTypes memberMatchType, bool memberImplementedBySignature, bool memberImplementedExplicitly)
+            {
+                return memberMatchType switch
+                {
+                    MemberMatchTypes.Public => memberImplementedBySignature,
+                    MemberMatchTypes.Explicit => memberImplementedExplicitly,
+                    MemberMatchTypes.Any => memberImplementedBySignature || memberImplementedExplicitly,
+                    _ => throw new NotSupportedException(),
+                };
             }
 
             if (generator != null)

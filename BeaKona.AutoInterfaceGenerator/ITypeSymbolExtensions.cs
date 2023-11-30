@@ -73,12 +73,12 @@ internal static class ITypeSymbolExtensions
         };
     }
 
-    public static bool IsMemberImplemented(this ITypeSymbol @this, ISymbol member)
-    {
-        ISymbol? implementation = @this.FindImplementationForInterfaceMember(member);
+    //public static bool IsMemberImplemented(this ITypeSymbol @this, ISymbol member)
+    //{
+    //    ISymbol? implementation = @this.FindImplementationForInterfaceMember(member);
 
-        return implementation is not null && implementation.IsStatic == false && implementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default);
-    }
+    //    return implementation is not null && implementation.IsStatic == false && implementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default);
+    //}
 
     public static ISymbol? FindImplementationForInterfaceMemberBySignature(this ITypeSymbol @this, ISymbol interfaceMember)
     {

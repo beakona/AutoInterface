@@ -12,4 +12,5 @@ internal interface IMemberInfo
     bool BySignature { get; }
     bool PreferCoalesce { get; }
     bool AllowMissingMembers { get; }
+    MemberMatchTypes MemberMatch { get; }
 }

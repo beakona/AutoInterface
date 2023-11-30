@@ -30,7 +30,7 @@ internal class PartialTemplate
                 {
                     if (ts[1].template.MemberFilter != null)
                     {
-                        Helpers.ReportDiagnostic(context, "BK-AG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
+                        Helpers.ReportDiagnostic(context, "BKAG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
                             name);
                         return null;
                     }
@@ -47,13 +47,13 @@ internal class PartialTemplate
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BK-AG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
+                        Helpers.ReportDiagnostic(context, "BKAG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
                             name);
                         return null;
                     }
                 }
             default:
-                Helpers.ReportDiagnostic(context, "BK-AG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
+                Helpers.ReportDiagnostic(context, "BKAG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
                     name);
                 return null;
         }

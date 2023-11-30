@@ -23,4 +23,5 @@ public sealed class AutoInterfaceAttribute : Attribute
     public string? TemplateBody { get; set; }
     public string? TemplateFileName { get; set; }
     public bool AllowMissingMembers { get; set; }
+    public MemberMatchTypes MemberMatch { get; set; }
 }

@@ -13,60 +13,41 @@ namespace AutoInterfaceSample
             //p.Method(1, out f, ref g, "t", 1, 2, 3);
 
             IPrintableComplex p = new Person2();
-            //p.Print();
+            p.Print();
             p.PrintComplex();
         }
     }
 
     interface IPrintableComplex
     {
-        [Obsolete("ok", false)]
         void Print();
         void PrintComplex();
-
-        [Obsolete("12")]
-        int Count
-        {
-            get;
-            [Obsolete("ok3")]
-            set;
-        }
-
-        int Count2
-        {
-            //[Obsolete("cd2")]
-            get;
-        }
-
-        [Obsolete("cd")]
-        int this[int a]
-        {
-            [Obsolete("cd3")]
-            get;
-        }
     }
 
-    public class SimplePrinter
+    public class SimplePrinter //: IPrintableComplex
     {
         public void Print() { Console.WriteLine("OK"); }
-        public void PrintComplex() { Console.WriteLine("OK2"); }
-
-        public int Count
-        {
-            get;
-            set;
-        }
-
-        public int Count2 => 10;
-        public int this[int a] => 10;
+        public void PrintComplex() { Console.WriteLine("OKC"); }
     }
 
-    public partial class Person2 : IPrintableComplex
+    public partial class Person2 //: IPrintableComplex
     {
-        [BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = false)]
-        private readonly SimplePrinter aspect1 = new SimplePrinter();
+        //[BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true, MemberMatch = BeaKona.MemberMatchTypes.Public)]
+        //private readonly SimplePrinter aspect1 = new SimplePrinter();
+
+        //[BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true, MemberMatch = BeaKona.MemberMatchTypes.Explicit)]
+        //private readonly SimplePrinter aspect2 = new SimplePrinter();
+
+        [BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true)]
+        private readonly SimplePrinter aspect3 = new SimplePrinter();
+
+        //[BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true, MemberMatch = BeaKona.MemberMatchTypes.Any)]
+        //private readonly SimplePrinter aspect4 = new SimplePrinter();
+
+        //void IPrintableComplex.PrintComplex() => Console.WriteLine("OKC2");
 
         public void PrintComplex() { Console.WriteLine("Oh, K."); }
+        //void IPrintableComplex.PrintComplex() { Console.WriteLine("Oh, K."); }
     }
 
 

@@ -21,6 +21,7 @@ public static class Helpers
         var lDescription = new LocalizableResourceString(description, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
         var category = typeof(AutoInterfaceSourceGenerator).Namespace;
         var link = "https://github.com/beakona/AutoInterface";
+
         var dd = new DiagnosticDescriptor(id, lTitle, lMessage, category, severity, true, lDescription, link, WellKnownDiagnosticTags.NotConfigurable);
         var d = Diagnostic.Create(dd, location, messageArgs);
         context.ReportDiagnostic(d);

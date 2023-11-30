@@ -4,7 +4,7 @@ namespace BeaKona.AutoInterfaceGenerator;
 
 internal sealed class AutoInterfaceRecord : IMemberInfo
 {
-    public AutoInterfaceRecord(ISymbol member, ITypeSymbol receiverType, INamedTypeSymbol interfaceType, TemplateDefinition? template, List<PartialTemplate> templateParts, bool bySignature, bool preferCoalesce, bool allowMissingMembers)
+    public AutoInterfaceRecord(ISymbol member, ITypeSymbol receiverType, INamedTypeSymbol interfaceType, TemplateDefinition? template, List<PartialTemplate> templateParts, bool bySignature, bool preferCoalesce, bool allowMissingMembers, MemberMatchTypes memberMatch)
     {
         this.Member = member;
         this.ReceiverType = receiverType;
@@ -14,6 +14,7 @@ internal sealed class AutoInterfaceRecord : IMemberInfo
         this.BySignature = bySignature;
         this.PreferCoalesce = preferCoalesce;
         this.AllowMissingMembers = allowMissingMembers;
+        this.MemberMatch = memberMatch;
     }
 
     public ISymbol Member { get; }
@@ -24,4 +25,5 @@ internal sealed class AutoInterfaceRecord : IMemberInfo
     public bool BySignature { get; }
     public bool PreferCoalesce { get; }
     public bool AllowMissingMembers { get; }
+    public MemberMatchTypes MemberMatch { get; }
 }

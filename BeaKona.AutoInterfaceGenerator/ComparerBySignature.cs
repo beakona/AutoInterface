@@ -8,6 +8,8 @@ public sealed class ComparerBySignature : IEqualityComparer<ISymbol>
 
     public bool Equals(ISymbol s1, ISymbol s2)
     {
+        //should we check s1/s2.DeclaredAccessibility to be Accessibility.Public || Accessibility.NotApplicable??
+
         if (s1.Kind == s2.Kind)
         {
             if (s1.Kind == SymbolKind.Method)
