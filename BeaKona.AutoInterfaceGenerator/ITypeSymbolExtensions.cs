@@ -110,7 +110,7 @@ internal static class ITypeSymbolExtensions
             return false;
         }
 
-        foreach (ISymbol member in @interface.GetMembers())
+        foreach (var member in @interface.GetMembers())
         {
             if (@this.IsMemberImplementedBySignature(member) == false)
             {

@@ -1,6 +1,6 @@
 ﻿namespace BeaKona.AutoInterfaceGenerator;
 
-public sealed class ComparerBySignature : IEqualityComparer<ISymbol>
+internal sealed class ComparerBySignature : IEqualityComparer<ISymbol>
 {
     private readonly Dictionary<ITypeParameterSymbol, List<ITypeParameterSymbol>> aliasesByKey = new(SymbolEqualityComparer.Default);
 

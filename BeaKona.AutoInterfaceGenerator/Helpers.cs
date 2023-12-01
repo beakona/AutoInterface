@@ -2,7 +2,7 @@
 
 namespace BeaKona.AutoInterfaceGenerator;
 
-public static class Helpers
+internal static class Helpers
 {
     public static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, SyntaxNode? node, params object?[] messageArgs)
     {
