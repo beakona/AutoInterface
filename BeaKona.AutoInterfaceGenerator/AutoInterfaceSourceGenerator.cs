@@ -800,7 +800,6 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
         return error == false && anyReasonToEmitSourceFile ? builder.ToString() : null;
     }
 
-
     /// <summary>
     /// Created on demand before each generation pass
     /// </summary>
