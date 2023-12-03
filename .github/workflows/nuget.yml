@@ -65,7 +65,7 @@ jobs:
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
     - name: Download Artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v1
       with:
         name: nupkg
     - name: Push to nuget.org
