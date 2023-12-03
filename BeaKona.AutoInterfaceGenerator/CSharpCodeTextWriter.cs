@@ -789,17 +789,13 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         this.WriteTypeReference(builder, type, scope);
     }
 
-    public void WriteNamespaceBeginning(SourceBuilder builder, INamespaceSymbol @namespace)
+    public bool WriteNamespaceBeginning(SourceBuilder builder, INamespaceSymbol @namespace)
     {
-        if (@namespace != null && @namespace.ConstituentNamespaces.Length > 0)
+        if (@namespace != null)
         {
-            List<INamespaceSymbol> containingNamespaces = [];
-            for (INamespaceSymbol? ct = @namespace; ct != null && ct.IsGlobalNamespace == false; ct = ct.ContainingNamespace)
-            {
-                containingNamespaces.Insert(0, ct);
-            }
+            INamespaceSymbol[] containingNamespaces = @namespace.GetNamespaceElements();
 
-            if (containingNamespaces.Count > 0)
+            if (containingNamespaces.Length > 0)
             {
                 builder.AppendIndentation();
                 builder.Append("namespace");
@@ -808,8 +804,12 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 builder.AppendIndentation();
                 builder.AppendLine('{');
                 builder.IncrementIndentation();
+
+                return true;
             }
         }
+
+        return false;
     }
 
     public void WriteHolderReference(SourceBuilder builder, ISymbol member, ScopeInfo scope)

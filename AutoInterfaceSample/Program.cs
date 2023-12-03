@@ -1,7 +1,4 @@
-﻿using BeaKona;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 
 namespace AutoInterfaceSample.Test
 {
@@ -15,9 +12,6 @@ namespace AutoInterfaceSample.Test
             //int g = 1;
             //p.Method(1, out f, ref g, "t", 1, 2, 3);
 
-            TestClass<int> t = new TestClass<int>();
-            var x = t.AsMy1();
-
             IPrintableComplex p = new Person2();
             p.Print();
             p.PrintComplex();
@@ -28,45 +22,6 @@ namespace AutoInterfaceSample.Test
     {
         void Print();
         void PrintComplex();
-    }
-
-    public interface IMy1Base
-    {
-    }
-
-    public interface IMy1<H> : IMy1Base
-    {
-    }
-
-    internal interface IMy2<T>
-    {
-    }
-
-    internal interface IMy2<T1, T2>
-    {
-    }
-
-    internal interface IMy3
-    {
-    }
-
-    internal interface @internal
-    {
-    }
-
-    public abstract class TestClassBase : IMy3
-    {
-    }
-
-    [GenerateAutoAs(EntireInterfaceHierarchy = true, SkipSystemInterfaces = false)]
-    public partial class TestClass<T> : TestClassBase, IMy1<T>, IMy2<int>, IMy2<string>, IMy2<string, string>, IEnumerable<int>, @internal
-    {
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-
-        public IEnumerator<int> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     public class SimplePrinter //: IPrintableComplex

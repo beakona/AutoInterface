@@ -554,13 +554,9 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
         //bool isNullable = compilation.Options.NullableContextOptions == NullableContextOptions.Enable;
         builder.AppendLine("#nullable enable");
         builder.AppendLine();
-        writer.WriteNamespaceBeginning(builder, type.ContainingNamespace);
+        bool namespaceGenerated = writer.WriteNamespaceBeginning(builder, type.ContainingNamespace);
 
-        List<INamedTypeSymbol> containingTypes = [];
-        for (INamedTypeSymbol? ct = type.ContainingType; ct != null; ct = ct.ContainingType)
-        {
-            containingTypes.Insert(0, ct);
-        }
+        INamedTypeSymbol[] containingTypes = type.GetContainingTypes();
 
         foreach (INamedTypeSymbol ct in containingTypes)
         {
@@ -776,7 +772,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
         builder.AppendIndentation();
         builder.Append('}');
 
-        for (int i = 0; i < containingTypes.Count; i++)
+        for (int i = 0; i < containingTypes.Length; i++)
         {
             builder.AppendLine();
             builder.DecrementIndentation();
@@ -784,7 +780,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
             builder.Append('}');
         }
 
-        if (type.ContainingNamespace != null && type.ContainingNamespace.ConstituentNamespaces.Length > 0)
+        if (namespaceGenerated)
         {
             builder.AppendLine();
             builder.DecrementIndentation();
