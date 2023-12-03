@@ -50,7 +50,7 @@ jobs:
         VERSION="${VERSION//v}"
         dotnet pack -c Release -p:PackageVersion=$VERSION BeaKona.AutoInterfaceGenerator
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
         name: nupkg
         path: |
