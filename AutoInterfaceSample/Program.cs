@@ -24,7 +24,7 @@ namespace AutoInterfaceSample.Test
         void PrintComplex();
     }
 
-    public class SimplePrinter //: IPrintableComplex
+    public class SimplePrinter // : IPrintableComplex
     {
         public void Print() { Console.WriteLine("OK"); }
         public void PrintComplex() { Console.WriteLine("OKC"); }
