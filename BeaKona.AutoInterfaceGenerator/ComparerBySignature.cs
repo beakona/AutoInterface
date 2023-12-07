@@ -2,6 +2,12 @@
 
 internal sealed class ComparerBySignature : IEqualityComparer<ISymbol>
 {
+    public ComparerBySignature(bool strict)
+    {
+        this.strict = strict;
+    }
+
+    private readonly bool strict;
     private readonly Dictionary<ITypeParameterSymbol, List<ITypeParameterSymbol>> aliasesByKey = new(SymbolEqualityComparer.Default);
 
     public int GetHashCode(ISymbol obj) => throw new NotSupportedException();//SymbolEqualityComparer.Default.GetHashCode(obj);
@@ -108,9 +114,34 @@ internal sealed class ComparerBySignature : IEqualityComparer<ISymbol>
                 {
                     if (this.Equals(v1.Type, v2.Type))
                     {
-                        static bool HasGetter(IPropertySymbol p) => p.GetMethod != null;
-                        static bool HasSetter(IPropertySymbol p) => p.SetMethod != null;
-                        if (HasGetter(v1) == HasGetter(v2) && HasSetter(v1) == HasSetter(v2))
+                        static bool IsMatch(IPropertySymbol x, IPropertySymbol y, bool strict)
+                        {
+                            static bool HasGetter(IPropertySymbol p) => p.GetMethod != null;
+                            static bool HasSetter(IPropertySymbol p) => p.SetMethod != null;
+
+                            var hasGetter = HasGetter(x);
+                            var requireGetter = HasGetter(y);
+                            var hasSetter = HasSetter(x);
+                            var requireSetter = HasSetter(y);
+
+                            if (strict)
+                            {
+                                return hasGetter == requireGetter && hasSetter == requireSetter;
+                            }
+                            else
+                            {
+                                if ((requireGetter && hasGetter == false) || (requireSetter && hasSetter == false))
+                                {
+                                    return false;
+                                }
+                                else
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if (IsMatch(v1, v2, this.strict))
                         {
                             if (v1.IsIndexer)
                             {

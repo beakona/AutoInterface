@@ -83,14 +83,14 @@ internal static class ITypeSymbolExtensions
     //    return implementation is not null && implementation.IsStatic == false && implementation.ContainingType.Equals(@this, SymbolEqualityComparer.Default);
     //}
 
-    public static ISymbol? FindImplementationForInterfaceMemberBySignature(this ITypeSymbol @this, ISymbol interfaceMember)
+    public static ISymbol? FindImplementationForInterfaceMemberBySignature(this ITypeSymbol @this, ISymbol interfaceMember, bool strict)
     {
         string name = interfaceMember.Name;
         if (string.IsNullOrEmpty(name) == false)
         {
             foreach (ISymbol member in @this.GetMembers(name).Where(i => i.Kind == interfaceMember.Kind))
             {
-                var comparer = new ComparerBySignature();
+                var comparer = new ComparerBySignature(strict);
                 if (comparer.Equals(member, interfaceMember))
                 {
                     return member;
@@ -101,12 +101,12 @@ internal static class ITypeSymbolExtensions
         return null;
     }
 
-    public static bool IsMemberImplementedBySignature(this ITypeSymbol @this, ISymbol member)
+    public static bool IsMemberImplementedBySignature(this ITypeSymbol @this, ISymbol member, bool strict)
     {
-        return @this.FindImplementationForInterfaceMemberBySignature(member) != null;
+        return @this.FindImplementationForInterfaceMemberBySignature(member, strict) != null;
     }
 
-    public static bool IsAllInterfaceMembersImplementedBySignature(this ITypeSymbol @this, ITypeSymbol @interface)
+    public static bool IsAllInterfaceMembersImplementedBySignature(this ITypeSymbol @this, ITypeSymbol @interface, bool strict)
     {
         if (@interface.TypeKind != TypeKind.Interface)
         {
@@ -115,7 +115,7 @@ internal static class ITypeSymbolExtensions
 
         foreach (var member in @interface.GetMembers())
         {
-            if (@this.IsMemberImplementedBySignature(member) == false)
+            if (@this.IsMemberImplementedBySignature(member, strict) == false)
             {
                 return false;
             }

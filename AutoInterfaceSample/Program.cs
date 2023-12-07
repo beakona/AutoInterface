@@ -12,7 +12,9 @@ namespace AutoInterfaceSample.Test
             //int g = 1;
             //p.Method(1, out f, ref g, "t", 1, 2, 3);
 
-            //IPrintableComplex p = new Person2();
+            IPrintableComplex p = new Person2();
+            //var c = p.Count;
+            p.Count = 3;
             //p.Print();
             //p.PrintComplex();
         }
@@ -22,12 +24,23 @@ namespace AutoInterfaceSample.Test
     {
         void Print();
         void PrintComplex();
+        int Count { set; }
     }
 
     public class SimplePrinter // : IPrintableComplex
     {
         public void Print() { Console.WriteLine("OK"); }
         public void PrintComplex() { Console.WriteLine("OKC"); }
+        public int Count
+        {
+            get
+            {
+                return 0;
+            }
+            set
+            {
+            }
+        }
     }
 
     public partial class Person2 /*: IPrintableComplex*/

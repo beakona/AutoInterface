@@ -534,8 +534,8 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
         }
         else
         {
-            return receiverType.IsAllInterfaceMembersImplementedBySignature(interfaceType) &&
-                (includeBaseInterfaces == false || interfaceType.AllInterfaces.All(i => receiverType.IsMatchByTypeOrImplementsInterface(i) || receiverType.IsAllInterfaceMembersImplementedBySignature(i)));
+            return receiverType.IsAllInterfaceMembersImplementedBySignature(interfaceType, true) &&
+                (includeBaseInterfaces == false || interfaceType.AllInterfaces.All(i => receiverType.IsMatchByTypeOrImplementsInterface(i) || receiverType.IsAllInterfaceMembersImplementedBySignature(i, true)));
         }
     }
 
@@ -619,14 +619,14 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                 {
                     if (reference.AllowMissingMembers)
                     {
-                        if (reference.ReceiverType.IsMemberImplementedBySignature(member) == false)
+                        if (reference.ReceiverType.IsMemberImplementedBySignature(member, false) == false)
                         {
                             return false;
                         }
                     }
                 }
 
-                var memberImplementedBySignature = type.IsMemberImplementedBySignature(member);
+                var memberImplementedBySignature = type.IsMemberImplementedBySignature(member, true);
                 var memberImplementedExplicitly = type.IsMemberImplementedExplicitly(member);
 
                 foreach (var reference in references)
@@ -645,7 +645,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                 if (reference.AllowMissingMembers)
                 {
                     //AllowMissingMembers case
-                    return reference.ReceiverType.IsMemberImplementedBySignature(member);
+                    return reference.ReceiverType.IsMemberImplementedBySignature(member, false);
                 }
                 else
                 {
