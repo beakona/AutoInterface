@@ -12,35 +12,28 @@ namespace AutoInterfaceSample.Test
             //int g = 1;
             //p.Method(1, out f, ref g, "t", 1, 2, 3);
 
-            IPrintableComplex p = new Person2();
+            IPrintable p = new MyPrinter();
             //var c = p.Count;
-            p.Count = 3;
-            //p.Print();
+            //Count = 3;
+            p.Print();
             //p.PrintComplex();
         }
     }
 
-    interface IPrintableComplex
+    public interface IPrintable
     {
-        void Print();
-        void PrintComplex();
-        int Count { set; }
+        public void Print();
     }
 
-    public class SimplePrinter // : IPrintableComplex
+    public class SimplePrinter : IPrintable
     {
         public void Print() { Console.WriteLine("OK"); }
-        public void PrintComplex() { Console.WriteLine("OKC"); }
-        public int Count
-        {
-            get
-            {
-                return 0;
-            }
-            set
-            {
-            }
-        }
+    }
+
+    public partial class MyPrinter : IPrintable
+    {
+        [BeaKona.AutoInterface]
+        private readonly IPrintable _simplePrinter = new SimplePrinter();
     }
 
     public partial class Person2 /*: IPrintableComplex*/
@@ -51,8 +44,8 @@ namespace AutoInterfaceSample.Test
         //[BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true, MemberMatch = BeaKona.MemberMatchTypes.Explicit)]
         //private readonly SimplePrinter aspect2 = new SimplePrinter();
 
-        [BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true)]
-        private readonly SimplePrinter aspect3 = new SimplePrinter();
+        //[BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true)]
+        //private readonly SimplePrinter aspect3 = new SimplePrinter();
 
         //[BeaKona.AutoInterface(typeof(IPrintableComplex), AllowMissingMembers = true, MemberMatch = BeaKona.MemberMatchTypes.Any)]
         //private readonly SimplePrinter aspect4 = new SimplePrinter();
