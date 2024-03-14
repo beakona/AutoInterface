@@ -207,9 +207,14 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     public void WriteParameterAttributes(SourceBuilder builder, IParameterSymbol parameter)
     {
-        foreach (var attribute in parameter.GetAttributes())
+        bool any = false;
+        foreach (var attribute in parameter.GetAttributes().Where(IsPublicAccess))
         {
             this.WriteAttribute(builder, attribute);
+            any = true;
+        }
+        if (any)
+        {
             builder.Append(' ');
         }
     }
@@ -317,7 +322,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     private bool HasAttributes(params ISymbol?[] members)
     {
-        if (this.HasForwardAttributes(members))
+        if (this.HasAnyForwardAttribute(members))
         {
             return true;
         }
@@ -326,7 +331,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         {
             if (member is IMethodSymbol method)
             {
-                if (method.GetReturnTypeAttributes().Any())
+                if (this.GetReturnAttributes(method).Any())
                 {
                     return true;
                 }
@@ -336,7 +341,25 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         return false;
     }
 
-    private bool HasForwardAttributes(params ISymbol?[] members)
+    private IEnumerable<AttributeData> GetReturnAttributes(IMethodSymbol method)
+    {
+        return method.GetReturnTypeAttributes().Where(IsPublicAccess);
+    }
+
+    private static bool IsPublicAccess(AttributeData attribute)
+    {
+        if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
+        {
+            if (attributeClass.DeclaredAccessibility == Accessibility.Public)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool HasAnyForwardAttribute(params ISymbol?[] members)
     {
         if (members != null)
         {
@@ -360,7 +383,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         var methodScope = new ScopeInfo(scope);
 
         this.WriteForwardAttributes(builder, method);
-        this.WriteReturnAttributes(builder, method.GetReturnTypeAttributes());
+        this.WriteReturnAttributes(builder, this.GetReturnAttributes(method));
 
         if (method.IsGenericMethod)
         {
@@ -560,7 +583,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     if (property.GetMethod is not null)
                     {
                         this.WriteForwardAttributes(builder, property.GetMethod);
-                        this.WriteReturnAttributes(builder, property.GetMethod.GetReturnTypeAttributes());
+                        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property.GetMethod));
 
                         builder.AppendIndentation();
                         builder.Append("get => ");
@@ -570,7 +593,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     if (property.SetMethod is not null)
                     {
                         this.WriteForwardAttributes(builder, property.SetMethod);
-                        this.WriteReturnAttributes(builder, property.SetMethod.GetReturnTypeAttributes());
+                        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property.SetMethod));
 
                         builder.AppendIndentation();
                         builder.Append("set => ");
@@ -583,7 +606,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     if (property.GetMethod is not null)
                     {
                         this.WriteForwardAttributes(builder, property.GetMethod);
-                        this.WriteReturnAttributes(builder, property.GetMethod.GetReturnTypeAttributes());
+                        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property.GetMethod));
 
                         builder.AppendIndentation();
                         if (getterTemplate != null)
@@ -627,7 +650,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     if (property.SetMethod is not null)
                     {
                         this.WriteForwardAttributes(builder, property.SetMethod);
-                        this.WriteReturnAttributes(builder, property.SetMethod.GetReturnTypeAttributes());
+                        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property.SetMethod));
 
                         builder.AppendIndentation();
                         builder.AppendLine("set");
@@ -726,7 +749,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 if (@event.AddMethod != null)
                 {
                     this.WriteForwardAttributes(builder, @event.AddMethod);
-                    this.WriteReturnAttributes(builder, @event.AddMethod.GetReturnTypeAttributes());
+                    this.WriteReturnAttributes(builder, this.GetReturnAttributes(@event.AddMethod));
 
                     builder.AppendIndentation();
                     builder.AppendLine("add");
@@ -771,7 +794,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 if (@event.RemoveMethod != null)
                 {
                     this.WriteForwardAttributes(builder, @event.RemoveMethod);
-                    this.WriteReturnAttributes(builder, @event.RemoveMethod.GetReturnTypeAttributes());
+                    this.WriteReturnAttributes(builder, this.GetReturnAttributes(@event.RemoveMethod));
 
                     builder.AppendIndentation();
                     builder.AppendLine("remove");
