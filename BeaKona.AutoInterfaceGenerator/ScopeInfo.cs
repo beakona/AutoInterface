@@ -39,7 +39,7 @@ internal sealed class ScopeInfo
             }
         }
 
-        return types.ToImmutableList();
+        return [.. types];
     }
 
     public void CreateAliases(ImmutableArray<ITypeSymbol> typeArguments)

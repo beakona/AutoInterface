@@ -2,13 +2,8 @@
 
 namespace BeaKona.AutoInterfaceGenerator;
 
-internal sealed class SourceBuilder
+internal sealed class SourceBuilder(SourceBuilderOptions options)
 {
-    public SourceBuilder(SourceBuilderOptions options)
-    {
-        this.Options = options;
-    }
-
     private SourceBuilder(SourceBuilder owner, SourceBuilderOptions options) : this(options)
     {
         this.owner = owner;
@@ -16,7 +11,7 @@ internal sealed class SourceBuilder
 
     private readonly SourceBuilder? owner;
 
-    public SourceBuilderOptions Options { get; }
+    public SourceBuilderOptions Options { get; } = options;
 
     private readonly List<object> elements = [];
     private readonly HashSet<string> aliases = [];
@@ -211,14 +206,9 @@ internal sealed class SourceBuilder
     {
     }
 
-    private sealed class IndentationMarker
+    private sealed class IndentationMarker(int depth)
     {
-        public IndentationMarker(int depth)
-        {
-            this.Depth = depth;
-        }
-
-        public readonly int Depth;
+        public readonly int Depth = depth;
     }
 
     private sealed class FlexibleSpaceMarker

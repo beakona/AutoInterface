@@ -33,35 +33,59 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                     // loop over the candidates, and keep the ones that are actually annotated
                     List<AutoInterfaceRecord> records = [];
 
-                    foreach (MemberDeclarationSyntax candidate in receiver.Candidates)
-                    {
-                        SemanticModel model = compilation.GetSemanticModel(candidate.SyntaxTree);
-                        if (candidate is FieldDeclarationSyntax fieldSyntax)
-                        {
-                            foreach (VariableDeclaratorSyntax variableSyntax in fieldSyntax.Declaration.Variables)
-                            {
-                                // get symbol being declared by the member, and keep it if its annotated
-                                if (model.GetDeclaredSymbol(variableSyntax) is IFieldSymbol field)
-                                {
-                                    records.AddRange(CollectRecords(context, field, field.Type, autoInterfaceAttributeSymbol, autoInterfaceTemplateAttributeSymbol));
-                                }
-                            }
-                        }
-                        else if (candidate is PropertyDeclarationSyntax propertySyntax)
-                        {
-                            // get symbol being declared by the member, and keep it if its annotated
-                            if (model.GetDeclaredSymbol(propertySyntax) is IPropertySymbol property)
-                            {
-                                if (property.IsWriteOnly)
-                                {
-                                    Helpers.ReportDiagnostic(context, "BKAG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
-                                        property.Name);
-                                    continue;
-                                }
+                    HashSet<IFieldSymbol> fields = [];
+                    HashSet<IPropertySymbol> properties = [];
 
-                                records.AddRange(CollectRecords(context, property, property.Type, autoInterfaceAttributeSymbol, autoInterfaceTemplateAttributeSymbol));
+                    foreach (var fieldSyntax in receiver.Fields)
+                    {
+                        SemanticModel model = compilation.GetSemanticModel(fieldSyntax.SyntaxTree);
+
+                        foreach (VariableDeclaratorSyntax variableSyntax in fieldSyntax.Declaration.Variables)
+                        {
+                            if (model.GetDeclaredSymbol(variableSyntax) is IFieldSymbol field)
+                            {
+                                fields.Add(field);
                             }
                         }
+                    }
+
+                    foreach (var propertySyntax in receiver.Properties)
+                    {
+                        SemanticModel model = compilation.GetSemanticModel(propertySyntax.SyntaxTree);
+
+                        if (model.GetDeclaredSymbol(propertySyntax) is IPropertySymbol property)
+                        {
+                            properties.Add(property);
+                        }
+                    }
+
+                    foreach (var parameterSyntax in receiver.Parameters)
+                    {
+                        SemanticModel model = compilation.GetSemanticModel(parameterSyntax.SyntaxTree);
+                        if (model.GetDeclaredSymbol(parameterSyntax) is IParameterSymbol parameter)
+                        {
+                            if (parameter.ContainingType.GetMembers(parameter.Name).FirstOrDefault() is IPropertySymbol property)
+                            {
+                                properties.Add(property);
+                            }
+                        }
+                    }
+
+                    foreach (var field in fields)
+                    {
+                        records.AddRange(GetRecords(context, field, field.Type, autoInterfaceAttributeSymbol, autoInterfaceTemplateAttributeSymbol));
+                    }
+
+                    foreach (var property in properties)
+                    {
+                        if (property.IsWriteOnly)
+                        {
+                            Helpers.ReportDiagnostic(context, "BKAG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
+                                property.Name);
+                            continue;
+                        }
+
+                        records.AddRange(GetRecords(context, property, property.Type, autoInterfaceAttributeSymbol, autoInterfaceTemplateAttributeSymbol));
                     }
 
                     // group elements by the containing class, and generate the source
@@ -127,18 +151,17 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
     }
 #endif
 
-    private static List<AutoInterfaceRecord> CollectRecords(GeneratorExecutionContext context, ISymbol symbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
+    private static List<PartialTemplate> GetTemplateRecords(GeneratorExecutionContext context, ISymbol directSymbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol, Action<ISymbol, INamedTypeSymbol> registerInterface)
     {
         List<PartialTemplate> templateParts = [];
-        var danglingInterfaceTypesBySymbols = new Dictionary<ISymbol, HashSet<INamedTypeSymbol>>(SymbolEqualityComparer.Default);
 
-        foreach (AttributeData attribute in symbol.GetAttributes())
+        foreach (AttributeData attribute in directSymbol.GetAttributes())
         {
             if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(autoInterfaceTemplateAttributeSymbol, SymbolEqualityComparer.Default))
             {
-                ITypeSymbol? type = receiverType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-
                 AutoInterfaceTargets memberTargets = (AutoInterfaceTargets)Convert.ToInt32(attribute.ConstructorArguments[0].Value);
+
+                ITypeSymbol? type = receiverType.WithNullableAnnotation(NullableAnnotation.NotAnnotated);
 
                 if (type.TypeKind == TypeKind.Interface)
                 {
@@ -219,12 +242,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                 }
 
                                 templateParts.Add(new PartialTemplate(memberTargets, rxMemberFilter, new TemplateDefinition(templateLanguage ?? "scriban", templateBody.Trim())));
-                                if (danglingInterfaceTypesBySymbols.TryGetValue(symbol, out HashSet<INamedTypeSymbol> interfaceTypes) == false)
-                                {
-                                    danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-                                }
-
-                                interfaceTypes.Add(interfaceType);
+                                registerInterface(directSymbol, interfaceType);
                             }
                             else if (templateFileName != null && templateFileName.Trim().Length > 0)
                             {
@@ -268,12 +286,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                 }
 
                                 templateParts.Add(new PartialTemplate(memberTargets, rxMemberFilter, new TemplateDefinition(templateLanguage ?? "scriban", content)));
-                                if (danglingInterfaceTypesBySymbols.TryGetValue(symbol, out HashSet<INamedTypeSymbol> interfaceTypes) == false)
-                                {
-                                    danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
-                                }
-
-                                interfaceTypes.Add(interfaceType);
+                                registerInterface(directSymbol, interfaceType);
                             }
                             else
                             {
@@ -305,9 +318,14 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
             }
         }
 
+        return templateParts;
+    }
+
+    private static List<AutoInterfaceRecord> GetEmbeddedRecords(GeneratorExecutionContext context, ISymbol directSymbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, IEnumerable<PartialTemplate> templateParts, Action<ISymbol> unregisterInterface)
+    {
         List<AutoInterfaceRecord> records = [];
 
-        foreach (AttributeData attribute in symbol.GetAttributes())
+        foreach (AttributeData attribute in directSymbol.GetAttributes())
         {
             if (attribute.AttributeClass != null && attribute.AttributeClass.Equals(autoInterfaceAttributeSymbol, SymbolEqualityComparer.Default))
             {
@@ -447,7 +465,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                 templateLanguage = extension;
                             }
 
-                            if (templateParts.Count > 0)
+                            if (templateParts.Any())
                             {
                                 Helpers.ReportDiagnostic(context, "BKAG13", nameof(AutoInterfaceResource.AG13_title), nameof(AutoInterfaceResource.AG13_message), nameof(AutoInterfaceResource.AG13_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
                                     );
@@ -464,26 +482,26 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
                         if (IsImplementedDirectly(receiverType, type))
                         {
-                            danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
+                            unregisterInterface(directSymbol);
+                            records.Add(new AutoInterfaceRecord(directSymbol, receiverType, interfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
+                                    records.Add(new AutoInterfaceRecord(directSymbol, receiverType, baseInterfaceType, template, templateParts, false, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                                 }
                             }
                         }
                         else if (IsDuckImplementation(receiverType, type, includeBaseInterfaces.Value, allowMissingMembers.Value))
                         {
-                            danglingInterfaceTypesBySymbols.Remove(symbol);
-                            records.Add(new AutoInterfaceRecord(symbol, receiverType, interfaceType, template, templateParts, true, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
+                            unregisterInterface(directSymbol);
+                            records.Add(new AutoInterfaceRecord(directSymbol, receiverType, interfaceType, template, templateParts, true, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                             if (includeBaseInterfaces.Value)
                             {
                                 foreach (INamedTypeSymbol baseInterfaceType in interfaceType.AllInterfaces)
                                 {
                                     bool byType = receiverType.IsMatchByTypeOrImplementsInterface(baseInterfaceType);
-                                    records.Add(new AutoInterfaceRecord(symbol, receiverType, baseInterfaceType, template, templateParts, !byType, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
+                                    records.Add(new AutoInterfaceRecord(directSymbol, receiverType, baseInterfaceType, template, templateParts, !byType, preferCoalesce.Value, allowMissingMembers.Value, memberMatch.Value));
                                 }
                             }
                         }
@@ -509,6 +527,31 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                 }
             }
         }
+
+        return records;
+    }
+
+    private static List<AutoInterfaceRecord> GetRecords(GeneratorExecutionContext context, ISymbol directSymbol, ITypeSymbol receiverType, INamedTypeSymbol autoInterfaceAttributeSymbol, INamedTypeSymbol autoInterfaceTemplateAttributeSymbol)
+    {
+        var danglingInterfaceTypesBySymbols = new Dictionary<ISymbol, HashSet<INamedTypeSymbol>>(SymbolEqualityComparer.Default);
+        void RegisterPossibleDanglingInterface(ISymbol symbol, INamedTypeSymbol interfaceType)
+        {
+            if (danglingInterfaceTypesBySymbols.TryGetValue(symbol, out HashSet<INamedTypeSymbol> interfaceTypes) == false)
+            {
+                danglingInterfaceTypesBySymbols[symbol] = interfaceTypes = new HashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+            }
+
+            interfaceTypes.Add(interfaceType);
+        }
+
+        void UnregisterDanglingInterface(ISymbol symbol)
+        {
+            danglingInterfaceTypesBySymbols.Remove(symbol);
+        }
+
+        var templateParts = GetTemplateRecords(context, directSymbol, receiverType, autoInterfaceTemplateAttributeSymbol, RegisterPossibleDanglingInterface);
+
+        var records = GetEmbeddedRecords(context, directSymbol, receiverType, autoInterfaceAttributeSymbol, templateParts, UnregisterDanglingInterface).ToList();
 
         foreach (KeyValuePair<ISymbol, HashSet<INamedTypeSymbol>> danglingInterfaceTypes in danglingInterfaceTypesBySymbols)
         {
@@ -570,6 +613,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
         builder.AppendIndentation();
         writer.WriteTypeDeclarationBeginning(builder, type, scope);
+
         {
             bool first = true;
             foreach (INamedTypeSymbol missingInterfaceType in members.Select(i => i.InterfaceType).Where(i => type.AllInterfaces.Contains(i, SymbolEqualityComparer.Default) == false).ToHashSet())
@@ -581,6 +625,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
             }
         }
         builder.AppendLine();
+
         builder.AppendIndentation();
         builder.AppendLine('{');
         builder.IncrementIndentation();
@@ -801,24 +846,58 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
     /// </summary>
     private sealed class SyntaxReceiver : ISyntaxReceiver
     {
-        public List<MemberDeclarationSyntax> Candidates { get; } = [];
+        public List<FieldDeclarationSyntax> Fields { get; } = [];
+        public List<PropertyDeclarationSyntax> Properties { get; } = [];
+        public List<ParameterSyntax> Parameters { get; } = [];
 
         /// <summary>
         /// Called for every syntax node in the compilation, we can inspect the nodes and save any information useful for generation
         /// </summary>
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
-            if (syntaxNode is MemberDeclarationSyntax memberDeclarationSyntax && memberDeclarationSyntax.AttributeLists.Count > 0)
+            if (syntaxNode is MemberDeclarationSyntax memberDeclarationSyntax)
             {
-                if (memberDeclarationSyntax.Parent is TypeDeclarationSyntax)
+                // any field or property with at least one attribute is a candidate for source generation
+                if (memberDeclarationSyntax.AttributeLists.Count > 0 && memberDeclarationSyntax.Parent is TypeDeclarationSyntax)
                 {
-                    // any field or property with at least one attribute is a candidate for source generation
-                    if (memberDeclarationSyntax is FieldDeclarationSyntax || memberDeclarationSyntax is PropertyDeclarationSyntax)
+                    if (memberDeclarationSyntax is FieldDeclarationSyntax fieldSyntax)
                     {
-                        this.Candidates.Add(memberDeclarationSyntax);
+                        this.Fields.Add(fieldSyntax);
+                    }
+                    else if (memberDeclarationSyntax is PropertyDeclarationSyntax propertySyntax)
+                    {
+                        this.Properties.Add(propertySyntax);
                     }
                 }
             }
+            else if (syntaxNode is AttributeTargetSpecifierSyntax attributeTargetSyntax)
+            {
+                //any primary constructor parameter that has attribute with property target
+                if (attributeTargetSyntax.Identifier.Text is string attributeTarget)
+                {
+                    if (string.Equals(attributeTarget, "property", StringComparison.InvariantCulture))
+                    {
+                        if (ResolveParameter(attributeTargetSyntax) is ParameterSyntax parameterSyntax)
+                        {
+                            if (ResolveTypeDeclaration(parameterSyntax) is RecordDeclarationSyntax)
+                            {
+                                this.Parameters.Add(parameterSyntax);
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+        private static TypeDeclarationSyntax? ResolveTypeDeclaration(ParameterSyntax parameterSyntax)
+        {
+            return parameterSyntax?.Parent?.Parent as TypeDeclarationSyntax;
+        }
+
+        private static ParameterSyntax? ResolveParameter(AttributeTargetSpecifierSyntax attributeTargetSpecifierSyntax)
+        {
+            return attributeTargetSpecifierSyntax?.Parent?.Parent as ParameterSyntax;
         }
     }
 }

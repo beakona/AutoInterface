@@ -2,18 +2,11 @@
 
 namespace BeaKona.AutoInterfaceGenerator.Templates;
 
-internal class PartialTemplate
+internal class PartialTemplate(AutoInterfaceTargets memberTargets, Regex? memberFilter, TemplateDefinition template)
 {
-    public PartialTemplate(AutoInterfaceTargets memberTargets, Regex? memberFilter, TemplateDefinition template)
-    {
-        this.MemberTargets = memberTargets;
-        this.MemberFilter = memberFilter;
-        this.Template = template;
-    }
-
-    public AutoInterfaceTargets MemberTargets;
-    public Regex? MemberFilter;
-    public TemplateDefinition Template;
+    public AutoInterfaceTargets MemberTargets = memberTargets;
+    public Regex? MemberFilter = memberFilter;
+    public TemplateDefinition Template = template;
 
     public bool FilterMatch(string name) => this.MemberFilter == null || this.MemberFilter.IsMatch(name);
 

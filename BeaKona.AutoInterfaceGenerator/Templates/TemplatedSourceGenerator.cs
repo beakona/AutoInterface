@@ -1,27 +1,12 @@
 ﻿namespace BeaKona.AutoInterfaceGenerator.Templates;
 
-internal class TemplatedSourceTextGenerator : ISourceTextGenerator
+internal class TemplatedSourceTextGenerator(TemplateDefinition template) : ISourceTextGenerator
 {
-    public TemplatedSourceTextGenerator(TemplateDefinition template)
-    {
-        this.Template = template;
-    }
-
-    public TemplateDefinition Template { get; }
+    public TemplateDefinition Template { get; } = template;
 
     public void Emit(ICodeTextWriter writer, SourceBuilder builder, object? model, ref bool separatorRequired)
     {
-        Scriban.Template? template = (this.Template.Language ?? "").ToLowerInvariant() switch
-        {
-            "scriban" => Scriban.Template.Parse(this.Template.Body),
-            "liquid" => Scriban.Template.ParseLiquid(this.Template.Body),
-            _ => null,
-        };
-
-        if (template == null)
-        {
-            throw new NotSupportedException($"Template language '{this.Template.Language}' is not supported.");
-        }
+        var template = this.ResolveTemplate(this.Template.Language ?? "") ?? throw new NotSupportedException($"Template language '{this.Template.Language}' is not supported.");
 
         string text = template.Render(model);
 
@@ -48,5 +33,15 @@ internal class TemplatedSourceTextGenerator : ISourceTextGenerator
                 separatorRequired = true;
             }
         }
+    }
+
+    private Scriban.Template? ResolveTemplate(string language)
+    {
+        return language.ToLowerInvariant() switch
+        {
+            "scriban" => Scriban.Template.Parse(this.Template.Body),
+            "liquid" => Scriban.Template.ParseLiquid(this.Template.Body),
+            _ => null,
+        };
     }
 }

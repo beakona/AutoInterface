@@ -1,15 +1,9 @@
 ﻿namespace BeaKona.AutoInterfaceGenerator.Templates;
 
-internal class TemplateDefinition : IEquatable<TemplateDefinition>
+internal class TemplateDefinition(string language, string body) : IEquatable<TemplateDefinition>
 {
-    public TemplateDefinition(string language, string body)
-    {
-        this.Language = language ?? "";
-        this.Body = body ?? "";
-    }
-
-    public string Language { get; }
-    public string Body { get; }
+    public string Language { get; } = language ?? "";
+    public string Body { get; } = body ?? "";
 
     public bool Equals(TemplateDefinition other)
     {

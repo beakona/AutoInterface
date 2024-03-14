@@ -1,13 +1,8 @@
 ﻿namespace BeaKona.AutoInterfaceGenerator;
 
-internal sealed class ComparerBySignature : IEqualityComparer<ISymbol>
+internal sealed class ComparerBySignature(bool strict) : IEqualityComparer<ISymbol>
 {
-    public ComparerBySignature(bool strict)
-    {
-        this.strict = strict;
-    }
-
-    private readonly bool strict;
+    private readonly bool strict = strict;
     private readonly Dictionary<ITypeParameterSymbol, List<ITypeParameterSymbol>> aliasesByKey = new(SymbolEqualityComparer.Default);
 
     public int GetHashCode(ISymbol obj) => throw new NotSupportedException();//SymbolEqualityComparer.Default.GetHashCode(obj);
