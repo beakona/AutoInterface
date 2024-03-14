@@ -1,8 +1,8 @@
-﻿using NLog;
+﻿using TestInterfaces.A.B;
 
 namespace AutoInterfaceSample.Test
 {
-    public partial record TestRecord([property: BeaKona.AutoInterface(IncludeBaseInterfaces = true)] ILogger Logger)
+    public partial record TestRecord([property: BeaKona.AutoInterface(IncludeBaseInterfaces = true)] ITestable Testable)
     {
     }
 
@@ -12,8 +12,10 @@ namespace AutoInterfaceSample.Test
         {
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_TestRecord.Info);
 
-            ILogger p = new TestRecord(new SimpleLogger());
-            p.IsEnabled(LogLevel.Info);
+            ITestable p = new TestRecord(new SimpleLogger());
+
+            p.Test();
+
             //p.Log<int?>(LogLevel.Debug, default, 1, null, null);
             //var result = p.BindProperty<int>("test", 1, false, out var property, 1, 2, 3);
         }

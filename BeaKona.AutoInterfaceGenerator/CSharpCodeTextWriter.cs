@@ -11,16 +11,75 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         this.Context = context;
         this.Compilation = compilation;
 
-        if (this.Compilation.GetTypeByMetadataName(typeof(ObsoleteAttribute).FullName) is INamedTypeSymbol obsoleteAttributeSymbol)
         {
-            this.obsoleteAttributeSymbol = obsoleteAttributeSymbol;
+            var forwardAttributeSymbols = new List<INamedTypeSymbol>();
+            if (this.Compilation.GetTypeByMetadataName(typeof(ObsoleteAttribute).FullName) is INamedTypeSymbol obsoleteAttributeSymbol)
+            {
+                forwardAttributeSymbols.Add(obsoleteAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.ExperimentalAttribute") is INamedTypeSymbol experimentalAttributeSymbol)
+            {
+                forwardAttributeSymbols.Add(experimentalAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute") is INamedTypeSymbol doesNotReturnAttributeSymbol)
+            {
+                forwardAttributeSymbols.Add(doesNotReturnAttributeSymbol);
+            }
+
+            this.forwardAttributeSymbols = [.. forwardAttributeSymbols];
+        }
+
+        {
+            var returnAttributeSymbols = new List<INamedTypeSymbol>();
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.MaybeNullAttribute") is INamedTypeSymbol maybeNullAttributeSymbol)
+            {
+                returnAttributeSymbols.Add(maybeNullAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullAttribute") is INamedTypeSymbol notNullAttributeSymbol)
+            {
+                returnAttributeSymbols.Add(notNullAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute") is INamedTypeSymbol notNullIfNotNullAttributeSymbol)
+            {
+                returnAttributeSymbols.Add(notNullIfNotNullAttributeSymbol);
+            }
+
+            this.returnAttributeSymbols = [.. returnAttributeSymbols];
+        }
+
+        {
+            var parameterAttributeSymbols = new List<INamedTypeSymbol>();
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute") is INamedTypeSymbol doesNotReturnIfAttributeSymbol)
+            {
+                parameterAttributeSymbols.Add(doesNotReturnIfAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute") is INamedTypeSymbol maybeNullWhenAttributeSymbol)
+            {
+                parameterAttributeSymbols.Add(maybeNullWhenAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullAttribute") is INamedTypeSymbol notNullAttributeSymbol)
+            {
+                parameterAttributeSymbols.Add(notNullAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute") is INamedTypeSymbol notNullIfNotNullAttributeSymbol)
+            {
+                parameterAttributeSymbols.Add(notNullIfNotNullAttributeSymbol);
+            }
+            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullWhenAttribute") is INamedTypeSymbol notNullWhenAttributeSymbol)
+            {
+                parameterAttributeSymbols.Add(notNullWhenAttributeSymbol);
+            }
+
+            this.parameterAttributeSymbols = [.. parameterAttributeSymbols];
         }
     }
 
     public GeneratorExecutionContext Context { get; }
     public Compilation Compilation { get; }
 
-    private readonly INamedTypeSymbol? obsoleteAttributeSymbol;
+    private readonly INamedTypeSymbol[] forwardAttributeSymbols;
+    private readonly INamedTypeSymbol[] returnAttributeSymbols;
+    private readonly INamedTypeSymbol[] parameterAttributeSymbols;
 
     public void WriteTypeReference(SourceBuilder builder, ITypeSymbol type, ScopeInfo scope)
     {
@@ -208,11 +267,13 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
     public void WriteParameterAttributes(SourceBuilder builder, IParameterSymbol parameter)
     {
         bool any = false;
-        foreach (var attribute in parameter.GetAttributes().Where(IsPublicAccess))
+
+        foreach (var attribute in GetParameterAttributes(parameter))
         {
             this.WriteAttribute(builder, attribute);
             any = true;
         }
+
         if (any)
         {
             builder.Append(' ');
@@ -280,7 +341,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     private void WriteForwardAttributes(SourceBuilder builder, ISymbol member)
     {
-        foreach (var attribute in this.GetForwardAttributes(member.GetAttributes()))
+        foreach (var attribute in this.GetForwardAttributes(member))
         {
             builder.AppendIndentation();
             this.WriteAttribute(builder, attribute);
@@ -312,54 +373,67 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         builder.Append(']');
     }
 
-    private IEnumerable<AttributeData> GetForwardAttributes(IEnumerable<AttributeData> attributes)
+    private IEnumerable<AttributeData> GetParameterAttributes(IParameterSymbol parameter)
     {
-        if (this.obsoleteAttributeSymbol != null && attributes.FirstOrDefault(i => i.AttributeClass != null && i.AttributeClass.Equals(this.obsoleteAttributeSymbol, SymbolEqualityComparer.Default)) is AttributeData obsoleteAttribute)
-        {
-            yield return obsoleteAttribute;
-        }
-    }
+        var attributes = parameter.GetAttributes().Where(IsPublicAccess).ToList();
 
-    private bool HasAttributes(params ISymbol?[] members)
-    {
-        if (this.HasAnyForwardAttribute(members))
+        foreach (var attribute in attributes)
         {
-            return true;
-        }
-
-        foreach (var member in members)
-        {
-            if (member is IMethodSymbol method)
+            if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
-                if (this.GetReturnAttributes(method).Any())
+                foreach (var typeSymbol in this.parameterAttributeSymbols)
                 {
-                    return true;
+                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
+                    {
+                        yield return attribute;
+                        break;
+                    }
                 }
             }
         }
+    }
 
-        return false;
+    private IEnumerable<AttributeData> GetForwardAttributes(ISymbol symbol)
+    {
+        var attributes = symbol.GetAttributes().Where(IsPublicAccess).ToList();
+
+        foreach (var attribute in attributes)
+        {
+            if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
+            {
+                foreach (var typeSymbol in this.forwardAttributeSymbols)
+                {
+                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
+                    {
+                        yield return attribute;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private IEnumerable<AttributeData> GetReturnAttributes(IMethodSymbol method)
     {
-        return method.GetReturnTypeAttributes().Where(IsPublicAccess);
-    }
+        var attributes = method.GetReturnTypeAttributes().Where(IsPublicAccess).ToList();
 
-    private static bool IsPublicAccess(AttributeData attribute)
-    {
-        if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
+        foreach (var attribute in attributes)
         {
-            if (attributeClass.DeclaredAccessibility == Accessibility.Public)
+            if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
-                return true;
+                foreach (var typeSymbol in this.returnAttributeSymbols)
+                {
+                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
+                    {
+                        yield return attribute;
+                        break;
+                    }
+                }
             }
         }
-
-        return false;
     }
 
-    private bool HasAnyForwardAttribute(params ISymbol?[] members)
+    private bool HasAttributes(params ISymbol?[] members)
     {
         if (members != null)
         {
@@ -367,12 +441,51 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
             {
                 if (member != null)
                 {
-                    if (this.GetForwardAttributes(member.GetAttributes()).Any())
+                    if (this.GetForwardAttributes(member).Any())
                     {
                         return true;
                     }
+
+                    if (member is IMethodSymbol method)
+                    {
+                        if (this.GetReturnAttributes(method).Any())
+                        {
+                            return true;
+                        }
+                    }
                 }
             }
+        }
+
+        return false;
+    }
+
+    private static bool IsPublicAccess(AttributeData attribute)
+    {
+        if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
+        {
+            return IsPublicAccess(attributeClass);
+        }
+
+        return false;
+    }
+
+    private static bool IsPublicAccess(ITypeSymbol type)
+    {
+        if (type.DeclaredAccessibility == Accessibility.Public)
+        {
+            if (type is INamedTypeSymbol namedType)
+            {
+                foreach (var typeArgument in namedType.TypeArguments)
+                {
+                    if (IsPublicAccess(typeArgument) == false)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         return false;
