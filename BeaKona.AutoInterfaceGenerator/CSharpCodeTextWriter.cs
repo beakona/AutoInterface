@@ -413,28 +413,9 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         }
     }
 
-    private IEnumerable<AttributeData> GetReturnAttributes(IPropertySymbol method)
+    private IEnumerable<AttributeData> GetReturnAttributes(ISymbol symbol)
     {
-        var attributes = method.GetAttributes().Where(IsPublicAccess).ToList();
-
-        foreach (var attribute in attributes)
-        {
-            if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
-            {
-                foreach (var typeSymbol in this.returnAttributeSymbols)
-                {
-                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
-                    {
-                        yield return attribute;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    private IEnumerable<AttributeData> GetReturnAttributes(IMethodSymbol method)
-    {
-        var attributes = method.GetReturnTypeAttributes().Where(IsPublicAccess).ToList();
+        var attributes = symbol.GetAttributes().Where(IsPublicAccess).ToList();
 
         foreach (var attribute in attributes)
         {
@@ -673,7 +654,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         PartialTemplate? setterTemplate = this.GetMatchedTemplates(references, setterTarget, property.IsIndexer ? "this" : property.Name);
 
         this.WriteForwardAttributes(builder, property);
-        this.WriteReturnAttributes(builder, GetReturnAttributes(property));
+        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property));
 
         builder.AppendIndentation();
         this.WriteTypeReference(builder, property.Type, scope);
@@ -842,7 +823,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         PartialTemplate? removerTemplate = this.GetMatchedTemplates(references, AutoInterfaceTargets.EventRemover, @event.Name);
 
         this.WriteForwardAttributes(builder, @event);
-        this.WriteReturnAttributes(builder, @event.Type.GetAttributes());
+        this.WriteReturnAttributes(builder, this.GetReturnAttributes(@event));
 
         builder.AppendIndentation();
         builder.Append("event");
