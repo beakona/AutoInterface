@@ -11,75 +11,19 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         this.Context = context;
         this.Compilation = compilation;
 
+        if (this.Compilation.GetTypeByMetadataName(typeof(ObsoleteAttribute).FullName) is INamedTypeSymbol obsoleteAttributeSymbol)
         {
-            var forwardAttributeSymbols = new List<INamedTypeSymbol>();
-            if (this.Compilation.GetTypeByMetadataName(typeof(ObsoleteAttribute).FullName) is INamedTypeSymbol obsoleteAttributeSymbol)
-            {
-                forwardAttributeSymbols.Add(obsoleteAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.ExperimentalAttribute") is INamedTypeSymbol experimentalAttributeSymbol)
-            {
-                forwardAttributeSymbols.Add(experimentalAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.DoesNotReturnAttribute") is INamedTypeSymbol doesNotReturnAttributeSymbol)
-            {
-                forwardAttributeSymbols.Add(doesNotReturnAttributeSymbol);
-            }
-
-            this.forwardAttributeSymbols = [.. forwardAttributeSymbols];
+            this.forwardAttributeSymbols.Add(obsoleteAttributeSymbol);
         }
 
-        {
-            var returnAttributeSymbols = new List<INamedTypeSymbol>();
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.MaybeNullAttribute") is INamedTypeSymbol maybeNullAttributeSymbol)
-            {
-                returnAttributeSymbols.Add(maybeNullAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullAttribute") is INamedTypeSymbol notNullAttributeSymbol)
-            {
-                returnAttributeSymbols.Add(notNullAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute") is INamedTypeSymbol notNullIfNotNullAttributeSymbol)
-            {
-                returnAttributeSymbols.Add(notNullIfNotNullAttributeSymbol);
-            }
-
-            this.returnAttributeSymbols = [.. returnAttributeSymbols];
-        }
-
-        {
-            var parameterAttributeSymbols = new List<INamedTypeSymbol>();
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.DoesNotReturnIfAttribute") is INamedTypeSymbol doesNotReturnIfAttributeSymbol)
-            {
-                parameterAttributeSymbols.Add(doesNotReturnIfAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.MaybeNullWhenAttribute") is INamedTypeSymbol maybeNullWhenAttributeSymbol)
-            {
-                parameterAttributeSymbols.Add(maybeNullWhenAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullAttribute") is INamedTypeSymbol notNullAttributeSymbol)
-            {
-                parameterAttributeSymbols.Add(notNullAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute") is INamedTypeSymbol notNullIfNotNullAttributeSymbol)
-            {
-                parameterAttributeSymbols.Add(notNullIfNotNullAttributeSymbol);
-            }
-            if (this.Compilation.GetTypeByMetadataName("System.Diagnostics.CodeAnalysis.NotNullWhenAttribute") is INamedTypeSymbol notNullWhenAttributeSymbol)
-            {
-                parameterAttributeSymbols.Add(notNullWhenAttributeSymbol);
-            }
-
-            this.parameterAttributeSymbols = [.. parameterAttributeSymbols];
-        }
+        this.forwardAttributeNamespaces.Add("System.Diagnostics.CodeAnalysis");
     }
 
     public GeneratorExecutionContext Context { get; }
     public Compilation Compilation { get; }
 
-    private readonly INamedTypeSymbol[] forwardAttributeSymbols;
-    private readonly INamedTypeSymbol[] returnAttributeSymbols;
-    private readonly INamedTypeSymbol[] parameterAttributeSymbols;
+    private readonly HashSet<INamedTypeSymbol> forwardAttributeSymbols = new(SymbolEqualityComparer.Default);
+    private readonly HashSet<string> forwardAttributeNamespaces = [];
 
     public void WriteTypeReference(SourceBuilder builder, ITypeSymbol type, ScopeInfo scope)
     {
@@ -375,19 +319,15 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     private IEnumerable<AttributeData> GetParameterAttributes(IParameterSymbol parameter)
     {
-        var attributes = parameter.GetAttributes().Where(IsPublicAccess).ToList();
+        var attributes = parameter.GetAttributes().Where(IsPublicAccess);
 
         foreach (var attribute in attributes)
         {
             if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
-                foreach (var typeSymbol in this.parameterAttributeSymbols)
+                if (this.forwardAttributeNamespaces.Contains(attributeClass.ContainingNamespace.ToDisplayString()))
                 {
-                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
-                    {
-                        yield return attribute;
-                        break;
-                    }
+                    yield return attribute;
                 }
             }
         }
@@ -395,19 +335,19 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     private IEnumerable<AttributeData> GetForwardAttributes(ISymbol symbol)
     {
-        var attributes = symbol.GetAttributes().Where(IsPublicAccess).ToList();
+        var attributes = symbol.GetAttributes().Where(IsPublicAccess);
 
         foreach (var attribute in attributes)
         {
             if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
-                foreach (var typeSymbol in this.forwardAttributeSymbols)
+                if (this.forwardAttributeNamespaces.Contains(attributeClass.ContainingNamespace.ToDisplayString()))
                 {
-                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
-                    {
-                        yield return attribute;
-                        break;
-                    }
+                    yield return attribute;
+                }
+                else if (this.forwardAttributeSymbols.Contains(attributeClass))
+                {
+                    yield return attribute;
                 }
             }
         }
@@ -415,18 +355,25 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     private IEnumerable<AttributeData> GetReturnAttributes(ISymbol symbol)
     {
-        var attributes = symbol.GetAttributes().Where(IsPublicAccess).ToList();
+        return this.GetReturnAttributes(symbol.GetAttributes());
+    }
 
+    private IEnumerable<AttributeData> GetReturnAttributes(IMethodSymbol method)
+    {
+        return this.GetReturnAttributes(method.GetReturnTypeAttributes());
+    }
+
+    private IEnumerable<AttributeData> GetReturnAttributes(IEnumerable<AttributeData> attributes)
+    {
         foreach (var attribute in attributes)
         {
             if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
-                foreach (var typeSymbol in this.returnAttributeSymbols)
+                if ((attributeClass.GetAttributeUsages() & AttributeTargets.ReturnValue) == AttributeTargets.ReturnValue)
                 {
-                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
+                    if (this.forwardAttributeNamespaces.Contains(attributeClass.ContainingNamespace.ToDisplayString()))
                     {
                         yield return attribute;
-                        break;
                     }
                 }
             }

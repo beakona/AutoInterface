@@ -16,6 +16,8 @@ namespace AutoInterfaceSample.Test
         {
             //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_TestRecord.Info);
 
+            ITestInterfaceObsolete r = new TestObsoleteRecord(null);
+            r.TestObsoleteMethod("");
             //   ITestable p = new TestRecord(new SimpleLogger());
 
             //  p.Test();
@@ -31,13 +33,14 @@ namespace AutoInterfaceSample.Test
     interface ITestInterfaceObsolete
     {
         [Obsolete]
-        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
-        [return: NotNullIfNotNullAttribute("test")]
-        [return: TestReturnAttribute]
+        [DoesNotReturn]
+        [return: MaybeNull]
+        [return: NotNullIfNotNull(nameof(test))]
+        [return: TestReturn]
         ResObject? TestObsoleteMethod(string? test);
 
         [Obsolete]
-        [System.Diagnostics.CodeAnalysis.DisallowNull]
+        [DisallowNull]
         ResObject? TestObsoleteProperty { get; }
 
 

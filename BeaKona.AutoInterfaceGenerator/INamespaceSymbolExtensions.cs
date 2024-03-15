@@ -23,4 +23,17 @@ internal static class INamespaceSymbolExtensions
         }
         return [.. containingNamespaces];
     }
+
+    public static INamespaceSymbol? GetNamespace(this INamespaceSymbol @this, string name)
+    {
+        foreach (var member in @this.GetNamespaceMembers())
+        {
+            if (member is INamespaceSymbol @namespace && @namespace.NamespaceKind == NamespaceKind.Module && @namespace.Name == name)
+            {
+                return @namespace;
+            }
+        }
+
+        return default;
+    }
 }
