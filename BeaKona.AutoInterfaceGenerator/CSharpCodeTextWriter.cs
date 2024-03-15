@@ -413,6 +413,25 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         }
     }
 
+    private IEnumerable<AttributeData> GetReturnAttributes(IPropertySymbol method)
+    {
+        var attributes = method.GetAttributes().Where(IsPublicAccess).ToList();
+
+        foreach (var attribute in attributes)
+        {
+            if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
+            {
+                foreach (var typeSymbol in this.returnAttributeSymbols)
+                {
+                    if (attributeClass.Equals(typeSymbol, SymbolEqualityComparer.Default))
+                    {
+                        yield return attribute;
+                        break;
+                    }
+                }
+            }
+        }
+    }
     private IEnumerable<AttributeData> GetReturnAttributes(IMethodSymbol method)
     {
         var attributes = method.GetReturnTypeAttributes().Where(IsPublicAccess).ToList();
@@ -654,7 +673,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         PartialTemplate? setterTemplate = this.GetMatchedTemplates(references, setterTarget, property.IsIndexer ? "this" : property.Name);
 
         this.WriteForwardAttributes(builder, property);
-        this.WriteReturnAttributes(builder, property.Type.GetAttributes());
+        this.WriteReturnAttributes(builder, GetReturnAttributes(property));
 
         builder.AppendIndentation();
         this.WriteTypeReference(builder, property.Type, scope);
