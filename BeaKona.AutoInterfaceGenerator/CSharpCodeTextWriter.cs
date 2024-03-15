@@ -319,9 +319,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     private IEnumerable<AttributeData> GetParameterAttributes(IParameterSymbol parameter)
     {
-        var attributes = parameter.GetAttributes().Where(IsPublicAccess);
-
-        foreach (var attribute in attributes)
+        foreach (var attribute in parameter.GetAttributes().Where(IsPublicAccess))
         {
             if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
@@ -335,9 +333,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
     private IEnumerable<AttributeData> GetForwardAttributes(ISymbol symbol)
     {
-        var attributes = symbol.GetAttributes().Where(IsPublicAccess);
-
-        foreach (var attribute in attributes)
+        foreach (var attribute in symbol.GetAttributes().Where(IsPublicAccess))
         {
             if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
@@ -353,19 +349,9 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         }
     }
 
-    private IEnumerable<AttributeData> GetReturnAttributes(ISymbol symbol)
-    {
-        return this.GetReturnAttributes(symbol.GetAttributes());
-    }
-
     private IEnumerable<AttributeData> GetReturnAttributes(IMethodSymbol method)
     {
-        return this.GetReturnAttributes(method.GetReturnTypeAttributes());
-    }
-
-    private IEnumerable<AttributeData> GetReturnAttributes(IEnumerable<AttributeData> attributes)
-    {
-        foreach (var attribute in attributes)
+        foreach (var attribute in method.GetReturnTypeAttributes().Where(IsPublicAccess))
         {
             if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
             {
@@ -601,7 +587,6 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         PartialTemplate? setterTemplate = this.GetMatchedTemplates(references, setterTarget, property.IsIndexer ? "this" : property.Name);
 
         this.WriteForwardAttributes(builder, property);
-        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property));
 
         builder.AppendIndentation();
         this.WriteTypeReference(builder, property.Type, scope);
@@ -653,7 +638,6 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     if (property.SetMethod is not null)
                     {
                         this.WriteForwardAttributes(builder, property.SetMethod);
-                        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property.SetMethod));
 
                         builder.AppendIndentation();
                         builder.Append("set => ");
@@ -710,7 +694,6 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                     if (property.SetMethod is not null)
                     {
                         this.WriteForwardAttributes(builder, property.SetMethod);
-                        this.WriteReturnAttributes(builder, this.GetReturnAttributes(property.SetMethod));
 
                         builder.AppendIndentation();
                         builder.AppendLine("set");
@@ -770,7 +753,6 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         PartialTemplate? removerTemplate = this.GetMatchedTemplates(references, AutoInterfaceTargets.EventRemover, @event.Name);
 
         this.WriteForwardAttributes(builder, @event);
-        this.WriteReturnAttributes(builder, this.GetReturnAttributes(@event));
 
         builder.AppendIndentation();
         builder.Append("event");
@@ -809,7 +791,6 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 if (@event.AddMethod != null)
                 {
                     this.WriteForwardAttributes(builder, @event.AddMethod);
-                    this.WriteReturnAttributes(builder, this.GetReturnAttributes(@event.AddMethod));
 
                     builder.AppendIndentation();
                     builder.AppendLine("add");
@@ -854,7 +835,6 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 if (@event.RemoveMethod != null)
                 {
                     this.WriteForwardAttributes(builder, @event.RemoveMethod);
-                    this.WriteReturnAttributes(builder, this.GetReturnAttributes(@event.RemoveMethod));
 
                     builder.AppendIndentation();
                     builder.AppendLine("remove");

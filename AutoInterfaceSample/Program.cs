@@ -41,12 +41,19 @@ namespace AutoInterfaceSample.Test
 
         [Obsolete]
         [DisallowNull]
-        ResObject? TestObsoleteProperty { get; }
+        ResObject? TestObsoleteProperty
+        {
+            get;
+        }
 
+        [DisallowNull]
+        ResObject? TestExpandedProperty
+        {
+            [return: MaybeNull]
+            get;
+        }
 
     }
-
-    [Obsolete]
 
     class ResObject;
 
