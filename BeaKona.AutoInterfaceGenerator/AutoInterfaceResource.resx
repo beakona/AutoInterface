@@ -261,4 +261,13 @@
   <data name="AG16_title" xml:space="preserve">
     <value>Multiple partial templates found.</value>
   </data>
+  <data name="AG17_description" xml:space="preserve">
+    <value>AG17</value>
+  </data>
+  <data name="AG17_message" xml:space="preserve">
+    <value>Following attributes are missing and should be implemented or referenced: {0}.</value>
+  </data>
+  <data name="AG17_title" xml:space="preserve">
+    <value>Missing attributes.</value>
+  </data>
 </root>

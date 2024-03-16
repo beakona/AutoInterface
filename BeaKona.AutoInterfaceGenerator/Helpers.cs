@@ -155,4 +155,21 @@ internal static class Helpers
 
         return false;
     }
+
+    public static bool IsPublicAccess(ITypeSymbol type)
+    {
+        if (type.DeclaredAccessibility == Accessibility.Public)
+        {
+            if (type is INamedTypeSymbol namedType)
+            {
+                return namedType.TypeArguments.All(Helpers.IsPublicAccess);
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

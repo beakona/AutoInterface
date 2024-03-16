@@ -10,7 +10,7 @@ internal interface ICodeTextWriter
 
     void WriteTypeArgumentsDefinition(SourceBuilder builder, IEnumerable<ITypeSymbol> typeArguments, ScopeInfo scope);
 
-    void WriteParameterAttributes(SourceBuilder builder, IParameterSymbol parameter);
+    void WriteParameterAttributes(SourceBuilder builder, ScopeInfo scope, IParameterSymbol parameter);
 
     void WriteParameterDefinition(SourceBuilder builder, ScopeInfo scope, IEnumerable<IParameterSymbol> parameters);
 

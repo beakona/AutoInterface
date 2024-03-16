@@ -491,5 +491,32 @@ namespace BeaKona.AutoInterfaceGenerator {
                 return ResourceManager.GetString("AG16_title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AG17.
+        /// </summary>
+        internal static string AG17_description {
+            get {
+                return ResourceManager.GetString("AG17_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Following attributes are missing and should be implemented or referenced: {0}..
+        /// </summary>
+        internal static string AG17_message {
+            get {
+                return ResourceManager.GetString("AG17_message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing attributes..
+        /// </summary>
+        internal static string AG17_title {
+            get {
+                return ResourceManager.GetString("AG17_title", resourceCulture);
+            }
+        }
     }
 }

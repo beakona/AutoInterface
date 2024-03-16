@@ -16,6 +16,27 @@ internal static class CompilationExtensions
             }
             @namespace = next;
         }
+
         return @namespace;
+    }
+
+    public static bool IsVisible(this Compilation @this, INamedTypeSymbol className)
+    {
+        foreach (var type in @this.GetTypesByMetadataName(className.ToDisplayString()))
+        {
+            if (type.DeclaredAccessibility == Accessibility.Public)
+            {
+                return true;
+            }
+            else if (type.DeclaredAccessibility == Accessibility.Internal)
+            {
+                if (@this.Assembly.Equals(type.ContainingAssembly, SymbolEqualityComparer.Default))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
