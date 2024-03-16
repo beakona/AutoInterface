@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceGenerator", "BeaKona.AutoInterfaceGenerator\BeaKona.AutoInterfaceGenerator.csproj", "{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoInterfaceSample", "AutoInterfaceSample\AutoInterfaceSample.csproj", "{D80AD027-6463-4CBB-91B5-4952AE0204B3}"
-	ProjectSection(ProjectDependencies) = postProject
-		{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A} = {FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestInterfaces", "TestInterfaces\TestInterfaces.csproj", "{E271DF85-2B8E-48C4-8EB0-37FBF60A2E15}"
 EndProject
