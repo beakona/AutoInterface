@@ -17,6 +17,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaKona.AutoInterfaceAttributes", "BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj", "{8EB5E4A3-F09E-42A8-9846-C000B2D5286C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestInterfacesNetStandard", "TestInterfacesNetStandard\TestInterfacesNetStandard.csproj", "{FD5316C0-B9E2-48C9-8597-19D241D2CCE4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A} = {FF7DF2CF-FA1C-4655-B451-B6FD1E374E3A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AutoInterfaceSampleNetStandard", "AutoInterfaceSampleNetStandard\AutoInterfaceSampleNetStandard.csproj", "{FFDE2B7B-1B86-4FFD-800F-0682B5144560}"
 EndProject
