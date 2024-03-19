@@ -214,7 +214,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
 
         foreach (var attribute in GetParameterAttributes(parameter))
         {
-            this.WriteAttribute(builder, scope, attribute);
+            this.WriteAttribute(builder, scope, attribute, false);
             any = true;
         }
 
@@ -288,7 +288,7 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         foreach (var attribute in this.GetForwardAttributes(member))
         {
             builder.AppendIndentation();
-            this.WriteAttribute(builder, scope, attribute);
+            this.WriteAttribute(builder, scope, attribute, true);
             builder.AppendLine();
         }
     }
@@ -300,60 +300,69 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
             foreach (var attribute in attributes)
             {
                 builder.AppendIndentation();
-                this.WriteAttribute(builder, scope, attribute, true);
+                this.WriteAttribute(builder, scope, attribute, false, true);
                 builder.AppendLine();
             }
         }
     }
 
-    private void WriteAttributeReference(SourceBuilder builder, ScopeInfo scope, AttributeData attribute)
+    private void WriteAttributeReference(SourceBuilder builder, ScopeInfo scope, AttributeData attribute, bool strict)
     {
-        if (attribute.AttributeClass is INamedTypeSymbol attributeTypeSymbol)
+        if (attribute.AttributeClass is INamedTypeSymbol attributeClass)
         {
-            if (Helpers.IsPublicAccess(attributeTypeSymbol) == false)
+            bool publicAccess = Helpers.IsPublicAccess(attributeClass);
+
+            if (strict || publicAccess)
             {
-                builder.MissingAttributesRegistry.Add(attributeTypeSymbol);
+                if (publicAccess == false)
+                {
+                    builder.MissingAttributesRegistry.Add(attributeClass);
+                }
+
+                this.WriteTypeReference(builder, attributeClass, scope);
+
+                if (attribute.ConstructorArguments.Any() || attribute.NamedArguments.Any())
+                {
+                    builder.Append('(');
+
+                    bool first = true;
+
+                    foreach (var constructorArgument in attribute.ConstructorArguments)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            builder.Append(", ");
+                        }
+
+                        builder.Append(constructorArgument.ToCSharpString());
+                    }
+
+                    foreach (var namedArgument in attribute.NamedArguments)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            builder.Append(", ");
+                        }
+
+                        builder.Append(namedArgument.Key);
+                        builder.Append(" = ");
+                        builder.Append(namedArgument.Value.ToCSharpString());
+                    }
+
+                    builder.Append(')');
+                }
             }
-
-            this.WriteTypeReference(builder, attributeTypeSymbol, scope);
-
-            if (attribute.ConstructorArguments.Any() || attribute.NamedArguments.Any())
+            else
             {
-                builder.Append('(');
-
-                bool first = true;
-
-                foreach (var constructorArgument in attribute.ConstructorArguments)
-                {
-                    if (first)
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        builder.Append(", ");
-                    }
-
-                    builder.Append(constructorArgument.ToCSharpString());
-                }
-
-                foreach (var namedArgument in attribute.NamedArguments)
-                {
-                    if (first)
-                    {
-                        first = false;
-                    }
-                    else
-                    {
-                        builder.Append(", ");
-                    }
-
-                    builder.Append(namedArgument.Key);
-                    builder.Append(" = ");
-                    builder.Append(namedArgument.Value.ToCSharpString());
-                }
-
-                builder.Append(')');
+                builder.Append(attribute.ToString());
             }
         }
         else
@@ -362,14 +371,14 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
         }
     }
 
-    private void WriteAttribute(SourceBuilder builder, ScopeInfo scope, AttributeData attribute, bool isReturn = false)
+    private void WriteAttribute(SourceBuilder builder, ScopeInfo scope, AttributeData attribute, bool strict, bool isReturn = false)
     {
         builder.Append('[');
         if (isReturn)
         {
             builder.Append("return: ");
         }
-        this.WriteAttributeReference(builder, scope, attribute);
+        this.WriteAttributeReference(builder, scope, attribute, strict);
         builder.Append(']');
     }
 
