@@ -1,4 +1,5 @@
-﻿using TestInterfacesNetStandard;
+﻿#nullable enable
+using System.Diagnostics.CodeAnalysis;
 
 namespace AutoInterfaceSample.Test
 {
@@ -10,14 +11,55 @@ namespace AutoInterfaceSample.Test
         }
     }
 
-    partial record TestRecord
+    public class MyDb : IDb
     {
-        //[BeaKona.AutoInterface(IncludeBaseInterfaces = true)]
-        public ITestable2? Testable { get; set; }
+        public string ConnectionString { get; [param: AllowNull] set; } = default!;
+
+        public string this[int a, [AllowNull] string b]
+        {
+            get => b ?? "";
+            [param: AllowNull]
+            set
+            {
+            }
+        }
+    }
+
+    partial record TestDb([property: BeaKona.AutoInterface(typeof(IDb), IncludeBaseInterfaces = true)] IDb Inner) //: IDb
+    {
+    }
+
+    //partial record TecProgDbConnection
+    //{
+    //[AllowNull]
+    //[DisallowNull]
+    //string IDb.ConnectionString
+    //{
+    //    get => (this.Inner as System.Data.IDbConnection)!.ConnectionString;
+    //    //[param:MaybeNull]
+    //    set => (this.Inner as System.Data.IDbConnection)!.ConnectionString = value;
+    //}
+    //}
+
+    public interface IDb
+    {
+        string ConnectionString
+        {
+            get;
+            [param: AllowNull]
+            set;
+        }
+
+        string this[int a, [AllowNull] string b]
+        {
+            get;
+            [param: AllowNull]
+            set;
+        }
     }
 }
 
-namespace System.Diagnostics.CodeAnalysis
+/*namespace System.Diagnostics.CodeAnalysis
 {
 
     [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
@@ -25,4 +67,4 @@ namespace System.Diagnostics.CodeAnalysis
     {
         public bool ReturnValue { get; } = returnValue;
     }
-}
+}*/
