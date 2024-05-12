@@ -128,6 +128,33 @@ internal static class Helpers
         return true;
     }
 
+    public static bool EqualDictionaries<TKey, TValue>(ImmutableDictionary<TKey, TValue> x, ImmutableDictionary<TKey, TValue> y, IEqualityComparer<TValue>? comparer = null) where TKey : notnull
+    {
+        if (x.Count != y.Count)
+        {
+            return false;
+        }
+
+        comparer ??= EqualityComparer<TValue>.Default;
+
+        foreach (var item in x)
+        {
+            if (y.TryGetValue(item.Key, out var yValue) == false)
+            {
+                return false;
+            }
+
+            var xValue = item.Value;
+
+            if (comparer.Equals(xValue, yValue) == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public static bool IsDynamic(IParameterSymbol symbol)
     {
         return Helpers.IsDynamic(symbol.Type);
@@ -171,5 +198,57 @@ internal static class Helpers
         }
 
         return false;
+    }
+
+    public static bool EqualStrings(string? s1, string? s2)
+    {
+        if (s1 != null)
+        {
+            if (s2 != null)
+            {
+                return string.Equals(s1, s2);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (s2 != null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+    }
+
+    public static bool EqualStrings(string? s1, string? s2, StringComparison comparisonType)
+    {
+        if (s1 != null)
+        {
+            if (s2 != null)
+            {
+                return string.Equals(s1, s2, comparisonType);
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (s2 != null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

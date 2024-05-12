@@ -7,14 +7,16 @@ namespace AutoInterfaceSample.Test
     {
         public static void Main()
         {
-            //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_TestRecord.Info);
+            //System.Diagnostics.Debug.WriteLine(BeaKona.Output.Debug_TestDb.Info);
         }
     }
 
     public class MyDb : IDb
     {
+        [AllowNull]
         public string ConnectionString { get; [param: AllowNull] set; } = default!;
 
+        [AllowNull]
         public string this[int a, [AllowNull] string b]
         {
             get => b ?? "";
@@ -43,6 +45,7 @@ namespace AutoInterfaceSample.Test
 
     public interface IDb
     {
+        [AllowNull]
         string ConnectionString
         {
             get;
@@ -50,6 +53,7 @@ namespace AutoInterfaceSample.Test
             set;
         }
 
+        [AllowNull]
         string this[int a, [AllowNull] string b]
         {
             get;

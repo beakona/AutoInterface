@@ -10,8 +10,10 @@ namespace AutoInterfaceSampleNetStandard
 
     public class MyDb : IDb
     {
+        [AllowNull]
         public string ConnectionString { get; [param: AllowNull] set; } = default!;
 
+        [AllowNull]
         public string this[int a, [AllowNull] string b]
         {
             get => b ?? "";
@@ -24,6 +26,7 @@ namespace AutoInterfaceSampleNetStandard
 
     public interface IDb
     {
+        [AllowNull]
         string ConnectionString
         {
             get;
@@ -31,6 +34,7 @@ namespace AutoInterfaceSampleNetStandard
             set;
         }
 
+        [AllowNull]
         string this[int a, [AllowNull] string b]
         {
             get;
@@ -60,7 +64,7 @@ namespace System.Diagnostics.CodeAnalysis
         public bool ReturnValue { get; }
     }
 
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Class, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
     internal sealed class AllowNullAttribute : Attribute
     {
         public AllowNullAttribute()
