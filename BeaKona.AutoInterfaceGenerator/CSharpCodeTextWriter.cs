@@ -1238,6 +1238,10 @@ internal sealed class CSharpCodeTextWriter : ICodeTextWriter
                 {
                     return this.GetSourceIdentifier(tupleElement.Identifier);
                 }
+                else if (syntax is DelegateDeclarationSyntax @delegate)
+                {
+                    return this.GetSourceIdentifier(@delegate.Identifier);
+                }
                 else if (syntax is NamespaceDeclarationSyntax @namespace)
                 {
                     throw new NotSupportedException(syntax.GetType().ToString());
