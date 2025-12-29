@@ -15,18 +15,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Analyzer Include="..\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-    <PackageReference Include="NLog" Version="5.2.8" />
-    <PackageReference Include="Serilog" Version="3.1.1" />
-    <ProjectReference Include="..\BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
-    <ProjectReference Include="..\TestInterfacesNetStandard\TestInterfacesNetStandard.csproj" />
-  </ItemGroup>
+    <!--<Analyzer Include="..\BeaKona.AutoInterfaceGenerator\bin\Debug\netstandard2.0\BeaKona.AutoInterfaceGenerator.dll" />-->
+    <ProjectReference Include="..\BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj" />
+  </ItemGroup> 
 
   <ItemGroup>
-    <ProjectReference Include="..\TestInterfaces\TestInterfaces.csproj">
-      <Aliases></Aliases>
-    </ProjectReference>
+    <ProjectReference Include="..\BeaKona.AutoInterfaceGenerator\BeaKona.AutoInterfaceGenerator.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
-
 </Project>
