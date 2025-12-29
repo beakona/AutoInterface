@@ -787,7 +787,9 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                     separatorRequired = true;
                 }
 
-                foreach (IPropertySymbol property in @interface.GetProperties().Where(ShouldGenerate))
+                foreach (IPropertySymbol property in @interface.GetProperties()
+                             .Where(p => p.ExplicitInterfaceImplementations.Length == 0) //Only declared in current interface
+                             .Where(ShouldGenerate))
                 {
                     anyReasonToEmitSourceFile = true;
 

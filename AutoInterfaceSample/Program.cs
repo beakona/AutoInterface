@@ -1,5 +1,7 @@
 ﻿#nullable enable
+using BeaKona;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 
 namespace AutoInterfaceSample.Test
 {
@@ -11,64 +13,32 @@ namespace AutoInterfaceSample.Test
         }
     }
 
-    public class MyDb : IDb
+    interface IA
     {
-        [AllowNull]
-        public string ConnectionString { get; [param: AllowNull] set; } = default!;
-
-        [AllowNull]
-        public string this[int a, [AllowNull] string b]
-        {
-            get => b ?? "";
-            [param: AllowNull]
-            set
-            {
-            }
-        }
+        int X();
+        int Y { get; }
     }
 
-    partial record TestDb([property: BeaKona.AutoInterface(typeof(IDb), IncludeBaseInterfaces = true)] IDb Inner) //: IDb
+    interface IB : IA
     {
+        Point Point { get; }
+        int IA.X() => Point.X;
+        int IA.Y => Point.Y;
     }
 
-    //partial record TecProgDbConnection
-    //{
-    //[AllowNull]
-    //[DisallowNull]
-    //string IDb.ConnectionString
-    //{
-    //    get => (this.Inner as System.Data.IDbConnection)!.ConnectionString;
-    //    //[param:MaybeNull]
-    //    set => (this.Inner as System.Data.IDbConnection)!.ConnectionString = value;
-    //}
-    //}
 
-    public interface IDb
+    partial class C1 : IB
     {
-        [AllowNull]
-        string ConnectionString
-        {
-            get;
-            [param: AllowNull]
-            set;
-        }
 
-        [AllowNull]
-        string this[int a, [AllowNull] string b]
-        {
-            get;
-            [param: AllowNull]
-            set;
-        }
+        [AutoInterface(typeof(IB))] private IB _inner = default!;
+
     }
+    partial class D1 : IB
+    {
+
+        [AutoInterface(typeof(IB), IncludeBaseInterfaces = true)] private IB _inner = default!;
+
+    }
+
 }
-
-/*namespace System.Diagnostics.CodeAnalysis
-{
-
-    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-    internal sealed class NotNullWhenAttribute(bool returnValue) : Attribute
-    {
-        public bool ReturnValue { get; } = returnValue;
-    }
-}*/
+ 
