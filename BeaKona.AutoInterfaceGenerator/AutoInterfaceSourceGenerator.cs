@@ -675,12 +675,17 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
             bool ShouldGenerate(ISymbol member)
             {
-
-                if (member.DeclaredAccessibility is not Accessibility.Public)
+                if (member.IsStatic)
                 {
-                    //ignore members with "protected" modifier
                     return false;
                 }
+
+                if (member.DeclaredAccessibility is not Accessibility.Public and Accessibility.Internal)
+                {
+                    //ignore members with "protected" modifier and similar
+                    return false;
+                }
+
                 foreach (var reference in references)
                 {
                     if (reference.AllowMissingMembers)
