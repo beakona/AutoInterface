@@ -1,60 +1,65 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <PackageId>BeaKona.AutoInterfaceGenerator</PackageId>
-    <Authors>BeaKona</Authors>
-    <Description>A C# Source Generator which redirects all interface-calls to a backing member.</Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/beakona/AutoInterface</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
-    <Version>1.0.45</Version>
-    <IsRoslynComponent>true</IsRoslynComponent>
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<PackageId>BeaKona.AutoInterfaceGenerator</PackageId>
+		<Authors>BeaKona</Authors>
+		<Description>A C# Source Generator which redirects all interface-calls to a backing member.</Description>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/beakona/AutoInterface</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
+		<Version>1.0.45</Version>
+		<IsRoslynComponent>true</IsRoslynComponent>
+		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <PackageScribanIncludeSource>true</PackageScribanIncludeSource>
-  </PropertyGroup>
+	<PropertyGroup>
+		<PackageScribanIncludeSource>true</PackageScribanIncludeSource>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
-    <PackageReference Include="Scriban" Version="5.9.1" PrivateAssets="all" IncludeAssets="build" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="AutoInterfaceResource.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>AutoInterfaceResource.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="AutoInterfaceResource.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>AutoInterfaceResource.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <Target Name="_AddAnalyzersToOutput">
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceGenerator.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceAttributes.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceAttributes.dll" PackagePath="lib/netstandard2.0" Pack="true" Visible="true" />
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" PrivateAssets="all" />
+		<PackageReference Include="Scriban" Version="5.9.1" PrivateAssets="all" IncludeAssets="build" />
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" PrivateAssets="all" />
 	</ItemGroup>
-  </Target>
+
+	<ItemGroup>
+		<ProjectReference Include="..\BeaKona.AutoInterfaceAttributes\BeaKona.AutoInterfaceAttributes.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="AutoInterfaceResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AutoInterfaceResource.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="AutoInterfaceResource.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>AutoInterfaceResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<Target Name="_AddAnalyzersToOutput">
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceGenerator.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
+			<TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceAttributes.dll" PackagePath="analyzers/dotnet/cs" Pack="true" Visible="false" />
+			<TfmSpecificPackageFile Include="$(OutputPath)\BeaKona.AutoInterfaceAttributes.dll" PackagePath="lib/netstandard2.0" Pack="true" Visible="true" />
+		</ItemGroup>
+	</Target>
 
 </Project>
