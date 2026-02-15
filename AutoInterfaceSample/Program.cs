@@ -13,11 +13,17 @@ namespace AutoInterfaceSample.Test
         }
     }
 
-    public interface IB
+    interface IA
     {
-        protected Point Point { get; }
-        int X() => Point.X;
-        int Y => Point.Y;
+        int X();
+        int Y { get; }
+    }
+
+    interface IB : IA
+    {
+        Point Point { get; }
+        int IA.X() => Point.X;
+        int IA.Y => Point.Y;
         static int Count => 1;
         int Count2 => 2;
     }
@@ -27,6 +33,19 @@ namespace AutoInterfaceSample.Test
         [AutoInterface(typeof(IB), AllowMissingMembers = true)] private IB _inner = default!;
 
         System.Drawing.Point IB.Point => Point.Empty;
+    }
+
+    partial class C2 : IB
+    {
+        [AutoInterface(typeof(IB))] private IB _inner = default!;
+
+    }
+
+    partial class D1 : IB
+    {
+
+        [AutoInterface(typeof(IB), IncludeBaseInterfaces = true)] private IB _inner = default!;
+
     }
 
     public class MyDb : IDb

@@ -697,6 +697,11 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                     }
                 }
 
+                if (member is IPropertySymbol p && p.ExplicitInterfaceImplementations.Length > 0)
+                {
+                    return false;
+                }
+
                 var memberImplementedBySignature = type.IsMemberImplementedBySignature(member, true);
                 var memberImplementedExplicitly = type.IsMemberImplementedExplicitly(member);
 
