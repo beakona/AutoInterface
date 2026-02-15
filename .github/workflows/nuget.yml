@@ -1,10 +1,6 @@
 name: NuGet
 
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
   release:
     types: [published]
   workflow_dispatch: # This enables the manual button
@@ -15,14 +11,16 @@ on:
         default: 'Manual test'
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-  DOTNET_VERSION: 8.0.x
+  DOTNET_VERSION: 10.0.x
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 jobs:
   build:
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
+    - name: Check trigger reason
+      run: |
+        echo "Triggered because: ${{ github.event.inputs.reason }}"
     - name: Checkout
       uses: actions/checkout@v4
     - name: Setup dotnet
