@@ -1,7 +1,7 @@
 # AutoInterface
 
 C# [Source Generator](https://github.com/dotnet/roslyn/blob/master/docs/features/source-generators.md) which redirects all interface-calls to one or more backing members. Source code can be generated for a `class`, `record`, or `struct`. It can be generated automatically or by a custom template ([scriban](https://github.com/scriban/scriban), liquid).
-<br>
+<br />
 
 Manually written source:
 
@@ -26,7 +26,7 @@ partial class Person
    void IPrintable.Print() => this.aspect1.Print();
 }
 ```
-<br>
+<br />
 
 ## Ad-hoc adapter pattern
 
@@ -60,7 +60,7 @@ partial class Person : IPrintable
    void IPrintable.Print() => this.aspect1.Print();
 }
 ```
-<br>
+<br />
 
 ## Generate code from a template
 
@@ -89,7 +89,7 @@ partial class Person
    ..generated from file..
 }
 ```
-<br>
+<br />
 
 ## Partial template
 
@@ -145,11 +145,11 @@ partial class Person
 }
 ```
 
-<br>
+<br />
 
 Other examples can be found in [wiki](https://github.com/beakona/AutoInterface/wiki/Examples).
 
-<br>
+<br />
 ---
 
 ![.NET Core](https://github.com/beakona/AutoInterface/workflows/.NET%20Core/badge.svg)
