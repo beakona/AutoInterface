@@ -13,7 +13,7 @@
     <RepositoryUrl>https://github.com/beakona/AutoInterface</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
-    <Version>1.0.44</Version>
+    <Version>1.0.45</Version>
     <IsRoslynComponent>true</IsRoslynComponent>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
