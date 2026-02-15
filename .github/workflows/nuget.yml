@@ -6,9 +6,13 @@ on:
   pull_request:
     branches: [ main, master ]
   release:
-    types:
-      - published
-
+    types: [published]
+  workflow_dispatch: # This enables the manual button
+    inputs:
+      reason:
+        description: 'Please describe why are you running this manually?'
+        required: false
+        default: 'Manual test'
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_VERSION: 8.0.x
@@ -16,7 +20,7 @@ env:
 
 jobs:
   build:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -42,8 +46,6 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
-    - name: Before Pack
-      run: echo "hello from ${{ matrix.runs-on }}" > file-${{ matrix.runs-on }}.txt
     - name: Pack
       run: |
         arrTag=(${GITHUB_REF//\// })
@@ -51,7 +53,7 @@ jobs:
         echo Version before: $VERSION
         VERSION="${VERSION//v}"
         echo Version after: $VERSION
-        echo "dotnet pack -c Release -p:PackageVersion=${{ VERSION }} BeaKona.AutoInterfaceGenerator"
+        echo "dotnet pack -c Release -p:PackageVersion=$VERSION BeaKona.AutoInterfaceGenerator"
         dotnet pack -c Release -p:PackageVersion=$VERSION BeaKona.AutoInterfaceGenerator
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
