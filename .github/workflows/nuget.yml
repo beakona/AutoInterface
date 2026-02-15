@@ -42,20 +42,22 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+    - name: Before Pack
+      run: echo "hello from ${{ matrix.runs-on }}" > file-${{ matrix.runs-on }}.txt
     - name: Pack
       run: |
         arrTag=(${GITHUB_REF//\// })
         VERSION="${arrTag[2]}"
-        echo Version: $VERSION
+        echo Version before: $VERSION
         VERSION="${VERSION//v}"
+        echo Version after: $VERSION
+        echo "dotnet pack -c Release -p:PackageVersion=${{ VERSION }} BeaKona.AutoInterfaceGenerator"
         dotnet pack -c Release -p:PackageVersion=$VERSION BeaKona.AutoInterfaceGenerator
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: nupkg
-        path: |
-         ./**/bin/Release/*.nupkg
-
+        name: nupkg-${{ matrix.runs-on }}
+        path: ./**/bin/Release/*.nupkg
   push:
     needs: pack
     runs-on: ubuntu-latest
@@ -67,6 +69,10 @@ jobs:
     - name: Download Artifact
       uses: actions/download-artifact@v4
       with:
-        name: nupkg
+        path: nupkg
+        pattern: nupkg-*
+        merge-multiple: true
+    - name: List directory
+      run: ls -R
     - name: Push to nuget.org
-      run: dotnet nuget push ./nupkg/**/*.* --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiKey }}
+      run: dotnet nuget push ./nupkg/**/*.nupkg --skip-duplicate --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NugetApiKey }}
