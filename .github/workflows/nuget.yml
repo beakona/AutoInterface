@@ -62,6 +62,7 @@ jobs:
           VERSION="${{ github.ref_name }}"
           echo "Release mode: Using version from tag: $VERSION"
         fi
+        VERSION="${VERSION//v}"
         echo "dotnet pack -c Release -p:PackageVersion=$VERSION BeaKona.AutoInterfaceGenerator"
         dotnet pack -c Release -p:PackageVersion=$VERSION BeaKona.AutoInterfaceGenerator
     - name: Upload Artifact
