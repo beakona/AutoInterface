@@ -13,6 +13,7 @@
 	  <RepositoryType>git</RepositoryType>
 	  <Version>1.0.0</Version>
 	  <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_").Replace(".AutoInterfaceAttributes",""))</RootNamespace>
   </PropertyGroup>
 
 </Project>
