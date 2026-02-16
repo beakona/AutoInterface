@@ -19,7 +19,7 @@ namespace BeaKona.AutoInterfaceGenerator {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class AutoInterfaceResource {
@@ -61,461 +61,461 @@ namespace BeaKona.AutoInterfaceGenerator {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG01..
+        ///   Looks up a localized string similar to BKAG01..
         /// </summary>
-        internal static string AG01_description {
+        internal static string BKAG01_description {
             get {
-                return ResourceManager.GetString("AG01_description", resourceCulture);
+                return ResourceManager.GetString("BKAG01_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type &apos;{0}&apos; is not marked as partial..
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; is not marked as partial.
         /// </summary>
-        internal static string AG01_message {
+        internal static string BKAG01_message {
             get {
-                return ResourceManager.GetString("AG01_message", resourceCulture);
+                return ResourceManager.GetString("BKAG01_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type is not marked as partial..
+        ///   Looks up a localized string similar to Type is not marked as partial.
         /// </summary>
-        internal static string AG01_title {
+        internal static string BKAG01_title {
             get {
-                return ResourceManager.GetString("AG01_title", resourceCulture);
+                return ResourceManager.GetString("BKAG01_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG02..
+        ///   Looks up a localized string similar to BKAG02..
         /// </summary>
-        internal static string AG02_description {
+        internal static string BKAG02_description {
             get {
-                return ResourceManager.GetString("AG02_description", resourceCulture);
+                return ResourceManager.GetString("BKAG02_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type &apos;{0}&apos; is static..
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; is static.
         /// </summary>
-        internal static string AG02_message {
+        internal static string BKAG02_message {
             get {
-                return ResourceManager.GetString("AG02_message", resourceCulture);
+                return ResourceManager.GetString("BKAG02_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type is static..
+        ///   Looks up a localized string similar to Type is static.
         /// </summary>
-        internal static string AG02_title {
+        internal static string BKAG02_title {
             get {
-                return ResourceManager.GetString("AG02_title", resourceCulture);
+                return ResourceManager.GetString("BKAG02_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG03..
+        ///   Looks up a localized string similar to BKAG03..
         /// </summary>
-        internal static string AG03_description {
+        internal static string BKAG03_description {
             get {
-                return ResourceManager.GetString("AG03_description", resourceCulture);
+                return ResourceManager.GetString("BKAG03_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type &apos;{0}&apos; is not an interface..
+        ///   Looks up a localized string similar to Type &apos;{0}&apos; is not an interface.
         /// </summary>
-        internal static string AG03_message {
+        internal static string BKAG03_message {
             get {
-                return ResourceManager.GetString("AG03_message", resourceCulture);
+                return ResourceManager.GetString("BKAG03_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type is not an interface..
+        ///   Looks up a localized string similar to Type is not an interface.
         /// </summary>
-        internal static string AG03_title {
+        internal static string BKAG03_title {
             get {
-                return ResourceManager.GetString("AG03_title", resourceCulture);
+                return ResourceManager.GetString("BKAG03_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG04..
+        ///   Looks up a localized string similar to BKAG04..
         /// </summary>
-        internal static string AG04_description {
+        internal static string BKAG04_description {
             get {
-                return ResourceManager.GetString("AG04_description", resourceCulture);
+                return ResourceManager.GetString("BKAG04_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to cast from type &apos;{0}&apos; to &apos;{1}&apos; or type &apos;{0}&apos; does not expose all members required by interface &apos;{1}&apos;..
+        ///   Looks up a localized string similar to Unable to cast from type &apos;{0}&apos; to &apos;{1}&apos; or type &apos;{0}&apos; does not expose all members required by interface &apos;{1}&apos;.
         /// </summary>
-        internal static string AG04_message {
+        internal static string BKAG04_message {
             get {
-                return ResourceManager.GetString("AG04_message", resourceCulture);
+                return ResourceManager.GetString("BKAG04_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to cast or missing member..
+        ///   Looks up a localized string similar to Unable to cast or missing member.
         /// </summary>
-        internal static string AG04_title {
+        internal static string BKAG04_title {
             get {
-                return ResourceManager.GetString("AG04_title", resourceCulture);
+                return ResourceManager.GetString("BKAG04_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG05..
+        ///   Looks up a localized string similar to BKAG05..
         /// </summary>
-        internal static string AG05_description {
+        internal static string BKAG05_description {
             get {
-                return ResourceManager.GetString("AG05_description", resourceCulture);
+                return ResourceManager.GetString("BKAG05_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type does not implement interface &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Type does not implement interface &apos;{0}&apos;.
         /// </summary>
-        internal static string AG05_message {
+        internal static string BKAG05_message {
             get {
-                return ResourceManager.GetString("AG05_message", resourceCulture);
+                return ResourceManager.GetString("BKAG05_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type does not implement a defined interface(s)..
+        ///   Looks up a localized string similar to Type does not implement a defined interface(s).
         /// </summary>
-        internal static string AG05_title {
+        internal static string BKAG05_title {
             get {
-                return ResourceManager.GetString("AG05_title", resourceCulture);
+                return ResourceManager.GetString("BKAG05_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG06..
+        ///   Looks up a localized string similar to BKAG06..
         /// </summary>
-        internal static string AG06_description {
+        internal static string BKAG06_description {
             get {
-                return ResourceManager.GetString("AG06_description", resourceCulture);
+                return ResourceManager.GetString("BKAG06_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member &apos;{0}&apos; does not have getter..
+        ///   Looks up a localized string similar to Member &apos;{0}&apos; does not have getter.
         /// </summary>
-        internal static string AG06_message {
+        internal static string BKAG06_message {
             get {
-                return ResourceManager.GetString("AG06_message", resourceCulture);
+                return ResourceManager.GetString("BKAG06_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Target member is writeonly..
+        ///   Looks up a localized string similar to Target member is writeonly.
         /// </summary>
-        internal static string AG06_title {
+        internal static string BKAG06_title {
             get {
-                return ResourceManager.GetString("AG06_title", resourceCulture);
+                return ResourceManager.GetString("BKAG06_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG07..
+        ///   Looks up a localized string similar to BKAG07..
         /// </summary>
-        internal static string AG07_description {
+        internal static string BKAG07_description {
             get {
-                return ResourceManager.GetString("AG07_description", resourceCulture);
+                return ResourceManager.GetString("BKAG07_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type cannot be null..
+        ///   Looks up a localized string similar to Type cannot be null.
         /// </summary>
-        internal static string AG07_message {
+        internal static string BKAG07_message {
             get {
-                return ResourceManager.GetString("AG07_message", resourceCulture);
+                return ResourceManager.GetString("BKAG07_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type should be an interface..
+        ///   Looks up a localized string similar to Type should be an interface.
         /// </summary>
-        internal static string AG07_title {
+        internal static string BKAG07_title {
             get {
-                return ResourceManager.GetString("AG07_title", resourceCulture);
+                return ResourceManager.GetString("BKAG07_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG08..
+        ///   Looks up a localized string similar to BKAG08..
         /// </summary>
-        internal static string AG08_description {
+        internal static string BKAG08_description {
             get {
-                return ResourceManager.GetString("AG08_description", resourceCulture);
+                return ResourceManager.GetString("BKAG08_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Only class, record or struct can auto-implement interface..
+        ///   Looks up a localized string similar to Only class, record or struct can auto-implement interface.
         /// </summary>
-        internal static string AG08_message {
+        internal static string BKAG08_message {
             get {
-                return ResourceManager.GetString("AG08_message", resourceCulture);
+                return ResourceManager.GetString("BKAG08_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type is not a class, record, or struct..
+        ///   Looks up a localized string similar to Type is not a class, record, or struct.
         /// </summary>
-        internal static string AG08_title {
+        internal static string BKAG08_title {
             get {
-                return ResourceManager.GetString("AG08_title", resourceCulture);
+                return ResourceManager.GetString("BKAG08_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG09..
+        ///   Looks up a localized string similar to BKAG09..
         /// </summary>
-        internal static string AG09_description {
+        internal static string BKAG09_description {
             get {
-                return ResourceManager.GetString("AG09_description", resourceCulture);
+                return ResourceManager.GetString("BKAG09_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Internal exception [{0}]..
+        ///   Looks up a localized string similar to Internal exception [{0}].
         /// </summary>
-        internal static string AG09_message {
+        internal static string BKAG09_message {
             get {
-                return ResourceManager.GetString("AG09_message", resourceCulture);
+                return ResourceManager.GetString("BKAG09_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Internal exception..
+        ///   Looks up a localized string similar to Internal exception.
         /// </summary>
-        internal static string AG09_title {
+        internal static string BKAG09_title {
             get {
-                return ResourceManager.GetString("AG09_title", resourceCulture);
+                return ResourceManager.GetString("BKAG09_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG10..
+        ///   Looks up a localized string similar to BKAG10..
         /// </summary>
-        internal static string AG10_description {
+        internal static string BKAG10_description {
             get {
-                return ResourceManager.GetString("AG10_description", resourceCulture);
+                return ResourceManager.GetString("BKAG10_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AutoInterface template for single interface should be defined at most once..
+        ///   Looks up a localized string similar to AutoInterface template for single interface should be defined at most once.
         /// </summary>
-        internal static string AG10_message {
+        internal static string BKAG10_message {
             get {
-                return ResourceManager.GetString("AG10_message", resourceCulture);
+                return ResourceManager.GetString("BKAG10_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Multiple AutoInterface templates..
+        ///   Looks up a localized string similar to Multiple AutoInterface templates.
         /// </summary>
-        internal static string AG10_title {
+        internal static string BKAG10_title {
             get {
-                return ResourceManager.GetString("AG10_title", resourceCulture);
+                return ResourceManager.GetString("BKAG10_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG11..
+        ///   Looks up a localized string similar to BKAG11..
         /// </summary>
-        internal static string AG11_description {
+        internal static string BKAG11_description {
             get {
-                return ResourceManager.GetString("AG11_description", resourceCulture);
+                return ResourceManager.GetString("BKAG11_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template file &apos;{0}&apos; not found..
+        ///   Looks up a localized string similar to Template file &apos;{0}&apos; not found.
         /// </summary>
-        internal static string AG11_message {
+        internal static string BKAG11_message {
             get {
-                return ResourceManager.GetString("AG11_message", resourceCulture);
+                return ResourceManager.GetString("BKAG11_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template file not found..
+        ///   Looks up a localized string similar to Template file not found.
         /// </summary>
-        internal static string AG11_title {
+        internal static string BKAG11_title {
             get {
-                return ResourceManager.GetString("AG11_title", resourceCulture);
+                return ResourceManager.GetString("BKAG11_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG12..
+        ///   Looks up a localized string similar to BKAG12..
         /// </summary>
-        internal static string AG12_description {
+        internal static string BKAG12_description {
             get {
-                return ResourceManager.GetString("AG12_description", resourceCulture);
+                return ResourceManager.GetString("BKAG12_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template should be specified either inline or from file but not both..
+        ///   Looks up a localized string similar to Template should be specified either inline or from file but not both.
         /// </summary>
-        internal static string AG12_message {
+        internal static string BKAG12_message {
             get {
-                return ResourceManager.GetString("AG12_message", resourceCulture);
+                return ResourceManager.GetString("BKAG12_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to More than one template specified..
+        ///   Looks up a localized string similar to More than one template specified.
         /// </summary>
-        internal static string AG12_title {
+        internal static string BKAG12_title {
             get {
-                return ResourceManager.GetString("AG12_title", resourceCulture);
+                return ResourceManager.GetString("BKAG12_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG13..
+        ///   Looks up a localized string similar to BKAG13..
         /// </summary>
-        internal static string AG13_description {
+        internal static string BKAG13_description {
             get {
-                return ResourceManager.GetString("AG13_description", resourceCulture);
+                return ResourceManager.GetString("BKAG13_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously..
+        ///   Looks up a localized string similar to Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.
         /// </summary>
-        internal static string AG13_message {
+        internal static string BKAG13_message {
             get {
-                return ResourceManager.GetString("AG13_message", resourceCulture);
+                return ResourceManager.GetString("BKAG13_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously..
+        ///   Looks up a localized string similar to Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.
         /// </summary>
-        internal static string AG13_title {
+        internal static string BKAG13_title {
             get {
-                return ResourceManager.GetString("AG13_title", resourceCulture);
+                return ResourceManager.GetString("BKAG13_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG14..
+        ///   Looks up a localized string similar to BKAG14..
         /// </summary>
-        internal static string AG14_description {
+        internal static string BKAG14_description {
             get {
-                return ResourceManager.GetString("AG14_description", resourceCulture);
+                return ResourceManager.GetString("BKAG14_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template is missing..
+        ///   Looks up a localized string similar to Template is missing.
         /// </summary>
-        internal static string AG14_message {
+        internal static string BKAG14_message {
             get {
-                return ResourceManager.GetString("AG14_message", resourceCulture);
+                return ResourceManager.GetString("BKAG14_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Template is missing..
+        ///   Looks up a localized string similar to Template is missing.
         /// </summary>
-        internal static string AG14_title {
+        internal static string BKAG14_title {
             get {
-                return ResourceManager.GetString("AG14_title", resourceCulture);
+                return ResourceManager.GetString("BKAG14_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG15..
+        ///   Looks up a localized string similar to BKAG15..
         /// </summary>
-        internal static string AG15_description {
+        internal static string BKAG15_description {
             get {
-                return ResourceManager.GetString("AG15_description", resourceCulture);
+                return ResourceManager.GetString("BKAG15_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter &apos;{0}&apos; is not valid Regex expression..
+        ///   Looks up a localized string similar to Filter &apos;{0}&apos; is not valid Regex expression.
         /// </summary>
-        internal static string AG15_message {
+        internal static string BKAG15_message {
             get {
-                return ResourceManager.GetString("AG15_message", resourceCulture);
+                return ResourceManager.GetString("BKAG15_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Filter is not valid Regex expression..
+        ///   Looks up a localized string similar to Filter is not valid Regex expression.
         /// </summary>
-        internal static string AG15_title {
+        internal static string BKAG15_title {
             get {
-                return ResourceManager.GetString("AG15_title", resourceCulture);
+                return ResourceManager.GetString("BKAG15_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG16..
+        ///   Looks up a localized string similar to BKAG16..
         /// </summary>
-        internal static string AG16_description {
+        internal static string BKAG16_description {
             get {
-                return ResourceManager.GetString("AG16_description", resourceCulture);
+                return ResourceManager.GetString("BKAG16_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Multiple partial templates found for member: &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Multiple partial templates found for member: &apos;{0}&apos;.
         /// </summary>
-        internal static string AG16_message {
+        internal static string BKAG16_message {
             get {
-                return ResourceManager.GetString("AG16_message", resourceCulture);
+                return ResourceManager.GetString("BKAG16_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Multiple partial templates found..
+        ///   Looks up a localized string similar to Multiple partial templates found.
         /// </summary>
-        internal static string AG16_title {
+        internal static string BKAG16_title {
             get {
-                return ResourceManager.GetString("AG16_title", resourceCulture);
+                return ResourceManager.GetString("BKAG16_title", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AG17.
+        ///   Looks up a localized string similar to BKAG17..
         /// </summary>
-        internal static string AG17_description {
+        internal static string BKAG17_description {
             get {
-                return ResourceManager.GetString("AG17_description", resourceCulture);
+                return ResourceManager.GetString("BKAG17_description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Following attributes are missing and should be implemented or referenced: {0}..
+        ///   Looks up a localized string similar to Following attributes are missing and should be implemented or referenced: {0}.
         /// </summary>
-        internal static string AG17_message {
+        internal static string BKAG17_message {
             get {
-                return ResourceManager.GetString("AG17_message", resourceCulture);
+                return ResourceManager.GetString("BKAG17_message", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Missing attributes..
+        ///   Looks up a localized string similar to Missing attributes.
         /// </summary>
-        internal static string AG17_title {
+        internal static string BKAG17_title {
             get {
-                return ResourceManager.GetString("AG17_title", resourceCulture);
+                return ResourceManager.GetString("BKAG17_title", resourceCulture);
             }
         }
     }

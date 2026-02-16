@@ -80,8 +80,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                     {
                         if (property.IsWriteOnly)
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG06", nameof(AutoInterfaceResource.AG06_title), nameof(AutoInterfaceResource.AG06_message), nameof(AutoInterfaceResource.AG06_description), DiagnosticSeverity.Error, property,
-                                property.Name);
+                            Diagnostics.Report(context, Diagnostics.BKAG06, property, property.Name);
                             continue;
                         }
 
@@ -97,21 +96,19 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
                         if (containingType.IsPartial() == false)
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG01", nameof(AutoInterfaceResource.AG01_title), nameof(AutoInterfaceResource.AG01_message), nameof(AutoInterfaceResource.AG01_description), DiagnosticSeverity.Error, containingType,
-                                containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                            Diagnostics.Report(context, Diagnostics.BKAG01, containingType, containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
 
                         if (containingType.IsStatic)
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG02", nameof(AutoInterfaceResource.AG02_title), nameof(AutoInterfaceResource.AG02_message), nameof(AutoInterfaceResource.AG02_description), DiagnosticSeverity.Error, containingType,
-                                containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                            Diagnostics.Report(context, Diagnostics.BKAG02, containingType, containingType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
 
                         if (containingType.TypeKind != TypeKind.Class && containingType.TypeKind != TypeKind.Struct)
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG08", nameof(AutoInterfaceResource.AG08_title), nameof(AutoInterfaceResource.AG08_message), nameof(AutoInterfaceResource.AG08_description), DiagnosticSeverity.Error, recordsByContainingType.First().Member);
+                            Diagnostics.Report(context, Diagnostics.BKAG08, recordsByContainingType.First().Member);
                             continue;
                         }
 
@@ -130,8 +127,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         }
                         catch (Exception ex)
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, containingType,
-                                ex.ToString().Replace("\r", "").Replace("\n", ""));
+                            Diagnostics.Report(context, Diagnostics.BKAG09, containingType, ex.ToString().Replace("\r", "").Replace("\n", ""));
                         }
                     }
 
@@ -140,8 +136,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         var toEmit = missingAttributes.Where(i => compilation.IsVisible(i) == false).ToList();
                         if (toEmit.Count > 0)
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG17", nameof(AutoInterfaceResource.AG17_title), nameof(AutoInterfaceResource.AG17_message), nameof(AutoInterfaceResource.AG17_description), DiagnosticSeverity.Error, (Location?)null,
-                                string.Join(", ", toEmit.Select(i => i.ToDisplayString())));
+                            Diagnostics.Report(context, Diagnostics.BKAG17, (Location?)null, string.Join(", ", toEmit.Select(i => i.ToDisplayString())));
                         }
                     }
                 }
@@ -233,8 +228,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                             {
                                 if (templateFileName != null && templateFileName.Trim().Length > 0)
                                 {
-                                    Helpers.ReportDiagnostic(context, "BKAG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
-                                        );
+                                    Diagnostics.Report(context, Diagnostics.BKAG12, attribute.ApplicationSyntaxReference?.GetSyntax());
                                     continue;
                                 }
 
@@ -247,8 +241,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                     }
                                     catch
                                     {
-                                        Helpers.ReportDiagnostic(context, "BKAG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                            memberFilter);
+                                        Diagnostics.Report(context, Diagnostics.BKAG15, attribute.ApplicationSyntaxReference?.GetSyntax(), memberFilter);
                                         continue;
                                     }
                                 }
@@ -267,8 +260,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                 }
                                 else
                                 {
-                                    Helpers.ReportDiagnostic(context, "BKAG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                        templateFileName);
+                                    Diagnostics.Report(context, Diagnostics.BKAG11, attribute.ApplicationSyntaxReference?.GetSyntax(), templateFileName);
                                     continue;
                                 }
 
@@ -291,8 +283,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                                     }
                                     catch
                                     {
-                                        Helpers.ReportDiagnostic(context, "BKAG15", nameof(AutoInterfaceResource.AG15_title), nameof(AutoInterfaceResource.AG15_message), nameof(AutoInterfaceResource.AG15_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                            memberFilter);
+                                        Diagnostics.Report(context, Diagnostics.BKAG15, attribute.ApplicationSyntaxReference?.GetSyntax(), memberFilter);
                                         continue;
                                     }
                                 }
@@ -302,29 +293,25 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                             }
                             else
                             {
-                                Helpers.ReportDiagnostic(context, "BKAG14", nameof(AutoInterfaceResource.AG14_title), nameof(AutoInterfaceResource.AG14_message), nameof(AutoInterfaceResource.AG14_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
-                                    );
+                                Diagnostics.Report(context, Diagnostics.BKAG14, attribute.ApplicationSyntaxReference?.GetSyntax());
                                 continue;
                             }
                         }
                         else
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                            Diagnostics.Report(context, Diagnostics.BKAG04, attribute.ApplicationSyntaxReference?.GetSyntax(), receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BKAG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                            157834);
+                        Diagnostics.Report(context, Diagnostics.BKAG09, attribute.ApplicationSyntaxReference?.GetSyntax(), 157834);
                         continue;
                     }
                 }
                 else
                 {
-                    Helpers.ReportDiagnostic(context, "BKAG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                        type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                    Diagnostics.Report(context, Diagnostics.BKAG03, attribute.ApplicationSyntaxReference?.GetSyntax(), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                     continue;
                 }
             }
@@ -361,7 +348,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
                 if (type == null)
                 {
-                    Helpers.ReportDiagnostic(context, "BKAG07", nameof(AutoInterfaceResource.AG07_title), nameof(AutoInterfaceResource.AG07_message), nameof(AutoInterfaceResource.AG07_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax());
+                    Diagnostics.Report(context, Diagnostics.BKAG07, attribute.ApplicationSyntaxReference?.GetSyntax());
                     continue;
                 }
                 else if (type.TypeKind == TypeKind.Interface)
@@ -444,8 +431,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         {
                             if (templateFileName != null && templateFileName.Trim().Length > 0)
                             {
-                                Helpers.ReportDiagnostic(context, "BKAG12", nameof(AutoInterfaceResource.AG12_title), nameof(AutoInterfaceResource.AG12_message), nameof(AutoInterfaceResource.AG12_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
-                                    );
+                                Diagnostics.Report(context, Diagnostics.BKAG12, attribute.ApplicationSyntaxReference?.GetSyntax());
                                 continue;
                             }
 
@@ -462,8 +448,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                             }
                             else
                             {
-                                Helpers.ReportDiagnostic(context, "BKAG11", nameof(AutoInterfaceResource.AG11_title), nameof(AutoInterfaceResource.AG11_message), nameof(AutoInterfaceResource.AG11_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                    templateFileName);
+                                Diagnostics.Report(context, Diagnostics.BKAG11, attribute.ApplicationSyntaxReference?.GetSyntax(), templateFileName);
                                 continue;
                             }
 
@@ -479,8 +464,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
 
                             if (templateParts.Any())
                             {
-                                Helpers.ReportDiagnostic(context, "BKAG13", nameof(AutoInterfaceResource.AG13_title), nameof(AutoInterfaceResource.AG13_message), nameof(AutoInterfaceResource.AG13_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax()
-                                    );
+                                Diagnostics.Report(context, Diagnostics.BKAG13, attribute.ApplicationSyntaxReference?.GetSyntax());
                                 continue;
                             }
 
@@ -519,22 +503,19 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         }
                         else
                         {
-                            Helpers.ReportDiagnostic(context, "BKAG04", nameof(AutoInterfaceResource.AG04_title), nameof(AutoInterfaceResource.AG04_message), nameof(AutoInterfaceResource.AG04_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                                receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                            Diagnostics.Report(context, Diagnostics.BKAG04, attribute.ApplicationSyntaxReference?.GetSyntax(), receiverType.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                             continue;
                         }
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BKAG09", nameof(AutoInterfaceResource.AG09_title), nameof(AutoInterfaceResource.AG09_message), nameof(AutoInterfaceResource.AG09_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                            157834);
+                        Diagnostics.Report(context, Diagnostics.BKAG09, attribute.ApplicationSyntaxReference?.GetSyntax(), 157834);
                         continue;
                     }
                 }
                 else
                 {
-                    Helpers.ReportDiagnostic(context, "BKAG03", nameof(AutoInterfaceResource.AG03_title), nameof(AutoInterfaceResource.AG03_message), nameof(AutoInterfaceResource.AG03_description), DiagnosticSeverity.Error, attribute.ApplicationSyntaxReference?.GetSyntax(),
-                        type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
+                    Diagnostics.Report(context, Diagnostics.BKAG03, attribute.ApplicationSyntaxReference?.GetSyntax(), type.ToDisplayString(SymbolDisplayFormat.CSharpErrorMessageFormat));
                     continue;
                 }
             }
@@ -659,7 +640,7 @@ public sealed class AutoInterfaceSourceGenerator : ISourceGenerator
                         if (g.Template.Equals(td) == false)
                         {
                             error = true;
-                            Helpers.ReportDiagnostic(context, "BKAG10", nameof(AutoInterfaceResource.AG10_title), nameof(AutoInterfaceResource.AG10_message), nameof(AutoInterfaceResource.AG10_description), DiagnosticSeverity.Error, reference.Member);
+                            Diagnostics.Report(context, Diagnostics.BKAG10, reference.Member);
                             continue;
                         }
                     }

@@ -117,157 +117,157 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AG01_description" xml:space="preserve">
-    <value>AG01.</value>
+  <data name="BKAG01_description" xml:space="preserve">
+    <value>BKAG01.</value>
   </data>
-  <data name="AG01_message" xml:space="preserve">
-    <value>Type '{0}' is not marked as partial.</value>
+  <data name="BKAG01_message" xml:space="preserve">
+    <value>Type '{0}' is not marked as partial</value>
   </data>
-  <data name="AG01_title" xml:space="preserve">
-    <value>Type is not marked as partial.</value>
+  <data name="BKAG01_title" xml:space="preserve">
+    <value>Type is not marked as partial</value>
   </data>
-  <data name="AG02_description" xml:space="preserve">
-    <value>AG02.</value>
+  <data name="BKAG02_description" xml:space="preserve">
+    <value>BKAG02.</value>
   </data>
-  <data name="AG02_message" xml:space="preserve">
-    <value>Type '{0}' is static.</value>
+  <data name="BKAG02_message" xml:space="preserve">
+    <value>Type '{0}' is static</value>
   </data>
-  <data name="AG02_title" xml:space="preserve">
-    <value>Type is static.</value>
+  <data name="BKAG02_title" xml:space="preserve">
+    <value>Type is static</value>
   </data>
-  <data name="AG03_description" xml:space="preserve">
-    <value>AG03.</value>
+  <data name="BKAG03_description" xml:space="preserve">
+    <value>BKAG03.</value>
   </data>
-  <data name="AG03_message" xml:space="preserve">
-    <value>Type '{0}' is not an interface.</value>
+  <data name="BKAG03_message" xml:space="preserve">
+    <value>Type '{0}' is not an interface</value>
   </data>
-  <data name="AG03_title" xml:space="preserve">
-    <value>Type is not an interface.</value>
+  <data name="BKAG03_title" xml:space="preserve">
+    <value>Type is not an interface</value>
   </data>
-  <data name="AG04_description" xml:space="preserve">
-    <value>AG04.</value>
+  <data name="BKAG04_description" xml:space="preserve">
+    <value>BKAG04.</value>
   </data>
-  <data name="AG04_message" xml:space="preserve">
-    <value>Unable to cast from type '{0}' to '{1}' or type '{0}' does not expose all members required by interface '{1}'.</value>
+  <data name="BKAG04_message" xml:space="preserve">
+    <value>Unable to cast from type '{0}' to '{1}' or type '{0}' does not expose all members required by interface '{1}'</value>
   </data>
-  <data name="AG04_title" xml:space="preserve">
-    <value>Unable to cast or missing member.</value>
+  <data name="BKAG04_title" xml:space="preserve">
+    <value>Unable to cast or missing member</value>
   </data>
-  <data name="AG05_description" xml:space="preserve">
-    <value>AG05.</value>
+  <data name="BKAG05_description" xml:space="preserve">
+    <value>BKAG05.</value>
   </data>
-  <data name="AG05_message" xml:space="preserve">
-    <value>Type does not implement interface '{0}'.</value>
+  <data name="BKAG05_message" xml:space="preserve">
+    <value>Type does not implement interface '{0}'</value>
   </data>
-  <data name="AG05_title" xml:space="preserve">
-    <value>Type does not implement a defined interface(s).</value>
+  <data name="BKAG05_title" xml:space="preserve">
+    <value>Type does not implement a defined interface(s)</value>
   </data>
-  <data name="AG06_description" xml:space="preserve">
-    <value>AG06.</value>
+  <data name="BKAG06_description" xml:space="preserve">
+    <value>BKAG06.</value>
   </data>
-  <data name="AG06_message" xml:space="preserve">
-    <value>Member '{0}' does not have getter.</value>
+  <data name="BKAG06_message" xml:space="preserve">
+    <value>Member '{0}' does not have getter</value>
   </data>
-  <data name="AG06_title" xml:space="preserve">
-    <value>Target member is writeonly.</value>
+  <data name="BKAG06_title" xml:space="preserve">
+    <value>Target member is writeonly</value>
   </data>
-  <data name="AG07_description" xml:space="preserve">
-    <value>AG07.</value>
+  <data name="BKAG07_description" xml:space="preserve">
+    <value>BKAG07.</value>
   </data>
-  <data name="AG07_message" xml:space="preserve">
-    <value>Type cannot be null.</value>
+  <data name="BKAG07_message" xml:space="preserve">
+    <value>Type cannot be null</value>
   </data>
-  <data name="AG07_title" xml:space="preserve">
-    <value>Type should be an interface.</value>
+  <data name="BKAG07_title" xml:space="preserve">
+    <value>Type should be an interface</value>
   </data>
-  <data name="AG08_description" xml:space="preserve">
-    <value>AG08.</value>
+  <data name="BKAG08_description" xml:space="preserve">
+    <value>BKAG08.</value>
   </data>
-  <data name="AG08_message" xml:space="preserve">
-    <value>Only class, record or struct can auto-implement interface.</value>
+  <data name="BKAG08_message" xml:space="preserve">
+    <value>Only class, record or struct can auto-implement interface</value>
   </data>
-  <data name="AG08_title" xml:space="preserve">
-    <value>Type is not a class, record, or struct.</value>
+  <data name="BKAG08_title" xml:space="preserve">
+    <value>Type is not a class, record, or struct</value>
   </data>
-  <data name="AG09_description" xml:space="preserve">
-    <value>AG09.</value>
+  <data name="BKAG09_description" xml:space="preserve">
+    <value>BKAG09.</value>
   </data>
-  <data name="AG09_message" xml:space="preserve">
-    <value>Internal exception [{0}].</value>
+  <data name="BKAG09_message" xml:space="preserve">
+    <value>Internal exception [{0}]</value>
   </data>
-  <data name="AG09_title" xml:space="preserve">
-    <value>Internal exception.</value>
+  <data name="BKAG09_title" xml:space="preserve">
+    <value>Internal exception</value>
   </data>
-  <data name="AG10_description" xml:space="preserve">
-    <value>AG10.</value>
+  <data name="BKAG10_description" xml:space="preserve">
+    <value>BKAG10.</value>
   </data>
-  <data name="AG10_message" xml:space="preserve">
-    <value>AutoInterface template for single interface should be defined at most once.</value>
+  <data name="BKAG10_message" xml:space="preserve">
+    <value>AutoInterface template for single interface should be defined at most once</value>
   </data>
-  <data name="AG10_title" xml:space="preserve">
-    <value>Multiple AutoInterface templates.</value>
+  <data name="BKAG10_title" xml:space="preserve">
+    <value>Multiple AutoInterface templates</value>
   </data>
-  <data name="AG11_description" xml:space="preserve">
-    <value>AG11.</value>
+  <data name="BKAG11_description" xml:space="preserve">
+    <value>BKAG11.</value>
   </data>
-  <data name="AG11_message" xml:space="preserve">
-    <value>Template file '{0}' not found.</value>
+  <data name="BKAG11_message" xml:space="preserve">
+    <value>Template file '{0}' not found</value>
   </data>
-  <data name="AG11_title" xml:space="preserve">
-    <value>Template file not found.</value>
+  <data name="BKAG11_title" xml:space="preserve">
+    <value>Template file not found</value>
   </data>
-  <data name="AG12_description" xml:space="preserve">
-    <value>AG12.</value>
+  <data name="BKAG12_description" xml:space="preserve">
+    <value>BKAG12.</value>
   </data>
-  <data name="AG12_message" xml:space="preserve">
-    <value>Template should be specified either inline or from file but not both.</value>
+  <data name="BKAG12_message" xml:space="preserve">
+    <value>Template should be specified either inline or from file but not both</value>
   </data>
-  <data name="AG12_title" xml:space="preserve">
-    <value>More than one template specified.</value>
+  <data name="BKAG12_title" xml:space="preserve">
+    <value>More than one template specified</value>
   </data>
-  <data name="AG13_description" xml:space="preserve">
-    <value>AG13.</value>
+  <data name="BKAG13_description" xml:space="preserve">
+    <value>BKAG13.</value>
   </data>
-  <data name="AG13_message" xml:space="preserve">
-    <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.</value>
+  <data name="BKAG13_message" xml:space="preserve">
+    <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously</value>
   </data>
-  <data name="AG13_title" xml:space="preserve">
-    <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously.</value>
+  <data name="BKAG13_title" xml:space="preserve">
+    <value>Cannot specify both AutoInterface.Template and AutoInterfaceTemplate simultaneously</value>
   </data>
-  <data name="AG14_description" xml:space="preserve">
-    <value>AG14.</value>
+  <data name="BKAG14_description" xml:space="preserve">
+    <value>BKAG14.</value>
   </data>
-  <data name="AG14_message" xml:space="preserve">
-    <value>Template is missing.</value>
+  <data name="BKAG14_message" xml:space="preserve">
+    <value>Template is missing</value>
   </data>
-  <data name="AG14_title" xml:space="preserve">
-    <value>Template is missing.</value>
+  <data name="BKAG14_title" xml:space="preserve">
+    <value>Template is missing</value>
   </data>
-  <data name="AG15_description" xml:space="preserve">
-    <value>AG15.</value>
+  <data name="BKAG15_description" xml:space="preserve">
+    <value>BKAG15.</value>
   </data>
-  <data name="AG15_message" xml:space="preserve">
-    <value>Filter '{0}' is not valid Regex expression.</value>
+  <data name="BKAG15_message" xml:space="preserve">
+    <value>Filter '{0}' is not valid Regex expression</value>
   </data>
-  <data name="AG15_title" xml:space="preserve">
-    <value>Filter is not valid Regex expression.</value>
+  <data name="BKAG15_title" xml:space="preserve">
+    <value>Filter is not valid Regex expression</value>
   </data>
-  <data name="AG16_description" xml:space="preserve">
-    <value>AG16.</value>
+  <data name="BKAG16_description" xml:space="preserve">
+    <value>BKAG16.</value>
   </data>
-  <data name="AG16_message" xml:space="preserve">
-    <value>Multiple partial templates found for member: '{0}'.</value>
+  <data name="BKAG16_message" xml:space="preserve">
+    <value>Multiple partial templates found for member: '{0}'</value>
   </data>
-  <data name="AG16_title" xml:space="preserve">
-    <value>Multiple partial templates found.</value>
+  <data name="BKAG16_title" xml:space="preserve">
+    <value>Multiple partial templates found</value>
   </data>
-  <data name="AG17_description" xml:space="preserve">
-    <value>AG17</value>
+  <data name="BKAG17_description" xml:space="preserve">
+    <value>BKAG17.</value>
   </data>
-  <data name="AG17_message" xml:space="preserve">
-    <value>Following attributes are missing and should be implemented or referenced: {0}.</value>
+  <data name="BKAG17_message" xml:space="preserve">
+    <value>Following attributes are missing and should be implemented or referenced: {0}</value>
   </data>
-  <data name="AG17_title" xml:space="preserve">
-    <value>Missing attributes.</value>
+  <data name="BKAG17_title" xml:space="preserve">
+    <value>Missing attributes</value>
   </data>
 </root>

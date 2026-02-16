@@ -4,29 +4,6 @@ namespace BeaKona.AutoInterfaceGenerator;
 
 internal static class Helpers
 {
-    public static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, SyntaxNode? node, params object?[] messageArgs)
-    {
-        Helpers.ReportDiagnostic(context, id, title, message, description, severity, node?.GetLocation(), messageArgs);
-    }
-
-    public static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, ISymbol? member, params object?[] messageArgs)
-    {
-        Helpers.ReportDiagnostic(context, id, title, message, description, severity, member != null && member.Locations.Length > 0 ? member.Locations[0] : null, messageArgs);
-    }
-
-    public static void ReportDiagnostic(GeneratorExecutionContext context, string id, string title, string message, string description, DiagnosticSeverity severity, Location? location, params object?[] messageArgs)
-    {
-        var lTitle = new LocalizableResourceString(title, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-        var lMessage = new LocalizableResourceString(message, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-        var lDescription = new LocalizableResourceString(description, AutoInterfaceResource.ResourceManager, typeof(AutoInterfaceResource));
-        var category = typeof(AutoInterfaceSourceGenerator).Namespace;
-        var link = "https://github.com/beakona/AutoInterface";
-
-        var dd = new DiagnosticDescriptor(id, lTitle, lMessage, category, severity, true, lDescription, link, WellKnownDiagnosticTags.NotConfigurable);
-        var d = Diagnostic.Create(dd, location, messageArgs);
-        context.ReportDiagnostic(d);
-    }
-
     public static bool EqualSets<T>(ImmutableArray<T> x, ImmutableArray<T> y, IEqualityComparer<T>? comparer = null)
     {
         if (x.IsDefaultOrEmpty)

@@ -23,8 +23,7 @@ internal class PartialTemplate(AutoInterfaceTargets memberTargets, Regex? member
                 {
                     if (ts[1].template.MemberFilter != null)
                     {
-                        Helpers.ReportDiagnostic(context, "BKAG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
-                            name);
+                        Diagnostics.Report(context, Diagnostics.BKAG16, ts[0].reference, name);
                         return null;
                     }
                     else
@@ -40,14 +39,12 @@ internal class PartialTemplate(AutoInterfaceTargets memberTargets, Regex? member
                     }
                     else
                     {
-                        Helpers.ReportDiagnostic(context, "BKAG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
-                            name);
+                        Diagnostics.Report(context, Diagnostics.BKAG16, ts[0].reference, name);
                         return null;
                     }
                 }
             default:
-                Helpers.ReportDiagnostic(context, "BKAG16", nameof(AutoInterfaceResource.AG16_title), nameof(AutoInterfaceResource.AG16_message), nameof(AutoInterfaceResource.AG16_description), DiagnosticSeverity.Error, ts[0].reference,
-                    name);
+                Diagnostics.Report(context, Diagnostics.BKAG16, ts[0].reference, name);
                 return null;
         }
     }
